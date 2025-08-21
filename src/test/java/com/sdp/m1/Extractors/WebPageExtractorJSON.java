@@ -19,6 +19,10 @@ import com.google.gson.GsonBuilder;
 import lombok.experimental.FieldNameConstants;
 // import com.sdp.m1.Runner.TestConfigs;
 
+// TODO:
+// If the type is 'hidden' of a element ignore
+// Adjust the text not just element.text() but with element.attr("placeholder") if exists or with other info
+// add checks for css selector and 'hidden' (bool vals)
 public class WebPageExtractorJSON {
 
     static class Component {
@@ -48,12 +52,13 @@ public class WebPageExtractorJSON {
         // cookie.put("value", "159060AE39DEBDDECD059D98943013D1");
 
         // String url = "https://google.com";
-        String url = "https://m1-impl.hsenidmobile.com/m1-sdp/home.html";
+        String url = "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login";
         driver.get(url);
 
-        driver.manage().addCookie(new Cookie("JSESSIONID", "7CF4758ED268DB2B65BEDFE1BD6AA8AA"));
-        Thread.sleep(1000); // Wait for cookie to be set
-        driver.navigate().to("https://m1-impl.hsenidmobile.com/provisioning/home.html");
+        // driver.manage().addCookie(new Cookie("JSESSIONID",
+        // "7CF4758ED268DB2B65BEDFE1BD6AA8AA"));
+        // Thread.sleep(1000); // Wait for cookie to be set
+        // driver.navigate().to("");
 
         String timestamp = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -79,7 +84,7 @@ public class WebPageExtractorJSON {
         extractByTag(doc, driver, "div", "section", components);
 
         // Save JSON
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         try (FileWriter fw = new FileWriter(fileName)) {
             gson.toJson(components, fw);
         }
@@ -241,6 +246,13 @@ public class WebPageExtractorJSON {
         Element current = el;
 
         while (current != null && !current.tagName().equals("html")) {
+            // If we got a id then we can get it from there.
+            if (!current.id().isEmpty()) {
+                path.add(0, "//*[@id='" + current.id() + "']");
+                // break; // ID is unique, no need to go further
+                return String.join("/", path); // Return early if ID found
+            }
+
             int index = 1;
             Element sibling = current.previousElementSibling();
             while (sibling != null) {
@@ -250,6 +262,7 @@ public class WebPageExtractorJSON {
                 sibling = sibling.previousElementSibling();
             }
             path.add(0, current.tagName() + "[" + index + "]");
+
             current = current.parent();
         }
 
