@@ -1,0 +1,150 @@
+Feature: User Management Functionality
+
+  Background:
+    Given I am logged in successfully
+
+  @smoke @user-management
+  Scenario: View User Profile
+    Given I am on the dashboard
+    When I click on the user profile menu
+    Then I should see my user profile information
+    And the profile should display correct username
+    And the profile should display correct email
+
+  @user-management @update
+  Scenario: Update User Profile Information
+    Given I am viewing my user profile
+    When I update my display name to "New Display Name"
+    And I click the save button
+    Then the profile should be updated successfully
+    And I should see a success message
+
+  @user-management @validation
+  Scenario: Update Profile with Invalid Data
+    Given I am viewing my user profile
+    When I update my email to "invalid-email"
+    And I click the save button
+    Then I should see a validation error message
+    And the profile should not be updated
+
+  @user-management @security
+  Scenario: Change Password
+    Given I am viewing my user profile
+    When I click on the change password option
+    And I enter my current password
+    And I enter a new password
+    And I confirm the new password
+    And I click the update password button
+    Then the password should be changed successfully
+    And I should be logged out
+    And I should be redirected to the login page
+
+  @user-management @validation
+  Scenario: Change Password with Mismatched Confirmation
+    Given I am viewing my user profile
+    When I click on the change password option
+    And I enter my current password
+    And I enter a new password
+    And I enter a different confirmation password
+    And I click the update password button
+    Then I should see a password mismatch error
+    And the password should not be changed
+
+  @user-management @validation
+  Scenario: Change Password with Weak Password
+    Given I am viewing my user profile
+    When I click on the change password option
+    And I enter my current password
+    And I enter a weak password "123"
+    And I confirm the weak password
+    And I click the update password button
+    Then I should see a password strength error
+    And the password should not be changed
+
+  @user-management @security
+  Scenario: Password History Validation
+    Given I am viewing my user profile
+    When I click on the change password option
+    And I enter my current password
+    And I enter a previously used password
+    And I confirm the previously used password
+    And I click the update password button
+    Then I should see a password history error
+    And the password should not be changed
+
+  @user-management @preferences
+  Scenario: Update User Preferences
+    Given I am viewing my user profile
+    When I change my language preference to "Spanish"
+    And I change my timezone to "UTC-5"
+    And I click the save preferences button
+    Then the preferences should be updated successfully
+    And the interface should reflect the new language
+    And the timezone should be updated
+
+  @user-management @notifications
+  Scenario: Update Notification Settings
+    Given I am viewing my user profile
+    When I enable email notifications
+    And I disable SMS notifications
+    And I set notification frequency to "Daily"
+    And I click the save notification settings button
+    Then the notification settings should be updated
+    And I should receive a confirmation email
+
+  @user-management @security
+  Scenario: Two-Factor Authentication Setup
+    Given I am viewing my user profile
+    When I click on the security settings
+    And I enable two-factor authentication
+    And I scan the QR code with my authenticator app
+    And I enter the verification code
+    Then two-factor authentication should be enabled
+    And I should see a success message
+
+  @user-management @security
+  Scenario: Two-Factor Authentication Disable
+    Given I have two-factor authentication enabled
+    When I click on the security settings
+    And I disable two-factor authentication
+    And I confirm the action
+    Then two-factor authentication should be disabled
+    And I should see a success message
+
+  @user-management @session
+  Scenario: View Active Sessions
+    Given I am viewing my user profile
+    When I click on the security settings
+    And I view active sessions
+    Then I should see all my active sessions
+    And each session should show device information
+    And each session should show last activity time
+
+  @user-management @security
+  Scenario: Terminate Active Session
+    Given I am viewing my active sessions
+    When I terminate a specific session
+    And I confirm the action
+    Then the session should be terminated
+    And I should see a success message
+    And the session should no longer appear in the list
+
+  @user-management @export
+  Scenario: Export User Data
+    Given I am viewing my user profile
+    When I click on the data export option
+    And I select the data types to export
+    And I click the export button
+    Then the data export should be initiated
+    And I should receive a download link via email
+    And the exported data should contain all selected information
+
+  @user-management @deletion
+  Scenario: Request Account Deletion
+    Given I am viewing my user profile
+    When I click on the account deletion option
+    And I enter my password to confirm
+    And I click the request deletion button
+    Then the deletion request should be submitted
+    And I should see a confirmation message
+    And my account should be scheduled for deletion

@@ -1,0 +1,329 @@
+package com.sdp.m1.Utils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
+
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+
+public class TestUtils {
+
+    private static final Logger logger = Logger.getLogger(TestUtils.class.getName());
+    private static final Random random = new Random();
+    private static final AtomicBoolean testFailed = new AtomicBoolean(false);
+
+    /**
+     * Mark test as failed
+     */
+    public static void markTestFailed() {
+        testFailed.set(true);
+        logger.warning("Test marked as failed");
+    }
+
+    /**
+     * Mark test as passed
+     */
+    public static void markTestPassed() {
+        testFailed.set(false);
+        logger.info("Test marked as passed");
+    }
+
+    /**
+     * Check if test has failed
+     */
+    public static boolean isTestFailed() {
+        return testFailed.get();
+    }
+
+    /**
+     * Reset test failure status
+     */
+    public static void resetTestStatus() {
+        testFailed.set(false);
+        logger.info("Test status reset");
+    }
+
+    /**
+     * Generate a random string of specified length
+     */
+    public static String generateRandomString(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Generate a random email address
+     */
+    public static String generateRandomEmail() {
+        return "test." + generateRandomString(8) + "@example.com";
+    }
+
+    /**
+     * Generate a random username
+     */
+    public static String generateRandomUsername() {
+        return "user_" + generateRandomString(6);
+    }
+
+    /**
+     * Generate a random password
+     */
+    public static String generateRandomPassword() {
+        return "Pass" + generateRandomString(8) + "123!";
+    }
+
+    /**
+     * Generate a random phone number
+     */
+    public static String generateRandomPhone() {
+        return "+1" + (random.nextInt(900) + 100) + "-"
+                + (random.nextInt(900) + 100) + "-"
+                + (random.nextInt(9000) + 1000);
+    }
+
+    /**
+     * Take a screenshot and save it to the specified directory
+     */
+    public static String takeScreenshot(WebDriver driver, String testName) {
+        try {
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String fileName = testName + "_" + timestamp + ".png";
+            String screenshotPath = "target/screenshots/" + fileName;
+
+            // Create screenshots directory if it doesn't exist
+            Path directory = Paths.get("target/screenshots");
+            if (!Files.exists(directory)) {
+                Files.createDirectories(directory);
+            }
+
+            // Get the underlying driver from SelfHealingDriver
+            WebDriver underlyingDriver = (WebDriver) driver.getClass().getMethod("getDelegate").invoke(driver);
+            File screenshot = ((TakesScreenshot) underlyingDriver).getScreenshotAs(OutputType.FILE);
+            Files.copy(screenshot.toPath(), Paths.get(screenshotPath));
+
+            logger.info(String.format("Screenshot saved: %s", screenshotPath));
+            return screenshotPath;
+        } catch (Exception e) {
+            logger.severe(String.format("Failed to take screenshot: %s", e.getMessage()));
+            return null;
+        }
+    }
+
+    /**
+     * Wait for a specified number of seconds
+     */
+    public static void wait(int seconds) {
+        try {
+            Thread.sleep(seconds * 1000L);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warning(String.format("Wait interrupted: %s", e.getMessage()));
+        }
+    }
+
+    /**
+     * Wait for a specified number of milliseconds
+     */
+    public static void waitMillis(long milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warning(String.format("Wait interrupted: %s", e.getMessage()));
+        }
+    }
+
+    /**
+     * Generate test data for different scenarios
+     */
+    public static class TestData {
+
+        public static final String[] VALID_USERNAMES = { "sdpsp", "admin", "user1", "testuser" };
+        public static final String[] VALID_PASSWORDS = { "test", "password123", "admin123", "userpass" };
+        public static final String[] INVALID_USERNAMES = { "", "   ", "invalid@user", "user'123",
+                "<script>alert('xss')</script>" };
+        public static final String[] INVALID_PASSWORDS = { "", "123", "weak", "password" };
+
+        public static final String[] SQL_INJECTION_PAYLOADS = {
+                "'; DROP TABLE users; --",
+                "' OR '1'='1",
+                "'; INSERT INTO users VALUES ('hacker', 'password'); --",
+                "' UNION SELECT * FROM users --"
+        };
+
+        public static final String[] XSS_PAYLOADS = {
+                "<script>alert('xss')</script>",
+                "javascript:alert('xss')",
+                "<img src=x onerror=alert('xss')>",
+                "';alert('xss');//"
+        };
+
+        public static final String[] COMMAND_INJECTION_PAYLOADS = {
+                "& cat /etc/passwd",
+                "; ls -la",
+                "| whoami",
+                "`id`"
+        };
+    }
+
+    /**
+     * Validate email format
+     */
+    public static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email != null && email.matches(emailRegex);
+    }
+
+    /**
+     * Validate phone number format
+     */
+    public static boolean isValidPhone(String phone) {
+        String phoneRegex = "^\\+?[1-9]\\d{1,14}$";
+        return phone != null && phone.replaceAll("[\\s\\-\\(\\)]", "").matches(phoneRegex);
+    }
+
+    /**
+     * Validate password strength
+     */
+    public static boolean isStrongPassword(String password) {
+        if (password == null || password.length() < 8) {
+            return false;
+        }
+
+        boolean hasUpper = password.matches(".*[A-Z].*");
+        boolean hasLower = password.matches(".*[a-z].*");
+        boolean hasDigit = password.matches(".*\\d.*");
+        boolean hasSpecial = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*");
+
+        return hasUpper && hasLower && hasDigit && hasSpecial;
+    }
+
+    /**
+     * Clean up test data
+     */
+    public static void cleanupTestData(String... filePaths) {
+        for (String filePath : filePaths) {
+            try {
+                Path path = Paths.get(filePath);
+                if (Files.exists(path)) {
+                    Files.delete(path);
+                    logger.info(String.format("Cleaned up test data: %s", filePath));
+                }
+            } catch (IOException e) {
+                logger.warning(String.format("Failed to cleanup test data %s: %s", filePath, e.getMessage()));
+            }
+        }
+    }
+
+    /**
+     * Get current timestamp in readable format
+     */
+    public static String getCurrentTimestamp() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    }
+
+    /**
+     * Get current timestamp in file-safe format
+     */
+    public static String getCurrentTimestampForFile() {
+        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+    }
+
+    /**
+     * Check if a file exists
+     */
+    public static boolean fileExists(String filePath) {
+        return Files.exists(Paths.get(filePath));
+    }
+
+    /**
+     * Get file size in bytes
+     */
+    public static long getFileSize(String filePath) {
+        try {
+            return Files.size(Paths.get(filePath));
+        } catch (IOException e) {
+            logger.warning(String.format("Failed to get file size for %s: %s", filePath, e.getMessage()));
+            return -1;
+        }
+    }
+
+    /**
+     * Create a test directory
+     */
+    public static boolean createTestDirectory(String directoryPath) {
+        try {
+            Path path = Paths.get(directoryPath);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+                logger.info(String.format("Created test directory: %s", directoryPath));
+                return true;
+            }
+            return true;
+        } catch (IOException e) {
+            logger.severe(String.format("Failed to create test directory %s: %s", directoryPath, e.getMessage()));
+            return false;
+        }
+    }
+
+    /**
+     * Delete a test directory and its contents
+     */
+    public static boolean deleteTestDirectory(String directoryPath) {
+        try {
+            Path path = Paths.get(directoryPath);
+            if (Files.exists(path)) {
+                Files.walk(path)
+                        .sorted((a, b) -> b.compareTo(a))
+                        .forEach(p -> {
+                            try {
+                                Files.delete(p);
+                            } catch (IOException e) {
+                                logger.warning(String.format("Failed to delete file: %s", p));
+                            }
+                        });
+                logger.info(String.format("Deleted test directory: %s", directoryPath));
+                return true;
+            }
+            return true;
+        } catch (IOException e) {
+            logger.severe(String.format("Failed to delete test directory %s: %s", directoryPath, e.getMessage()));
+            return false;
+        }
+    }
+
+    /**
+     * Measure the time taken for a page load action and assert threshold
+     * 
+     * @param pageLoadAction Runnable that performs the page load (e.g.
+     *                       loginPage.waitForPageLoad())
+     * @param logger         Logger for logging
+     */
+    public static void assertPageLoadWithinThreshold(Runnable pageLoadAction, Logger logger) {
+        long start = System.currentTimeMillis();
+        pageLoadAction.run();
+        long end = System.currentTimeMillis();
+        long loadTime = end - start;
+        // Get threshold from TestConfigs
+        long thresholdMs = com.sdp.m1.Runner.TestConfigs.getPageLoadThresholdMs();
+        if (loadTime > thresholdMs) {
+            logger.warning(
+                    String.format("Page load time exceeded threshold: %dms (threshold: %dms)", loadTime, thresholdMs));
+            throw new AssertionError(String.format("Page load time exceeded acceptable threshold: %dms", loadTime));
+        }
+        logger.info(String.format("Page loaded in acceptable time: %dms", loadTime));
+    }
+}

@@ -1,0 +1,167 @@
+Feature: Performance Testing
+
+  Background:
+    Given I am on the login page
+
+  @performance @load-time
+  Scenario: Page Load Performance
+    Given I am on the login page
+    When I measure the page load time
+    Then the page should load within 3 seconds
+    And all critical elements should be visible within 2 seconds
+    And the page should be interactive within 4 seconds
+
+  @performance @login-performance
+  Scenario: Login Process Performance
+    Given I am on the login page
+    When I enter valid credentials
+    And I click the login button
+    Then the authentication should complete within 2 seconds
+    And the redirect to dashboard should happen within 1 second
+    And the dashboard should load within 3 seconds
+
+  @performance @dashboard-performance
+  Scenario: Dashboard Load Performance
+    Given I am logged in successfully
+    When I navigate to the dashboard
+    Then the dashboard should load within 3 seconds
+    And all widgets should load within 5 seconds
+    And the page should be fully interactive within 6 seconds
+
+  @performance @search-performance
+  Scenario: Search Functionality Performance
+    Given I am on the dashboard
+    When I perform a search operation
+    Then the search results should appear within 1 second
+    And the results should be accurate
+    When I perform a complex search
+    Then the search should complete within 3 seconds
+
+  @performance @report-generation
+  Scenario: Report Generation Performance
+    Given I am on the reports page
+    When I generate a simple report
+    Then the report should be generated within 5 seconds
+    When I generate a complex report
+    Then the report should be generated within 15 seconds
+    And a progress indicator should be shown
+
+  @performance @data-export
+  Scenario: Data Export Performance
+    Given I am viewing user data
+    When I export data in CSV format
+    Then the export should complete within 10 seconds
+    When I export data in PDF format
+    Then the export should complete within 20 seconds
+    And the file should be properly formatted
+
+  @performance @concurrent-users
+  Scenario: Concurrent User Performance
+    Given multiple users are accessing the system
+    When 10 users login simultaneously
+    Then all logins should complete within 5 seconds
+    When 50 users login simultaneously
+    Then all logins should complete within 10 seconds
+    And the system should remain responsive
+
+  @performance @memory-usage
+  Scenario: Memory Usage Optimization
+    Given I am using the application
+    When I navigate between multiple pages
+    Then memory usage should remain stable
+    And there should be no memory leaks
+    When I perform multiple operations
+    Then memory usage should not exceed acceptable limits
+
+  @performance @database-performance
+  Scenario: Database Query Performance
+    Given I am performing database operations
+    When I execute a simple query
+    Then the query should complete within 100ms
+    When I execute a complex query
+    Then the query should complete within 1 second
+    And the results should be accurate
+
+  @performance @api-performance
+  Scenario: API Response Performance
+    Given I am making API calls
+    When I call a simple API endpoint
+    Then the response should be received within 200ms
+    When I call a complex API endpoint
+    Then the response should be received within 1 second
+    And the response should be valid
+
+  @performance @file-upload
+  Scenario: File Upload Performance
+    Given I am on the file upload page
+    When I upload a small file (1MB)
+    Then the upload should complete within 5 seconds
+    When I upload a large file (100MB)
+    Then the upload should complete within 60 seconds
+    And a progress indicator should be shown
+
+  @performance @image-processing
+  Scenario: Image Processing Performance
+    Given I am uploading images
+    When I upload a standard image (2MB)
+    Then the image should be processed within 3 seconds
+    When I upload a high-resolution image (20MB)
+    Then the image should be processed within 15 seconds
+    And the quality should be maintained
+
+  @performance @caching
+  Scenario: Caching Performance
+    Given I am accessing frequently used data
+    When I access the same page multiple times
+    Then subsequent loads should be faster
+    And cached data should be used when appropriate
+    When I clear the cache
+    Then the page should still load within acceptable time
+
+  @performance @mobile-performance
+  Scenario: Mobile Device Performance
+    Given I am accessing the application on a mobile device
+    When I load the mobile version
+    Then the page should load within 4 seconds
+    And touch interactions should be responsive
+    And the page should be optimized for mobile
+
+  @performance @network-performance
+  Scenario: Network Performance
+    Given I am on a slow network connection
+    When I access the application
+    Then the page should load within 8 seconds
+    And a loading indicator should be shown
+    And the user should be informed about slow loading
+
+  @performance @stress-testing
+  Scenario: Stress Testing
+    Given the system is under high load
+    When 100 users access the system simultaneously
+    Then the system should remain stable
+    And response times should not exceed 10 seconds
+    And no errors should occur
+    When the load increases to 200 users
+    Then the system should gracefully degrade
+    And users should be informed about high load
+
+  @performance @scalability
+  Scenario: System Scalability
+    Given the system is handling normal load
+    When the number of users doubles
+    Then the system should scale accordingly
+    And performance should remain consistent
+    When additional resources are added
+    Then the system should utilize them efficiently
+    And performance should improve
+
+  @performance @monitoring
+  Scenario: Performance Monitoring
+    Given I am monitoring system performance
+    When performance metrics are collected
+    Then response times should be recorded
+    And resource usage should be tracked
+    And alerts should be triggered for poor performance
+    When performance issues are detected
+    Then appropriate actions should be taken
+    And users should be notified if necessary
