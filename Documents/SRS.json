@@ -1,0 +1,120 @@
+[
+  {
+    "ID": "ServiceProviderID",
+    "Field": "Service Provider ID",
+    "Description": "Used to capture the service provider ID.",
+    "Type": "String",
+    "Validation": ["Mandatory", "Unique", "Should have 8 digits"],
+    "Error Response": [
+      "Service provider Id required",
+      "Service Provider Id already exists",
+      "Please enter 8 digit number for Service Provider Id."
+    ]
+  },
+  {
+    "ID": "CompanyName",
+    "Field": "Company name",
+    "Description": "Used to capture the name of the company.",
+    "Type": "String",
+    "Validation": ["Mandatory", "Maximum length 50 characters", "Unique"],
+    "Error Response": [
+      "Company Name required",
+      "Company Name should be less than 50 characters",
+      "Service Provider already exists"
+    ]
+  },
+  {
+    "ID": "Address",
+    "Field": "Address",
+    "Description": "Used to capture the address of the company.",
+    "Type": "String",
+    "Validation": ["Optional", "Maximum length 255 characters"],
+    "Error Response": ["Address should be less than 255 characters"]
+  },
+  {
+    "ID": "Description",
+    "Field": "Description",
+    "Description": "Used to capture the description about the SP.",
+    "Type": "String",
+    "Validation": ["Optional", "Maximum length 255 characters"],
+    "Error Response": ["Description should be less than 255 characters"]
+  },
+  {
+    "ID": "WhiteListedUsers",
+    "Field": "White Listed Users",
+    "Description": "Used to capture the whitelisted phone numbers.",
+    "Type": "String",
+    "Validation": [
+      "Mandatory",
+      "Minimum length 8 digits",
+      "Maximum length 15 digits",
+      "Multiple entries separated by commas",
+      "Must not overlap with blacklisted numbers",
+      "No duplicate MSISDN"
+    ],
+    "Error Response": [
+      "Should be comma-separated phone numbers having 15 digits as maximum and 8 digits as minimum",
+      "You can not have a White-listed user in the Blacklisted user list.",
+      "Msisdn are Duplicate in White listed Msisdn."
+    ]
+  },
+  {
+    "ID": "BlackListedUsers",
+    "Field": "Black Listed Users",
+    "Description": "Used to capture the blacklisted phone numbers.",
+    "Type": "String",
+    "Validation": [
+      "Optional",
+      "Minimum length 8 digits",
+      "Maximum length 15 digits",
+      "Multiple entries separated by commas"
+    ],
+    "Error Response": []
+  },
+  {
+    "ID": "DedicatedAlias",
+    "Field": "Dedicated Alias",
+    "Description": "Alias dedicated for the respective service provider across all SP Apps.",
+    "Type": "String",
+    "Validation": [
+      "Optional",
+      "Multiple entries separated by commas",
+      "Alias must be unique across SPs",
+      "Valid regex or alphanumeric pattern (see Appendix B)"
+    ],
+    "Error Response": [
+      "Dedicated alias/es - [Alias Name] or a wildcard format is already in use",
+      "Invalid regular expression/s {Dedicated Alias} please enter valid regular expression."
+    ]
+  },
+  {
+    "ID": "SPUsers",
+    "Field": "SP users",
+    "Description": "SP-typed User(s) to be assigned for the new SP.",
+    "Type": "multi-select list box",
+    "Validation": [
+      "Mandatory",
+      "At least one SP-typed user should be selected"
+    ],
+    "Error Response": ["Select atleast one User Name."]
+  },
+  {
+    "ID": "MarketingUsers",
+    "Field": "Marketing Users",
+    "Description": "Marketing user(s) who is allowed to monitor the SP and applications.",
+    "Type": "multi-select list box",
+    "Validation": [
+      "Mandatory",
+      "At least one marketing user should be selected"
+    ],
+    "Error Response": ["Allowed Marketing Users required."]
+  },
+  {
+    "ID": "Resources",
+    "Field": "Resources",
+    "Description": "Select the resources to be allowed for the SP. Options: SMS, MMS, BAS, WAPPUSH, USSD, SWS.",
+    "Type": "multi-select list box",
+    "Validation": ["Mandatory", "At least one resource should be selected"],
+    "Error Response": ["Select atleast one resource."]
+  }
+]
