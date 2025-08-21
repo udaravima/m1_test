@@ -19,11 +19,20 @@ import com.google.gson.GsonBuilder;
 import lombok.experimental.FieldNameConstants;
 // import com.sdp.m1.Runner.TestConfigs;
 
+/* 
 // TODO:
-// If the type is 'hidden' of a element ignore
-// Adjust the text not just element.text() but with element.attr("placeholder") if exists or with other info
-// add checks for css selector and 'hidden' (bool vals)
+//
+// - If the type is 'hidden' of a element ignore :)
+// - add checks for css selector and 'hidden' (bool vals) :)
+// - Add Test name to the file 
+// - Adjust the text not just element.text() but with element.attr("placeholder") if exists or with other info
+// - Make this as modulable 
+// - Login and session feature fix
+*/
 public class WebPageExtractorJSON {
+
+    private static final Boolean SELECT_HIDDEN = false;
+    private static final Boolean USE_CSS_SELECTOR = false;
 
     static class Component {
         String type; // e.g. form, navbar, section
@@ -33,6 +42,7 @@ public class WebPageExtractorJSON {
         String classes;
         String ariaLabel;
         String selector; // CSS selector
+        String role;
         Map<String, Integer> boundingBox = new HashMap<>();
         Set<Map<String, String>> actions = new HashSet<>();
         Set<Map<String, String>> fields = new HashSet<>();
@@ -57,12 +67,18 @@ public class WebPageExtractorJSON {
 
         // driver.manage().addCookie(new Cookie("JSESSIONID",
         // "7CF4758ED268DB2B65BEDFE1BD6AA8AA"));
-        // Thread.sleep(1000); // Wait for cookie to be set
-        // driver.navigate().to("");
+        driver.manage().deleteCookieNamed("orangehrm");
+        driver.manage().addCookie(new Cookie("orangehrm",
+                "t3hcstsr8th1b2ahn942sv49ro"));
+
+        Thread.sleep(5000); // Wait for cookie to be set
+        driver.navigate().to("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+        System.out.println("Navigated to login page");
 
         String timestamp = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        String fileName = String.format("page_components_%s_%s.json", timestamp, Math.abs(url.hashCode()));
+        String fileName = String.format("target/ExJson/page_components_%s_%s.json", timestamp,
+                Math.abs(url.hashCode()));
 
         System.out.println("Page source loaded, waiting for elements...");
         Thread.sleep(5000); // let the page load first
@@ -85,8 +101,18 @@ public class WebPageExtractorJSON {
 
         // Save JSON
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+        // create directories if not exists
+        try {
+            java.nio.file.Files.createDirectories(java.nio.file.Paths.get("target/ExJson"));
+        } catch (java.io.IOException e) {
+            System.err.println("Failed to create directories: " + e.getMessage());
+        }
+
         try (FileWriter fw = new FileWriter(fileName)) {
             gson.toJson(components, fw);
+        } catch (Exception e) {
+            System.err.println("Failed to write JSON file: " + e.getMessage());
         }
 
         System.out.printf("Extracted %d components -> %s%n", components.size(), fileName);
@@ -111,9 +137,10 @@ public class WebPageExtractorJSON {
                 Component c = new Component();
                 c.type = type;
                 c.tag = el.tagName();
-                c.text = el.text().trim();
+                c.text = el.ownText().trim();
                 c.id = el.id();
                 c.classes = el.className();
+                c.role = el.attr("role");
                 c.selector = buildSelector(el);
                 if (el.attr("aria-label").length() > 0)
                     c.ariaLabel = el.attr("aria-label");
@@ -135,9 +162,11 @@ public class WebPageExtractorJSON {
                 // Extract actions (buttons, submit, links)
                 Elements buttons = el.select("button, input[type=submit], input[type=button], input[type=reset], a");
                 for (Element b : buttons) {
+                    if (b.attr("type").equals("hidden") && !SELECT_HIDDEN)
+                        continue; // Skip hidden elements unless explicitly selected
                     Map<String, String> actionMeta = new HashMap<>();
                     actionMeta.put("selector", buildSelector(b));
-                    actionMeta.put("text", b.text());
+                    actionMeta.put("text", b.text().trim());
                     actionMeta.put("type", b.tagName());
                     actionMeta.put("name", b.attr("name"));
                     actionMeta.put("role", b.attr("role"));
@@ -152,6 +181,8 @@ public class WebPageExtractorJSON {
                 // Extract fields (inputs, selects, textareas)
                 Elements inputs = el.select("input, textarea, select");
                 for (Element f : inputs) {
+                    if (f.attr("type").equals("hidden") && !SELECT_HIDDEN)
+                        continue; // Skip hidden elements unless explicitly selected
                     if ("submit".equals(f.attr("type")) || "button".equals(f.attr("type"))
                             || "reset".equals(f.attr("type")))
                         continue;
@@ -208,7 +239,7 @@ public class WebPageExtractorJSON {
         if (!el.id().isEmpty()) {
             // Chrome prefers ID because it's unique
             return "#" + el.id();
-        } else if (!el.className().isEmpty()) {
+        } else if (!el.className().isEmpty() && USE_CSS_SELECTOR) {
             // multiple classes -> join with dots
             return el.tagName() + "." + el.className().trim().replace(" ", ".");
         } else {
