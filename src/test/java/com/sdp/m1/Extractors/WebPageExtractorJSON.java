@@ -39,10 +39,9 @@ public class WebPageExtractorJSON {
     private static final Boolean USE_COOKIE = false;
     // private static final String USE_URL =
     // "https://m1-impl.hsenidmobile.com/cas/login";
-    private static final String USE_URL = "https://google.com";
-    // private static final String USE_URL =
-    // "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login";
-    // private static final String USE_URL = "https://facebook.com";
+    // private static final String USE_URL = "https://google.com";
+    // private static final String USE_URL = "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login";
+    private static final String USE_URL = "https://facebook.com";
 
     private static final String COOKIE_NAME = "JSESSIONID";
     private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "37B78748D50060E1BDAD9A82BDBA6005");
@@ -73,13 +72,12 @@ public class WebPageExtractorJSON {
         if (USE_COOKIE) {
             driver.manage().deleteCookieNamed(COOKIE_NAME);
             driver.manage().addCookie(COOKIE);
-        }
+            Thread.sleep(1000); // Wait for cookie to be set
+            driver.navigate()
+                    .to(USE_URL);
 
-        Thread.sleep(1000); // Wait for cookie to be set
-        driver.navigate()
-                .to(USE_URL);
-        // driver.navigate().to("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
-        System.out.println("Navigated to login page");
+            System.out.println("Navigated with cookies");
+        }
 
         String timestamp = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));

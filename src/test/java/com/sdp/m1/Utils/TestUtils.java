@@ -338,63 +338,74 @@ public class TestUtils {
         logger.info(String.format("Page loaded in acceptable time: %dms", loadTime));
     }
 
+    public static void removeDriver(SelfHealingDriver drv) {
+        if (drv != null) {
+            drv.quit();
+        }
+        driver = null;
+    }
+
     /**
      * Get the WebDriver instance
      */
     public static SelfHealingDriver getDriver(String browserType) {
+        System.out.println("Getting WebDriver instance for browser: " + browserType); // Debugging
         if (driver == null) {
+            System.out.println("Initializing WebDriver for browser: " + browserType); // Debugging
             try {
+                System.out.println("Broowser inline " + browserType.toLowerCase()); // Debugging
                 switch (browserType.toLowerCase()) {
-                    case "chrome" -> {
-                        System.setProperty("webdriver.chrome.driver",
-                                com.sdp.m1.Runner.TestConfigs.getChromeDriverPath());
-                        ChromeOptions chromeOptions = new ChromeOptions();
-                        chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
-                        // chromeOptions.addArguments("--headless");
-                        driver = SelfHealingDriver.create(new ChromeDriver(chromeOptions));
-                    }
                     case "firefox" -> {
-                        System.setProperty("webdriver.gecko.driver",
-                                com.sdp.m1.Runner.TestConfigs.getGeckoDriverPath());
                         FirefoxOptions firefoxOptions = new FirefoxOptions();
-                        firefoxOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
-                        // firefoxOptions.addArguments("--headless");
-                        driver = SelfHealingDriver.create(new FirefoxDriver(firefoxOptions));
+                        // firefoxOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        if (TestConfigs.isHeadless()) {
+                            firefoxOptions.addArguments("--headless");
+                        } else {
+                            firefoxOptions.addArguments("--headed");
+                        }
+                        driver = SelfHealingDriver.create(new FirefoxDriver());
+                        break;
                     }
                     case "edge" -> {
-                        System.setProperty("webdriver.edge.driver", com.sdp.m1.Runner.TestConfigs.getEdgeDriverPath());
                         EdgeOptions edgeOptions = new EdgeOptions();
-                        edgeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
-                        // edgeOptions.addArguments("--headless");
-                        driver = SelfHealingDriver.create(new EdgeDriver(edgeOptions));
+                        // edgeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        if (TestConfigs.isHeadless()) {
+                            edgeOptions.addArguments("--headless");
+                        } else {
+                            edgeOptions.addArguments("--headed");
+                        }
+                        driver = SelfHealingDriver.create(new EdgeDriver());
+                        break;
                     }
-                    default -> throw new IllegalArgumentException("Unsupported browser type: " + browserType);
+                    default -> {
+                        // System.setProperty("webdriver.chrome.driver",
+                        // com.sdp.m1.Runner.TestConfigs.getChromeDriverPath());
+                        ChromeOptions chromeOptions = new ChromeOptions();
+                        chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        if (TestConfigs.isHeadless()) {
+                            chromeOptions.addArguments("--headless");
+                        } else {
+                            chromeOptions.addArguments("--headed");
+                        }
+                        driver = SelfHealingDriver.create(new ChromeDriver(chromeOptions));
+                    }
                 }
-            } catch (Exception e) {
+            } catch (
+
+            Exception e) {
                 System.out.println("Error occurred while initializing WebDriver: " + e.getMessage());
                 logger.severe(
                         String.format("Failed to get WebDriver instance for %s: %s", browserType, e.getMessage()));
-                logger.warning("Initializing fallback browser: Chrome");
-                try {
-                    System.setProperty("webdriver.chrome.driver",
-                            com.sdp.m1.Runner.TestConfigs.getChromeDriverPath());
-                    ChromeOptions chromeOptions = new ChromeOptions();
-                    chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
-                    // chromeOptions.addArguments("--headless");
-                    driver = SelfHealingDriver.create(new ChromeDriver(chromeOptions));
-                } catch (Exception fallbackException) {
-                    System.out.println(
-                            "Error occurred while initializing fallback WebDriver: " + fallbackException.getMessage());
-                    logger.severe(
-                            String.format("Failed to get fallback WebDriver instance: %s",
-                                    fallbackException.getMessage()));
-                }
+            }
+            if (driver == null) {
+                System.out.println("Failed to initialize WebDriver");
+                throw new RuntimeException("WebDriver initialization failed");
             }
         }
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(Integer.parseInt(TestConfigs.getDelay())));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(Integer.parseInt(TestConfigs.getDelay())));
 
         return driver;
+
     }
-    
 }

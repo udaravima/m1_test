@@ -1,6 +1,5 @@
 package com.sdp.m1.Steps;
 
-import java.time.Duration;
 import java.util.logging.Logger;
 
 import com.epam.healenium.SelfHealingDriver;
@@ -20,7 +19,7 @@ public class LoginSteps {
     private static final Logger logger = Logger.getLogger(LoginSteps.class.getName());
     private SelfHealingDriver driver;
     private m1LoginPage loginPage;
-    private String browserType = "chrome";
+    private String browserType = TestConfigs.getBrowser();
     private String currentTestName;
 
     @When("I enter valid password")
@@ -62,7 +61,6 @@ public class LoginSteps {
     @Before
     public void setUp() {
         // Get browser type from system property or use default
-        browserType = System.getProperty("browser", "chrome").toLowerCase();
         logger.info(String.format("Setting up test with browser: %s", browserType));
         // Reset test status at the beginning of each test
         TestUtils.resetTestStatus();
@@ -80,7 +78,7 @@ public class LoginSteps {
                     }
                 }
 
-                driver.quit();
+                TestUtils.removeDriver(driver);
                 logger.info("Browser closed successfully");
             } catch (Exception e) {
                 logger.warning(String.format("Error closing browser: %s", e.getMessage()));
@@ -439,56 +437,6 @@ public class LoginSteps {
             logger.severe(String.format("Error taking manual screenshot: %s", e.getMessage()));
         }
     }
-
-    // private void initializeDriver() {
-    // try {
-    // switch (browserType) {
-    // case "firefox":
-    // // Debuging
-    // System.setProperty("webdriver.gecko.driver",
-    // com.sdp.m1.Runner.TestConfigs.getGeckoDriverPath());
-    // FirefoxOptions firefoxOptions = new FirefoxOptions();
-    // // firefoxOptions.addArguments("--headless");
-    // driver = SelfHealingDriver.create(new FirefoxDriver(firefoxOptions));
-    // break;
-    // case "edge":
-    // System.setProperty("webdriver.edge.driver",
-    // com.sdp.m1.Runner.TestConfigs.getEdgeDriverPath());
-    // EdgeOptions edgeOptions = new EdgeOptions();
-    // // edgeOptions.addArguments("--headless");
-    // driver = SelfHealingDriver.create(new EdgeDriver(edgeOptions));
-    // break;
-    // case "chrome":
-    // default:
-    // System.setProperty("webdriver.chrome.driver",
-    // com.sdp.m1.Runner.TestConfigs.getChromeDriverPath());
-    // ChromeOptions chromeOptions = new ChromeOptions();
-    // chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
-    // driver = SelfHealingDriver.create(new ChromeDriver(chromeOptions));
-    // break;
-    // }
-    // logger.info(String.format("Driver initialized successfully for browser: %s",
-    // browserType));
-    // } catch (Exception e) {
-    // logger.severe(String.format("Failed to initialize driver for browser %s: %s",
-    // browserType, e.getMessage()));
-    // // Fallback to Chrome if specified browser fails
-    // try {
-    // System.setProperty("webdriver.chrome.driver",
-    // com.sdp.m1.Runner.TestConfigs.getChromeDriverPath());
-    // ChromeOptions chromeOptions = new ChromeOptions();
-    // chromeOptions.addArguments("--headless", "--no-sandbox",
-    // "--disable-dev-shm-usage");
-    // driver = SelfHealingDriver.create(new ChromeDriver(chromeOptions));
-    // logger.info("Fallback to Chrome driver successful");
-    // } catch (Exception fallbackException) {
-    // logger.severe(String.format("Fallback to Chrome also failed: %s",
-    // fallbackException.getMessage()));
-    // throw new RuntimeException("Driver initialization failed",
-    // fallbackException);
-    // }
-    // }
-    // }
 
     @Then("the username field should have proper label")
     public void the_username_field_should_have_proper_label() {
