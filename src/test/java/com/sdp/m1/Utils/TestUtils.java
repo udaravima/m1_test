@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,12 +15,22 @@ import java.util.logging.Logger;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+
+import com.epam.healenium.SelfHealingDriver;
+import com.sdp.m1.Runner.TestConfigs;
 
 public class TestUtils {
 
     private static final Logger logger = Logger.getLogger(TestUtils.class.getName());
     private static final Random random = new Random();
     private static final AtomicBoolean testFailed = new AtomicBoolean(false);
+    private static SelfHealingDriver driver;
 
     /**
      * Mark test as failed
@@ -326,4 +337,64 @@ public class TestUtils {
         }
         logger.info(String.format("Page loaded in acceptable time: %dms", loadTime));
     }
+
+    /**
+     * Get the WebDriver instance
+     */
+    public static SelfHealingDriver getDriver(String browserType) {
+        if (driver == null) {
+            try {
+                switch (browserType.toLowerCase()) {
+                    case "chrome" -> {
+                        System.setProperty("webdriver.chrome.driver",
+                                com.sdp.m1.Runner.TestConfigs.getChromeDriverPath());
+                        ChromeOptions chromeOptions = new ChromeOptions();
+                        chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        // chromeOptions.addArguments("--headless");
+                        driver = SelfHealingDriver.create(new ChromeDriver(chromeOptions));
+                    }
+                    case "firefox" -> {
+                        System.setProperty("webdriver.gecko.driver",
+                                com.sdp.m1.Runner.TestConfigs.getGeckoDriverPath());
+                        FirefoxOptions firefoxOptions = new FirefoxOptions();
+                        firefoxOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        // firefoxOptions.addArguments("--headless");
+                        driver = SelfHealingDriver.create(new FirefoxDriver(firefoxOptions));
+                    }
+                    case "edge" -> {
+                        System.setProperty("webdriver.edge.driver", com.sdp.m1.Runner.TestConfigs.getEdgeDriverPath());
+                        EdgeOptions edgeOptions = new EdgeOptions();
+                        edgeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        // edgeOptions.addArguments("--headless");
+                        driver = SelfHealingDriver.create(new EdgeDriver(edgeOptions));
+                    }
+                    default -> throw new IllegalArgumentException("Unsupported browser type: " + browserType);
+                }
+            } catch (Exception e) {
+                System.out.println("Error occurred while initializing WebDriver: " + e.getMessage());
+                logger.severe(
+                        String.format("Failed to get WebDriver instance for %s: %s", browserType, e.getMessage()));
+                logger.warning("Initializing fallback browser: Chrome");
+                try {
+                    System.setProperty("webdriver.chrome.driver",
+                            com.sdp.m1.Runner.TestConfigs.getChromeDriverPath());
+                    ChromeOptions chromeOptions = new ChromeOptions();
+                    chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                    // chromeOptions.addArguments("--headless");
+                    driver = SelfHealingDriver.create(new ChromeDriver(chromeOptions));
+                } catch (Exception fallbackException) {
+                    System.out.println(
+                            "Error occurred while initializing fallback WebDriver: " + fallbackException.getMessage());
+                    logger.severe(
+                            String.format("Failed to get fallback WebDriver instance: %s",
+                                    fallbackException.getMessage()));
+                }
+            }
+        }
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(Integer.parseInt(TestConfigs.getDelay())));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(Integer.parseInt(TestConfigs.getDelay())));
+
+        return driver;
+    }
+    
 }

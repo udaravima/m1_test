@@ -14,18 +14,18 @@ import java.util.logging.Logger;
 
 public class m1LoginPage {
     private static final Logger logger = Logger.getLogger(m1LoginPage.class.getName());
-    private SelfHealingDriver driver;
-    private WebDriverWait wait;
+    private final SelfHealingDriver driver;
+    private final WebDriverWait wait;
 
     // Locators
-    private By usernameField = By.id("username");
-    private By passwordField = By.id("password");
-    private By errorMessage = By.id("status");
-    private By successMsg = By.id("msg");
-    private By loginButton = By.xpath("//*[@id=\"login\"]/div[3]/input[3]");
-    private By pageTitle = By.tagName("title");
-    private By usernameLabel = By.xpath("//label[@for=\"username\"]");
-    private By passwordLabel = By.xpath("//label[@for=\"password\"]");
+    private final By usernameField = By.id("username");
+    private final By passwordField = By.id("password");
+    private final By errorMessage = By.id("status");
+    private final By successMsg = By.id("msg");
+    private final By loginButton = By.xpath("//*[@id=\"login\"]/div[3]/input[3]");
+    private final By pageTitle = By.tagName("title");
+    private final By usernameLabel = By.xpath("//label[@for=\"username\"]");
+    private final By passwordLabel = By.xpath("//label[@for=\"password\"]");
 
     public m1LoginPage(SelfHealingDriver driver) {
         this.driver = driver;
