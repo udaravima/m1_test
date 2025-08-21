@@ -1,6 +1,7 @@
 package com.sdp.m1.Extractors;
 
 import java.io.FileWriter;
+import java.lang.reflect.Array;
 import java.time.Duration;
 import java.util.*;
 
@@ -22,19 +23,31 @@ import lombok.experimental.FieldNameConstants;
 /* 
 // TODO:
 //
+// - Good Naming scheme
 // - If the type is 'hidden' of a element ignore :)
 // - add checks for css selector and 'hidden' (bool vals) :)
 // - Add Test name to the file 
 // - Adjust the text not just element.text() but with element.attr("placeholder") if exists or with other info
 // - Make this as modulable 
 // - Login and session feature fix
+// - Select tag upgrades! :)
 */
 public class WebPageExtractorJSON {
 
     private static final Boolean SELECT_HIDDEN = false;
     private static final Boolean USE_CSS_SELECTOR = false;
+    private static final Boolean USE_COOKIE = false;
+    // private static final String USE_URL =
+    // "https://m1-impl.hsenidmobile.com/cas/login";
+    private static final String USE_URL = "https://google.com";
+    // private static final String USE_URL =
+    // "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login";
+    // private static final String USE_URL = "https://facebook.com";
 
-    static class Component {
+    private static final String COOKIE_NAME = "JSESSIONID";
+    private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "37B78748D50060E1BDAD9A82BDBA6005");
+
+    private static class Component {
         String type; // e.g. form, navbar, section
         String tag; // HTML tag name
         String text; // visible text
@@ -55,30 +68,23 @@ public class WebPageExtractorJSON {
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
         // new WebDriverWait(driver, Duration.ofSeconds(10))
         // .until(ExpectedConditions.presenceOfElementLocated(By.tagName("form")));
+        driver.get(USE_URL);
 
-        // Login Logic temp
-        // Map<String, String> cookie = new HashMap<>();
-        // cookie.put("name", "JSESSIONID");
-        // cookie.put("value", "159060AE39DEBDDECD059D98943013D1");
+        if (USE_COOKIE) {
+            driver.manage().deleteCookieNamed(COOKIE_NAME);
+            driver.manage().addCookie(COOKIE);
+        }
 
-        // String url = "https://google.com";
-        String url = "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login";
-        driver.get(url);
-
-        // driver.manage().addCookie(new Cookie("JSESSIONID",
-        // "7CF4758ED268DB2B65BEDFE1BD6AA8AA"));
-        driver.manage().deleteCookieNamed("orangehrm");
-        driver.manage().addCookie(new Cookie("orangehrm",
-                "t3hcstsr8th1b2ahn942sv49ro"));
-
-        Thread.sleep(5000); // Wait for cookie to be set
-        driver.navigate().to("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+        Thread.sleep(1000); // Wait for cookie to be set
+        driver.navigate()
+                .to(USE_URL);
+        // driver.navigate().to("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
         System.out.println("Navigated to login page");
 
         String timestamp = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String fileName = String.format("target/ExJson/page_components_%s_%s.json", timestamp,
-                Math.abs(url.hashCode()));
+                Math.abs(USE_URL.hashCode()));
 
         System.out.println("Page source loaded, waiting for elements...");
         Thread.sleep(5000); // let the page load first
@@ -159,48 +165,54 @@ public class WebPageExtractorJSON {
                 if (we.isDisplayed())
                     c.boundingBox = box;
 
-                // Extract actions (buttons, submit, links)
                 Elements buttons = el.select("button, input[type=submit], input[type=button], input[type=reset], a");
-                for (Element b : buttons) {
-                    if (b.attr("type").equals("hidden") && !SELECT_HIDDEN)
-                        continue; // Skip hidden elements unless explicitly selected
-                    Map<String, String> actionMeta = new HashMap<>();
-                    actionMeta.put("selector", buildSelector(b));
-                    actionMeta.put("text", b.text().trim());
-                    actionMeta.put("type", b.tagName());
-                    actionMeta.put("name", b.attr("name"));
-                    actionMeta.put("role", b.attr("role"));
-                    actionMeta.put("value", b.attr("value"));
-                    if (b.attr("aria-label").length() > 0)
-                        actionMeta.put("aria-label", b.attr("aria-label"));
-                    if (b.attr("href").length() > 0)
-                        actionMeta.put("href", b.attr("href"));
-                    c.actions.add(actionMeta);
-                }
+                Elements inputs = el.select("input, textarea, select");
+                fieldBuilder(buttons, c.actions, doc, null);
+                fieldBuilder(inputs, c.fields, doc, new ArrayList<>(Arrays.asList("submit", "reset", "button")));
+
+                // Extract actions (buttons, submit, links)
+                // Add actions from the current element
+                // for (Element b : buttons) {
+                // if (b.attr("type").equals("hidden") && !SELECT_HIDDEN)
+                // continue; // Skip hidden elements unless explicitly selected
+                // Map<String, String> actionMeta = new HashMap<>();
+                // actionMeta.put("selector", buildSelector(b));
+                // actionMeta.put("text", b.text().trim());
+                // actionMeta.put("type", b.tagName());
+                // actionMeta.put("name", b.attr("name"));
+                // actionMeta.put("role", b.attr("role"));
+                // actionMeta.put("value", b.attr("value"));
+                // if (b.attr("aria-label").length() > 0)
+                // actionMeta.put("aria-label", b.attr("aria-label"));
+                // if (b.attr("href").length() > 0)
+                // actionMeta.put("href", b.attr("href"));
+                // c.actions.add(actionMeta);
+                // }
 
                 // Extract fields (inputs, selects, textareas)
-                Elements inputs = el.select("input, textarea, select");
-                for (Element f : inputs) {
-                    if (f.attr("type").equals("hidden") && !SELECT_HIDDEN)
-                        continue; // Skip hidden elements unless explicitly selected
-                    if ("submit".equals(f.attr("type")) || "button".equals(f.attr("type"))
-                            || "reset".equals(f.attr("type")))
-                        continue;
+                // Add fields from the current element
+                // for (Element f : inputs) {
+                // if (f.attr("type").equals("hidden") && !SELECT_HIDDEN)
+                // continue; // Skip hidden elements unless explicitly selected
+                // if ("submit".equals(f.attr("type")) || "button".equals(f.attr("type"))
+                // || "reset".equals(f.attr("type")))
+                // continue;
 
-                    Map<String, String> fieldMeta = new HashMap<>();
-                    fieldMeta.put("selector", buildSelector(f));
-                    fieldMeta.put("text", f.text().trim());
-                    fieldMeta.put("type", f.attr("type").isEmpty() ? f.tagName() : f.attr("type"));
-                    fieldMeta.put("name", f.attr("name"));
-                    fieldMeta.put("role", f.attr("role"));
-                    fieldMeta.put("value", f.attr("value"));
-                    fieldMeta.put("placeholder", f.attr("placeholder"));
-                    fieldMeta.put("label", findLabelText(doc, f));
-                    if (f.attr("aria-label").length() > 0)
-                        fieldMeta.put("aria-label", f.attr("aria-label"));
+                // Map<String, String> fieldMeta = new HashMap<>();
+                // fieldMeta.put("selector", buildSelector(f));
+                // fieldMeta.put("text", f.text().trim());
+                // fieldMeta.put("type", f.attr("type").isEmpty() ? f.tagName() :
+                // f.attr("type"));
+                // fieldMeta.put("name", f.attr("name"));
+                // fieldMeta.put("role", f.attr("role"));
+                // fieldMeta.put("value", f.attr("value"));
+                // fieldMeta.put("placeholder", f.attr("placeholder"));
+                // fieldMeta.put("label", findLabelText(doc, f));
+                // if (f.attr("aria-label").length() > 0)
+                // fieldMeta.put("aria-label", f.attr("aria-label"));
 
-                    c.fields.add(fieldMeta);
-                }
+                // c.fields.add(fieldMeta);
+                // }
 
                 // // Avoid duplicates (same selector + type)
                 // boolean duplicate = components.stream()
@@ -233,6 +245,58 @@ public class WebPageExtractorJSON {
                 System.out.printf("Failed to extract component: %s%n", ignored.getMessage());
             }
         }
+    }
+
+    private static Set<Map<String, String>> fieldBuilder(Elements elements, Set<Map<String, String>> fieldSets,
+            Document doc, ArrayList<String> ignoreTypes) {
+        if (elements == null || elements.isEmpty()) {
+            return fieldSets;
+        }
+
+        for (Element element : elements) {
+            if (element.attr("type").equals("hidden") && !SELECT_HIDDEN) {
+                continue; // Skip hidden elements unless explicitly selected
+            }
+            String type = element.attr("type");
+            if (ignoreTypes != null && ignoreTypes.contains(type)) {
+                continue;
+            }
+
+            Map<String, String> meta = new HashMap<>();
+            meta.put("selector", buildSelector(element));
+            meta.put("text", element.text().trim());
+            meta.put("type", element.attr("type").isEmpty() ? element.tagName() : element.attr("type"));
+            meta.put("name", element.attr("name"));
+            meta.put("role", element.attr("role"));
+            meta.put("value", element.attr("value"));
+            meta.put("placeholder", element.attr("placeholder"));
+            String label = findLabelText(doc, element);
+            if (label != null && !label.isEmpty()) {
+                meta.put("label", label);
+            }
+
+            if (element.tagName().equals("select")) {
+                // Handle <select> elements
+                meta.put("options", String.join(",", getSelectOptions(element)));
+            }
+            if (element.attr("href").length() > 0)
+                meta.put("href", element.attr("href"));
+            if (element.attr("aria-label").length() > 0)
+                meta.put("aria-label", element.attr("aria-label"));
+
+            fieldSets.add(meta);
+        }
+        return fieldSets;
+    }
+
+    private static Set<String> getSelectOptions(Element selectElement) {
+        Set<String> options = new HashSet<>();
+        for (Element option : selectElement.children()) {
+            if (option.tagName().equals("option")) {
+                options.add(option.text().trim());
+            }
+        }
+        return options;
     }
 
     private static String buildSelector(Element el) {
@@ -356,6 +420,13 @@ public class WebPageExtractorJSON {
         String id = input.id();
         if (id != null && !id.isEmpty()) {
             Element label = doc.selectFirst("label[for=" + id + "]");
+            if (label != null) {
+                return label.text();
+            }
+        }
+        String name = input.attr("name");
+        if (name != null && !name.isEmpty()) {
+            Element label = doc.selectFirst("label[for=" + name + "]");
             if (label != null) {
                 return label.text();
             }
