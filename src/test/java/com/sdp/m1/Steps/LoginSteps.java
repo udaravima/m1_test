@@ -3,6 +3,8 @@ package com.sdp.m1.Steps;
 import java.util.logging.Logger;
 
 import com.epam.healenium.SelfHealingDriver;
+import com.epam.healenium.SelfHealingDriverWait;
+
 import com.sdp.m1.Pages.m1LoginPage;
 import com.sdp.m1.Runner.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
@@ -18,9 +20,16 @@ public class LoginSteps {
 
     private static final Logger logger = Logger.getLogger(LoginSteps.class.getName());
     private SelfHealingDriver driver;
-    private m1LoginPage loginPage;
+    private SelfHealingDriverWait wait;
+    private final m1LoginPage loginPage;
     private String browserType = TestConfigs.getBrowser();
     private String currentTestName;
+
+    public LoginSteps() {
+        this.driver = TestUtils.getDriver(TestConfigs.getBrowser());
+        this.wait = TestUtils.getWaitDriver(driver);
+        this.loginPage = new m1LoginPage(driver, wait);
+    }
 
     @When("I enter valid password")
     public void i_enter_valid_password() {
@@ -50,6 +59,8 @@ public class LoginSteps {
         i_enter_valid_username_and_password("sdpsp", "test");
         i_click_the_login_button();
         i_should_be_redirected_to_the_dashboard();
+        // Add a small wait to ensure session is fully established before next step
+        TestUtils.wait(1);
     }
 
     @Given("I navigate to the login page using {string}")
@@ -77,8 +88,11 @@ public class LoginSteps {
                         logger.info(String.format("Failure screenshot saved: %s", screenshotPath));
                     }
                 }
-
+                System.out.println("Closing browser: " + browserType);
+                logger.warning("Closing browser: " + browserType);
                 TestUtils.removeDriver(driver);
+                driver = null;
+                wait = null;
                 logger.info("Browser closed successfully");
             } catch (Exception e) {
                 logger.warning(String.format("Error closing browser: %s", e.getMessage()));
@@ -90,12 +104,8 @@ public class LoginSteps {
     public void i_navigate_to_the_login_page() {
         try {
             currentTestName = "navigate_to_login";
-            driver = TestUtils.getDriver(browserType);
-
             logger.info(String.format("Navigating to: %s", TestConfigs.getLoginUrl()));
             driver.navigate().to(TestConfigs.getLoginUrl());
-
-            loginPage = new m1LoginPage(driver);
             loginPage.waitForPageLoad();
 
             // Take screenshot of successful page load
@@ -127,7 +137,7 @@ public class LoginSteps {
         }
     }
 
-    @When("^I enter valid (.*) and (.*)$")
+    @When("I enter valid {string} and {string}")
     public void i_enter_valid_username_and_password(String username, String password) {
         try {
             currentTestName = "enter_valid_credentials";
@@ -149,7 +159,7 @@ public class LoginSteps {
         }
     }
 
-    @When("^I enter invalid (.*) and (.*)$")
+    @When("I enter invalid {string} and {string}")
     public void i_enter_invalid_username_and_password(String username, String password) {
         try {
             currentTestName = "enter_invalid_credentials";

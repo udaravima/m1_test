@@ -33,21 +33,30 @@ import com.google.gson.GsonBuilder;
 */
 public class WebPageExtractorJSON {
 
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
+    public WebPageExtractorJSON() {
+    }
+
     private static final Boolean SELECT_HIDDEN = false;
     private static final Boolean USE_CSS_SELECTOR = false;
-    private static final Boolean USE_COOKIE = false;
-    // private static final String USE_URL =
-    // "https://m1-impl.hsenidmobile.com/cas/login";
+    private static final Boolean USE_COOKIE = true;
+    private static final Integer THREAD_DELAY = 8000;
+    private static final String USE_URL = "https://lms.jfn.ac.lk/lms-new/login/index.php";
+    private static final String NAV_URL = "https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html";
     // private static final String USE_URL = "https://google.com";
     // private static final String USE_URL =
     // "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login";
     // private static final String USE_URL = "https://facebook.com";
-    private static final String USE_URL = "https://lms.jfn.ac.lk/lms-new";
+    // private static final String USE_URL =
+    // "https://lms.jfn.ac.lk/lms-new/my/courses.php";
 
-    private static final String COOKIE_NAME = "JSESSIONID";
-    private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "37B78748D50060E1BDAD9A82BDBA6005");
+    private static final String COOKIE_NAME = "MoodleSession";
+    private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "iv5e9cat70j6fsnf6kk9500fn4");
 
-    private static class Component {
+    @SuppressWarnings("unused")
+    private static final class Component {
         String type; // e.g. form, navbar, section
         String tag; // HTML tag name
         String text; // visible text
@@ -66,16 +75,26 @@ public class WebPageExtractorJSON {
         WebDriver driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
-        // new WebDriverWait(driver, Duration.ofSeconds(10))
-        // .until(ExpectedConditions.presenceOfElementLocated(By.tagName("form")));
         driver.get(USE_URL);
 
         if (USE_COOKIE) {
             driver.manage().deleteCookieNamed(COOKIE_NAME);
+            // driver.manage().deleteCookieNamed("PHPSESSID");
             driver.manage().addCookie(COOKIE);
-            Thread.sleep(1000); // Wait for cookie to be set
-            driver.navigate()
-                    .to(USE_URL);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            driver.get(USE_URL);
+
+            // Wait for a key element to be present after reload, confirming login state
+            try {
+                new WebDriverWait(driver, Duration.ofSeconds(10))
+                        .until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+            } catch (TimeoutException e) {
+                System.err.println("Page did not reload correctly after setting cookie.");
+            }
 
             System.out.println("Navigated with cookies");
         }
@@ -88,7 +107,7 @@ public class WebPageExtractorJSON {
         if (path.endsWith("/") && path.length() > 1) {
             path = path.substring(0, path.length() - 1);
         }
-
+        System.out.printf("Domain: %s, Path: %s%n", domain, path);
         String pageName;
         if (path != null && !path.equals("/") && path.length() > 1) {
             // Get the last part of the path, e.g., "login" from "/auth/login"
@@ -113,8 +132,14 @@ public class WebPageExtractorJSON {
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String fileName = String.format("target/ExJson/page_components_%s_%s.json", pageName, timestamp);
 
-        System.out.println("Page source loaded, waiting for elements...");
-        Thread.sleep(5000); // let the page load first
+        System.out.println("Waiting for page to be fully loaded...");
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(THREAD_DELAY / 1000))
+                    .until(ExpectedConditions.jsReturnsValue("return document.readyState == 'complete'"));
+        } catch (TimeoutException e) {
+            System.err.println("Page did not finish loading within the timeout.");
+        }
+
         System.out.println("Done waiting!");
         String pageSource = driver.getPageSource();
         Document doc = Jsoup.parse(pageSource);
@@ -215,8 +240,13 @@ public class WebPageExtractorJSON {
                 // Only add if it's a "new" component
                 components.add(c);
 
-            } catch (Exception ignored) {
-                System.out.printf("Failed to extract component: %s%n", ignored.getMessage());
+            } catch (org.openqa.selenium.NoSuchElementException e) {
+                // This is expected if an element is in Jsoup's DOM but not visible/interactable
+                // in Selenium's DOM
+                // (e.g. because of 'display:none'). We can safely ignore it or log for
+                // debugging.
+                System.err.printf("Could not find element in Selenium DOM, skipping: %s. Reason: %s%n",
+                        buildSelector(el), e.getMessage());
             }
         }
     }

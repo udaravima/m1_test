@@ -3,14 +3,14 @@ Feature: Service Provider Registration
   Background:
     Given I navigate to the login page
     Then the login form should be visible
-    When I enter valid <username> and <password>
+    When I enter valid "sdpsp" and "test"
     And I click the login button
     Then I should be redirected to the dashboard
     Then I navigate to the service provider registration page
     Then the registration form should be visible
   # Service Provider ID
 
-  @positive
+  @positive @Registration
   Scenario: Register with valid Service Provider ID
     When I enter "12345678" in the Service Provider ID field
     And I fill other required fields with valid data

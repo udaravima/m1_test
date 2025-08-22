@@ -21,8 +21,10 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+// import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.epam.healenium.SelfHealingDriver;
+import com.epam.healenium.SelfHealingDriverWait;
 import com.sdp.m1.Runner.TestConfigs;
 
 public class TestUtils {
@@ -31,6 +33,7 @@ public class TestUtils {
     private static final Random random = new Random();
     private static final AtomicBoolean testFailed = new AtomicBoolean(false);
     private static SelfHealingDriver driver;
+    private static SelfHealingDriverWait waitDriver;
 
     /**
      * Mark test as failed
@@ -343,17 +346,15 @@ public class TestUtils {
             drv.quit();
         }
         driver = null;
+        waitDriver = null;
     }
 
     /**
      * Get the WebDriver instance
      */
     public static SelfHealingDriver getDriver(String browserType) {
-        System.out.println("Getting WebDriver instance for browser: " + browserType); // Debugging
         if (driver == null) {
-            System.out.println("Initializing WebDriver for browser: " + browserType); // Debugging
             try {
-                System.out.println("Broowser inline " + browserType.toLowerCase()); // Debugging
                 switch (browserType.toLowerCase()) {
                     case "firefox" -> {
                         FirefoxOptions firefoxOptions = new FirefoxOptions();
@@ -407,5 +408,17 @@ public class TestUtils {
 
         return driver;
 
+    }
+
+    public static SelfHealingDriverWait getWaitDriver(SelfHealingDriver driver) {
+        if (driver == null) {
+            // Fail fast if the driver is not initialized. This prevents NullPointerExceptions later.
+            throw new IllegalStateException("Cannot create a wait instance with a null driver.");
+        }
+        if (waitDriver == null) {
+            // The timeout can also be sourced from TestConfigs for consistency
+            waitDriver = new SelfHealingDriverWait(driver, Duration.ofSeconds(10));
+        }
+        return waitDriver;
     }
 }

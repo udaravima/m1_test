@@ -8,6 +8,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.epam.healenium.SelfHealingDriver;
+import com.epam.healenium.SelfHealingDriverWait;
 
 import java.time.Duration;
 import java.util.logging.Logger;
@@ -15,7 +16,7 @@ import java.util.logging.Logger;
 public class m1LoginPage {
     private static final Logger logger = Logger.getLogger(m1LoginPage.class.getName());
     private final SelfHealingDriver driver;
-    private final WebDriverWait wait;
+    private final SelfHealingDriverWait wait;
 
     // Locators
     private final By usernameField = By.id("username");
@@ -27,9 +28,9 @@ public class m1LoginPage {
     private final By usernameLabel = By.xpath("//label[@for=\"username\"]");
     private final By passwordLabel = By.xpath("//label[@for=\"password\"]");
 
-    public m1LoginPage(SelfHealingDriver driver) {
+    public m1LoginPage(SelfHealingDriver driver, SelfHealingDriverWait wait) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.wait = wait;
     }
 
     public void clearPassword() {

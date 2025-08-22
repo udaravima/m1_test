@@ -1,10 +1,12 @@
 package com.sdp.m1.Steps;
 
 import static org.junit.Assert.assertTrue;
-
 import java.util.logging.Logger;
+import java.time.Duration;
 
 import com.epam.healenium.SelfHealingDriver;
+import com.epam.healenium.SelfHealingDriverWait;
+
 import com.sdp.m1.Pages.ServiceProviderRegistrationPage;
 import com.sdp.m1.Runner.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
@@ -16,31 +18,21 @@ import io.cucumber.java.en.When;
 
 public class ServiceProviderRegistrationSteps {
     private static final Logger logger = Logger.getLogger(ServiceProviderRegistrationSteps.class.getName());
-    private ServiceProviderRegistrationPage registrationPage;
-    private SelfHealingDriver driver;
-    private String browserType = TestConfigs.getBrowser();
+    private final ServiceProviderRegistrationPage registrationPage;
 
-    // @Before
-    // public void setUp() {
-    // driver = TestUtils.getDriver(browserType);
-    // registrationPage = new ServiceProviderRegistrationPage(driver);
-    // }
-    @After
-    public void tearDown() {
-        if (driver != null) {
-            TestUtils.removeDriver(driver);
-        }
+    public ServiceProviderRegistrationSteps() {
+        SelfHealingDriver driver = TestUtils.getDriver(TestConfigs.getBrowser());
+        SelfHealingDriverWait wait = TestUtils.getWaitDriver(driver);
+        this.registrationPage = new ServiceProviderRegistrationPage(driver, wait);
     }
 
     @Then("I navigate to the service provider registration page")
     public void i_navigate_to_registration_page() {
         try {
-            if (driver == null) {
-                driver = TestUtils.getDriver(browserType);
-            }
-            registrationPage = new ServiceProviderRegistrationPage(driver);
+            // The driver is already initialized and logged in from the Background steps.
+            // We just need to navigate.
             registrationPage.open();
-
+            logger.info("Navigated to the service provider registration page.");
         } catch (Exception e) {
             logger.severe(String.format("Error navigating to registration page: %s", e.getMessage()));
         }
@@ -155,4 +147,6 @@ public class ServiceProviderRegistrationSteps {
     public void should_see_error_message(String errorMsg) {
         assertTrue(registrationPage.isErrorMessageVisible(errorMsg));
     }
+
+    
 }

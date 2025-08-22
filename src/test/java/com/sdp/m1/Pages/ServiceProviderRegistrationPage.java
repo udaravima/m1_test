@@ -1,124 +1,142 @@
 package com.sdp.m1.Pages;
 
 import java.time.Duration;
+
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
 import com.epam.healenium.SelfHealingDriver;
+import com.epam.healenium.SelfHealingDriverWait;
 
 import java.util.logging.Logger;
 
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class ServiceProviderRegistrationPage {
     private static final Logger logger = Logger.getLogger(ServiceProviderRegistrationPage.class.getName());
-    private SelfHealingDriver driver;
-    private WebDriverWait wait;
+    private final SelfHealingDriver driver;
+    private final SelfHealingDriverWait wait;
 
     // Locators
-    private By form = By.id("serviceProviderImpl");
-    private By spId = By.id("spId");
-    private By companyName = By.id("companyName");
-    private By address = By.id("address");
-    private By description = By.id("description");
-    private By whiteListedUsers = By.id("whiteListedUsers");
-    private By blackListedUsers = By.id("blackListedUsers");
-    private By dedicatedAliases = By.id("dedicatedAliases");
-    private By spUsers = By.id("userNames");
-    private By marketingUsers = By.id("allowedMarketingUsers");
-    private By resources = By.id("allowedNcses");
-    private By submitButton = By.xpath("//*[@id='serviceProviderImpl']//input[@type='submit']");
-    private By successMsg = By.id("msg");
-    private By errorMsg = By.id("status");
+    private final By form = By.id("serviceProviderImpl");
+    private final By spId = By.id("spId");
+    private final By companyName = By.id("companyName");
+    private final By address = By.id("address");
+    private final By description = By.id("description");
+    private final By whiteListedUsers = By.id("whiteListedUsers");
+    private final By blackListedUsers = By.id("blackListedUsers");
+    private final By dedicatedAliases = By.id("dedicatedAliases");
+    private final By spUsers = By.id("userNames");
+    private final By marketingUsers = By.id("allowedMarketingUsers");
+    private final By resources = By.id("allowedNcses");
+    private final By submitButton = By.xpath("//*[@id='serviceProviderImpl']//input[@type='submit']");
+    private final By successMsg = By.id("msg");
+    private final By errorMsg = By.id("status");
 
-    public ServiceProviderRegistrationPage(SelfHealingDriver driver) {
+    public ServiceProviderRegistrationPage(SelfHealingDriver driver, SelfHealingDriverWait wait) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.wait = wait;
     }
 
     public void open() {
-        driver.get("https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html");
+        System.out.println("Trying to open Service Provider Registration page");
+        logger.info(String.format("Cookies before navigation: %s", driver.manage().getCookies().toString()));
+        driver.navigate().to("https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html");
+        // driver.navigate().to("https://google.com");
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("serviceProviderImpl")));
+        logger.info("Navigated to Service Provider Registration page.");
     }
 
     public boolean isFormVisible() {
-        return driver.findElement(form).isDisplayed();
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(form));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void enterServiceProviderId(String value) {
-        WebElement el = driver.findElement(spId);
+        WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(spId));
         el.clear();
         el.sendKeys(value);
     }
 
     public void enterCompanyName(String value) {
-        WebElement el = driver.findElement(companyName);
+        WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(companyName));
         el.clear();
         el.sendKeys(value);
     }
 
     public void enterAddress(String value) {
-        WebElement el = driver.findElement(address);
+        WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(address));
         el.clear();
         el.sendKeys(value);
     }
 
     public void enterDescription(String value) {
-        WebElement el = driver.findElement(description);
+        WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(description));
         el.clear();
         el.sendKeys(value);
     }
 
     public void enterWhiteListedUsers(String value) {
-        WebElement el = driver.findElement(whiteListedUsers);
+        WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(whiteListedUsers));
         el.clear();
         el.sendKeys(value);
     }
 
     public void enterBlackListedUsers(String value) {
-        WebElement el = driver.findElement(blackListedUsers);
+        WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(blackListedUsers));
         el.clear();
         el.sendKeys(value);
     }
 
     public void enterDedicatedAlias(String value) {
-        WebElement el = driver.findElement(dedicatedAliases);
+        WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(dedicatedAliases));
         el.clear();
         el.sendKeys(value);
     }
 
     public void selectSPUser(String user) {
-        Select select = new Select(driver.findElement(spUsers));
+        WebElement selectElement = wait.until(ExpectedConditions.visibilityOfElementLocated(spUsers));
+        Select select = new Select(selectElement);
         select.selectByVisibleText(user);
     }
 
     public void clearSPUsers() {
-        Select select = new Select(driver.findElement(spUsers));
+        WebElement selectElement = wait.until(ExpectedConditions.visibilityOfElementLocated(spUsers));
+        Select select = new Select(selectElement);
         select.deselectAll();
     }
 
     public void selectMarketingUser(String user) {
-        Select select = new Select(driver.findElement(marketingUsers));
+        WebElement selectElement = wait.until(ExpectedConditions.visibilityOfElementLocated(marketingUsers));
+        Select select = new Select(selectElement);
         select.selectByVisibleText(user);
     }
 
     public void clearMarketingUsers() {
-        Select select = new Select(driver.findElement(marketingUsers));
+        WebElement selectElement = wait.until(ExpectedConditions.visibilityOfElementLocated(marketingUsers));
+        Select select = new Select(selectElement);
         select.deselectAll();
     }
 
     public void selectResource(String resource) {
-        Select select = new Select(driver.findElement(resources));
+        WebElement selectElement = wait.until(ExpectedConditions.visibilityOfElementLocated(resources));
+        Select select = new Select(selectElement);
         select.selectByVisibleText(resource);
     }
 
     public void clearResources() {
-        Select select = new Select(driver.findElement(resources));
+        WebElement selectElement = wait.until(ExpectedConditions.visibilityOfElementLocated(resources));
+        Select select = new Select(selectElement);
         select.deselectAll();
     }
 
     public void fillRequiredFieldsWithValidData() {
+        logger.info("Filling required fields with valid data...");
         enterCompanyName("Valid Company");
         enterAddress("123 Main Street");
         enterDescription("A valid description");
@@ -126,15 +144,19 @@ public class ServiceProviderRegistrationPage {
         selectSPUser("acrsp1");
         selectMarketingUser("ThiostMktg");
         selectResource("SMS");
+        logger.info("Finished filling required fields.");
     }
 
     public void submitForm() {
-        driver.findElement(submitButton).click();
+        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(submitButton));
+        button.click();
+        logger.info("Registration form submitted.");
     }
 
     public boolean isSuccessMessageVisible() {
         try {
-            return driver.findElement(successMsg).isDisplayed();
+            WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(successMsg));
+            return el.isDisplayed();
         } catch (Exception e) {
             return false;
         }
@@ -142,7 +164,7 @@ public class ServiceProviderRegistrationPage {
 
     public boolean isErrorMessageVisible(String expectedMsg) {
         try {
-            WebElement el = driver.findElement(errorMsg);
+            WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(errorMsg));
             return el.isDisplayed() && el.getText().contains(expectedMsg);
         } catch (Exception e) {
             return false;
