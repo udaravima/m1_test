@@ -1,11 +1,7 @@
 Feature: Service Provider Registration
 
   Background:
-    Given I navigate to the login page
-    Then the login form should be visible
-    When I enter valid "sdpsp" and "test"
-    And I click the login button
-    Then I should be redirected to the dashboard
+    Given I am logged in successfully
     Then I navigate to the service provider registration page
     Then the registration form should be visible
   # Service Provider ID

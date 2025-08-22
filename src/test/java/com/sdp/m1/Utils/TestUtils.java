@@ -111,7 +111,11 @@ public class TestUtils {
     /**
      * Take a screenshot and save it to the specified directory
      */
-    public static String takeScreenshot(WebDriver driver, String testName) {
+    public static String takeScreenshot(String testName) {
+        if (driver == null) {
+            logger.warning("Cannot take screenshot, driver is not initialized.");
+            return null;
+        }
         try {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
             String fileName = testName + "_" + timestamp + ".png";
@@ -130,7 +134,7 @@ public class TestUtils {
 
             logger.info(String.format("Screenshot saved: %s", screenshotPath));
             return screenshotPath;
-        } catch (Exception e) {
+        } catch (ReflectiveOperationException | ClassCastException | IOException e) {
             logger.severe(String.format("Failed to take screenshot: %s", e.getMessage()));
             return null;
         }
@@ -341,9 +345,9 @@ public class TestUtils {
         logger.info(String.format("Page loaded in acceptable time: %dms", loadTime));
     }
 
-    public static void removeDriver(SelfHealingDriver drv) {
-        if (drv != null) {
-            drv.quit();
+    public static void removeDriver() {
+        if (driver != null) {
+            driver.quit();
         }
         driver = null;
         waitDriver = null;
@@ -353,7 +357,11 @@ public class TestUtils {
      * Get the WebDriver instance
      */
     public static SelfHealingDriver getDriver(String browserType) {
-        if (driver == null) {
+        // If browserType is null, it's a call to get the existing driver.
+        // If the driver is null, we can't proceed without a browser type.
+        if (driver == null && browserType == null) {
+            return null;
+        } else if (driver == null) {
             try {
                 switch (browserType.toLowerCase()) {
                     case "firefox" -> {
@@ -421,4 +429,5 @@ public class TestUtils {
         }
         return waitDriver;
     }
+
 }

@@ -13,7 +13,7 @@ Feature: User Login Functionality
 
   @smoke @positive @Login
   Scenario Outline: Successful Login with Valid Credentials
-    When I enter valid <username> and <password>
+    When I enter valid "<username>" and "<password>"
     And I click the login button
     Then I should be redirected to the dashboard
 
@@ -23,7 +23,7 @@ Feature: User Login Functionality
 
   @negative @validation @Login
   Scenario Outline: Failed Login with Invalid Credentials
-    When I enter invalid <username> and <password>
+    When I enter invalid "<username>" and "<password>"
     And I click the login button
     Then I should see an error message
     And I should remain on the login page
@@ -105,20 +105,19 @@ Feature: User Login Functionality
   @performance @Login
   Scenario: Login Page Load Performance
     Given I navigate to the login page
-    Then the login form should be visible
     And the page should load within acceptable time
 
   @security @Login
   Scenario: Password Field Security
     Given I am on the login page
-    When I enter valid sdpsp and test
+    When I enter valid "sdpsp" and "test"
     Then the password field should mask the input
     And password should not be visible in page source
 
   @browser @cross-browser @Login
   Scenario: Cross Browser Login Compatibility
     Given I navigate to the login page using <browser>
-    When I enter valid sdpsp and test
+    When I enter valid "sdpsp" and "test"
     And I click the login button
     Then I should be redirected to the dashboard
 
@@ -130,10 +129,7 @@ Feature: User Login Functionality
 
   @session @Security
   Scenario: Session Management After Login
-    Given I am on the login page
-    When I enter valid username and password
-    And I click the login button
-    And I should be redirected to the dashboard
+    Given I am logged in successfully
     Then the session should be properly established
     And I should not be able to access login page again
 

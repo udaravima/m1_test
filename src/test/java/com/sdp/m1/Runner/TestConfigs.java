@@ -8,7 +8,7 @@ public class TestConfigs {
     private static Properties properties;
 
     // Default values
-    private static final String DEFAULT_LOGIN_URL = "https://m1-impl.hsenidmobile.com/cas/login";
+    private static final String DEFAULT_LOGIN_URL = "https://m1-impl.hsenidmobile.com";
     private static final String DEFAULT_USERNAME = "sdpsp";
     private static final String DEFAULT_PASSWORD = "test";
     private static final String DEFAULT_DELAY = "10";
@@ -112,6 +112,10 @@ public class TestConfigs {
         return Boolean.parseBoolean(getProperty("screenshot.on.failure", "true"));
     }
 
+    public static boolean isScreenshotOnSuccess() {
+        return Boolean.parseBoolean(getProperty("screenshot.on.success", "false"));
+    }
+
     public static String getScreenshotPath() {
         return getProperty("screenshot.path", "target/screenshots");
     }
@@ -127,5 +131,9 @@ public class TestConfigs {
 
     public static String getEdgeDriverPath() {
         return getProperty("edgedriver.path", "");
+    }
+
+    public static String getBaseUrl() {
+        return getProperty("base.url", DEFAULT_LOGIN_URL);
     }
 }

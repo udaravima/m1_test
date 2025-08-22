@@ -9,8 +9,6 @@ import com.sdp.m1.Pages.m1LoginPage;
 import com.sdp.m1.Runner.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
 
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -23,7 +21,6 @@ public class LoginSteps {
     private SelfHealingDriverWait wait;
     private final m1LoginPage loginPage;
     private String browserType = TestConfigs.getBrowser();
-    private String currentTestName;
 
     public LoginSteps() {
         this.driver = TestUtils.getDriver(TestConfigs.getBrowser());
@@ -56,7 +53,7 @@ public class LoginSteps {
     @Given("I am logged in successfully")
     public void i_am_logged_in_successfully() {
         i_navigate_to_the_login_page();
-        i_enter_valid_username_and_password("sdpsp", "test");
+        i_enter_valid_username_and_password(TestConfigs.getUsername(), TestConfigs.getPassword());
         i_click_the_login_button();
         i_should_be_redirected_to_the_dashboard();
         // Add a small wait to ensure session is fully established before next step
@@ -69,63 +66,18 @@ public class LoginSteps {
         i_navigate_to_the_login_page();
     }
 
-    @Before
-    public void setUp() {
-        // Get browser type from system property or use default
-        logger.info(String.format("Setting up test with browser: %s", browserType));
-        // Reset test status at the beginning of each test
-        TestUtils.resetTestStatus();
-    }
-
-    @After
-    public void tearDown() {
-        if (driver != null) {
-            try {
-                // Take screenshot before closing if test failed
-                if (TestUtils.isTestFailed()) {
-                    String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_failure");
-                    if (screenshotPath != null) {
-                        logger.info(String.format("Failure screenshot saved: %s", screenshotPath));
-                    }
-                }
-                System.out.println("Closing browser: " + browserType);
-                logger.warning("Closing browser: " + browserType);
-                TestUtils.removeDriver(driver);
-                driver = null;
-                wait = null;
-                logger.info("Browser closed successfully");
-            } catch (Exception e) {
-                logger.warning(String.format("Error closing browser: %s", e.getMessage()));
-            }
-        }
-    }
-
     @Given("I navigate to the login page")
     public void i_navigate_to_the_login_page() {
         try {
-            currentTestName = "navigate_to_login";
-            logger.info(String.format("Navigating to: %s", TestConfigs.getLoginUrl()));
-            driver.navigate().to(TestConfigs.getLoginUrl());
+            String loginUrl = TestConfigs.getBaseUrl() + "/cas/login";
+            logger.info(String.format("Navigating to: %s", loginUrl));
+            driver.navigate().to(loginUrl);
             loginPage.waitForPageLoad();
-
-            // Take screenshot of successful page load
-            String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_success");
-            if (screenshotPath != null) {
-                logger.info(String.format("Page load screenshot saved: %s", screenshotPath));
-            }
 
             logger.info("Login page loaded successfully");
         } catch (Exception e) {
             logger.severe(String.format("Failed to navigate to login page: %s", e.getMessage()));
             // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Navigation failed", e);
         }
     }
@@ -140,21 +92,11 @@ public class LoginSteps {
     @When("I enter valid {string} and {string}")
     public void i_enter_valid_username_and_password(String username, String password) {
         try {
-            currentTestName = "enter_valid_credentials";
             loginPage.enterUsername(username);
             loginPage.enterPassword(password);
             logger.info(String.format("Valid credentials entered - Username: %s", username));
         } catch (Exception e) {
             logger.severe(String.format("Failed to enter valid credentials: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Failed to enter credentials", e);
         }
     }
@@ -162,21 +104,11 @@ public class LoginSteps {
     @When("I enter invalid {string} and {string}")
     public void i_enter_invalid_username_and_password(String username, String password) {
         try {
-            currentTestName = "enter_invalid_credentials";
             loginPage.enterUsername(username);
             loginPage.enterPassword(password);
             logger.info(String.format("Invalid credentials entered - Username: %s", username));
         } catch (Exception e) {
             logger.severe(String.format("Failed to enter invalid credentials: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Failed to enter credentials", e);
         }
     }
@@ -184,20 +116,10 @@ public class LoginSteps {
     @When("I click the login button")
     public void i_click_the_login_button() {
         try {
-            currentTestName = "click_login_button";
             loginPage.clickLoginButton();
             logger.info("Login button clicked");
         } catch (Exception e) {
             logger.severe(String.format("Failed to click login button: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Login button click failed", e);
         }
     }
@@ -205,27 +127,10 @@ public class LoginSteps {
     @Then("I should be redirected to the dashboard")
     public void i_should_be_redirected_to_the_dashboard() {
         try {
-            currentTestName = "verify_dashboard_redirect";
             loginPage.verifyDashboard();
-
-            // Take screenshot of successful dashboard
-            String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_success");
-            if (screenshotPath != null) {
-                logger.info(String.format("Dashboard screenshot saved: %s", screenshotPath));
-            }
-
             logger.info("Successfully redirected to dashboard");
         } catch (Exception e) {
             logger.severe(String.format("Dashboard verification failed: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Dashboard verification failed", e);
         }
     }
@@ -233,27 +138,10 @@ public class LoginSteps {
     @Then("I should see an error message")
     public void i_should_see_an_error_message() {
         try {
-            currentTestName = "verify_error_message";
             loginPage.verifyErrorMessage();
-
-            // Take screenshot of error message
-            String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_success");
-            if (screenshotPath != null) {
-                logger.info(String.format("Error message screenshot saved: %s", screenshotPath));
-            }
-
             logger.info("Error message displayed successfully");
         } catch (Exception e) {
             logger.severe(String.format("Error message verification failed: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Error message verification failed", e);
         }
     }
@@ -261,29 +149,12 @@ public class LoginSteps {
     @Then("I should remain on the login page")
     public void i_should_remain_on_the_login_page() {
         try {
-            currentTestName = "verify_remain_on_login_page";
             if (!loginPage.isOnLoginPage()) {
                 throw new AssertionError("User was redirected away from login page");
             }
-
-            // Take screenshot of login page
-            String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_success");
-            if (screenshotPath != null) {
-                logger.info(String.format("Login page screenshot saved: %s", screenshotPath));
-            }
-
             logger.info("User remained on login page as expected");
         } catch (Exception e) {
             logger.severe(String.format("Login page verification failed: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Login page verification failed", e);
         }
     }
@@ -291,31 +162,14 @@ public class LoginSteps {
     @Then("the login form should be visible")
     public void the_login_form_should_be_visible() {
         try {
-            currentTestName = "verify_login_form_visibility";
             if (!loginPage.isUsernameFieldDisplayed()
                     || !loginPage.isPasswordFieldDisplayed()
                     || !loginPage.isLoginButtonEnabled()) {
                 throw new AssertionError("Login form elements are not visible or enabled");
             }
-
-            // Take screenshot of visible login form
-            String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_success");
-            if (screenshotPath != null) {
-                logger.info(String.format("Login form screenshot saved: %s", screenshotPath));
-            }
-
             logger.info("Login form is visible and enabled");
         } catch (Exception e) {
             logger.severe(String.format("Login form visibility check failed: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Login form visibility check failed", e);
         }
     }
@@ -323,20 +177,10 @@ public class LoginSteps {
     @When("I clear the username field")
     public void i_clear_the_username_field() {
         try {
-            currentTestName = "clear_username_field";
             loginPage.enterUsername("");
             logger.info("Username field cleared");
         } catch (Exception e) {
             logger.severe(String.format("Failed to clear username field: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Failed to clear username field", e);
         }
     }
@@ -344,20 +188,10 @@ public class LoginSteps {
     @When("I clear the password field")
     public void i_clear_the_password_field() {
         try {
-            currentTestName = "clear_password_field";
             loginPage.enterPassword("");
             logger.info("Password field cleared");
         } catch (Exception e) {
             logger.severe(String.format("Failed to clear password field: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Failed to clear password field", e);
         }
     }
@@ -365,30 +199,13 @@ public class LoginSteps {
     @Then("the username field should be empty")
     public void the_username_field_should_be_empty() {
         try {
-            currentTestName = "verify_username_field_empty";
             String usernameValue = loginPage.getUsernameFieldValue();
             if (!usernameValue.isEmpty()) {
                 throw new AssertionError("Username field is not empty, contains: " + usernameValue);
             }
-
-            // Take screenshot of empty username field
-            String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_success");
-            if (screenshotPath != null) {
-                logger.info(String.format("Empty username field screenshot saved: %s", screenshotPath));
-            }
-
             logger.info("Username field is empty as expected");
         } catch (Exception e) {
             logger.severe(String.format("Username field empty check failed: %s", e.getMessage()));
-            // Mark test as failed
-            TestUtils.markTestFailed();
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Username field empty check failed", e);
         }
     }
@@ -396,28 +213,13 @@ public class LoginSteps {
     @Then("the password field should be empty")
     public void the_password_field_should_be_empty() {
         try {
-            currentTestName = "verify_password_field_empty";
             String passwordValue = loginPage.getPasswordFieldValue();
             if (!passwordValue.isEmpty()) {
                 throw new AssertionError("Password field is not empty");
             }
-
-            // Take screenshot of empty password field
-            String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_success");
-            if (screenshotPath != null) {
-                logger.info(String.format("Empty password field screenshot saved: %s", screenshotPath));
-            }
-
             logger.info("Password field is empty as expected");
         } catch (Exception e) {
             logger.severe(String.format("Password field empty check failed: %s", e.getMessage()));
-            // Take screenshot on failure
-            if (driver != null) {
-                String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName + "_error");
-                if (screenshotPath != null) {
-                    logger.info(String.format("Error screenshot saved: %s", screenshotPath));
-                }
-            }
             throw new RuntimeException("Password field empty check failed", e);
         }
     }
@@ -436,13 +238,8 @@ public class LoginSteps {
     @And("I take a screenshot")
     public void i_take_a_screenshot() {
         try {
-            currentTestName = "manual_screenshot";
-            String screenshotPath = TestUtils.takeScreenshot(driver, currentTestName);
-            if (screenshotPath != null) {
-                logger.info(String.format("Manual screenshot saved: %s", screenshotPath));
-            } else {
-                logger.warning("Failed to take manual screenshot");
-            }
+            TestUtils.takeScreenshot("manual_screenshot");
+            logger.info("Manual screenshot taken.");
         } catch (Exception e) {
             logger.severe(String.format("Error taking manual screenshot: %s", e.getMessage()));
         }
@@ -499,7 +296,8 @@ public class LoginSteps {
 
     @And("I should not be able to access login page again")
     public void i_should_not_be_able_to_access_login_page_again() {
-        driver.navigate().to(TestConfigs.LOGIN_URL);
+        String loginUrl = TestConfigs.getBaseUrl() + "/cas/login";
+        driver.navigate().to(loginUrl);
         if (loginPage.isOnLoginPage()) {
             throw new AssertionError("Able to access login page after login");
         }
