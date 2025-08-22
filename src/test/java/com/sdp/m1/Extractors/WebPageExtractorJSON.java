@@ -43,7 +43,7 @@ public class WebPageExtractorJSON {
     private static final Boolean USE_CSS_SELECTOR = false;
     private static final Boolean USE_COOKIE = true;
     private static final Integer THREAD_DELAY = 8000;
-    private static final String USE_URL = "https://lms.jfn.ac.lk/lms-new/login/index.php";
+    private static final String USE_URL = "https://m1-impl.hsenidmobile.com/provisioning/";
     private static final String NAV_URL = "https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html";
     // private static final String USE_URL = "https://google.com";
     // private static final String USE_URL =
@@ -81,12 +81,12 @@ public class WebPageExtractorJSON {
             driver.manage().deleteCookieNamed(COOKIE_NAME);
             // driver.manage().deleteCookieNamed("PHPSESSID");
             driver.manage().addCookie(COOKIE);
+            driver.get(USE_URL);
             try {
-                Thread.sleep(1000);
+                Thread.sleep(THREAD_DELAY);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            driver.get(USE_URL);
 
             // Wait for a key element to be present after reload, confirming login state
             try {

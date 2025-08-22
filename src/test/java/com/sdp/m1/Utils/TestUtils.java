@@ -413,6 +413,7 @@ public class TestUtils {
         }
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(Integer.parseInt(TestConfigs.getDelay())));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(Integer.parseInt(TestConfigs.getDelay())));
+        driver.manage().window().maximize();
 
         return driver;
 
@@ -420,7 +421,8 @@ public class TestUtils {
 
     public static SelfHealingDriverWait getWaitDriver(SelfHealingDriver driver) {
         if (driver == null) {
-            // Fail fast if the driver is not initialized. This prevents NullPointerExceptions later.
+            // Fail fast if the driver is not initialized. This prevents
+            // NullPointerExceptions later.
             throw new IllegalStateException("Cannot create a wait instance with a null driver.");
         }
         if (waitDriver == null) {

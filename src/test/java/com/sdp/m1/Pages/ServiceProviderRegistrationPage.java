@@ -10,9 +10,13 @@ import com.epam.healenium.SelfHealingDriver;
 import com.epam.healenium.SelfHealingDriverWait;
 
 import java.util.logging.Logger;
+
 import com.sdp.m1.Runner.TestConfigs;
+import com.sdp.m1.Utils.TestUtils;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import junit.framework.Test;
 
 public class ServiceProviderRegistrationPage {
     private static final Logger logger = Logger.getLogger(ServiceProviderRegistrationPage.class.getName());
@@ -41,11 +45,10 @@ public class ServiceProviderRegistrationPage {
     }
 
     public void open() {
-        System.out.println("Trying to open Service Provider Registration page");
         String registrationUrl = TestConfigs.getBaseUrl() + "/provisioning/registerServiceProvider.html";
         logger.info(String.format("Cookies before navigation: %s", driver.manage().getCookies().toString()));
+        driver.navigate().to(String.format("%s/provisioning", TestConfigs.getBaseUrl()));
         driver.navigate().to(registrationUrl);
-        // driver.navigate().to("https://google.com");
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("serviceProviderImpl")));
         logger.info("Navigated to Service Provider Registration page.");
     }
