@@ -1,9 +1,9 @@
 package com.sdp.m1.Extractors;
 
 import java.io.FileWriter;
-import java.lang.reflect.Array;
 import java.time.Duration;
 import java.util.*;
+import java.net.URL;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,17 +17,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import lombok.experimental.FieldNameConstants;
 // import com.sdp.m1.Runner.TestConfigs;
 
 /* 
 // TODO:
 //
 // - Good Naming scheme
+// - Add Test name to the file 
 // - If the type is 'hidden' of a element ignore :)
 // - add checks for css selector and 'hidden' (bool vals) :)
-// - Add Test name to the file 
-// - Adjust the text not just element.text() but with element.attr("placeholder") if exists or with other info
+// - Adjust the text not just element.text() but with element.attr("placeholder") if exists or with other info :|
 // - Make this as modulable 
 // - Login and session feature fix
 // - Select tag upgrades! :)
@@ -40,8 +39,10 @@ public class WebPageExtractorJSON {
     // private static final String USE_URL =
     // "https://m1-impl.hsenidmobile.com/cas/login";
     // private static final String USE_URL = "https://google.com";
-    // private static final String USE_URL = "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login";
-    private static final String USE_URL = "https://facebook.com";
+    // private static final String USE_URL =
+    // "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login";
+    // private static final String USE_URL = "https://facebook.com";
+    private static final String USE_URL = "https://lms.jfn.ac.lk/lms-new";
 
     private static final String COOKIE_NAME = "JSESSIONID";
     private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "37B78748D50060E1BDAD9A82BDBA6005");
@@ -79,10 +80,38 @@ public class WebPageExtractorJSON {
             System.out.println("Navigated with cookies");
         }
 
+        // Breaking URL to domain and locators
+        URL url = new URL(USE_URL);
+        String domain = url.getHost();
+        String path = url.getPath();
+        // Trim trailing slash if it's not the root path, to handle URLs like /login/
+        if (path.endsWith("/") && path.length() > 1) {
+            path = path.substring(0, path.length() - 1);
+        }
+
+        String pageName;
+        if (path != null && !path.equals("/") && path.length() > 1) {
+            // Get the last part of the path, e.g., "login" from "/auth/login"
+            pageName = path.substring(path.lastIndexOf('/') + 1);
+            // Also remove file extensions like .html or .php to get a cleaner name
+            int lastDot = pageName.lastIndexOf('.');
+            if (lastDot > 0) {
+                pageName = pageName.substring(0, lastDot);
+            }
+        } else {
+            // Use the first part of the domain, e.g., "google" from "google.com"
+            pageName = domain.split("\\.")[0];
+        }
+
+        // Sanitize pageName for use in a filename
+        pageName = pageName.replaceAll("[^a-zA-Z0-9\\-]", "_").toLowerCase();
+        if (pageName.isEmpty()) {
+            pageName = "index"; // Fallback for cases like "http://example.com/"
+        }
+
         String timestamp = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        String fileName = String.format("target/ExJson/page_components_%s_%s.json", timestamp,
-                Math.abs(USE_URL.hashCode()));
+        String fileName = String.format("target/ExJson/page_components_%s_%s.json", pageName, timestamp);
 
         System.out.println("Page source loaded, waiting for elements...");
         Thread.sleep(5000); // let the page load first
@@ -163,64 +192,11 @@ public class WebPageExtractorJSON {
                 if (we.isDisplayed())
                     c.boundingBox = box;
 
+                // Extract actions (buttons, submit, links)
                 Elements buttons = el.select("button, input[type=submit], input[type=button], input[type=reset], a");
                 Elements inputs = el.select("input, textarea, select");
                 fieldBuilder(buttons, c.actions, doc, null);
                 fieldBuilder(inputs, c.fields, doc, new ArrayList<>(Arrays.asList("submit", "reset", "button")));
-
-                // Extract actions (buttons, submit, links)
-                // Add actions from the current element
-                // for (Element b : buttons) {
-                // if (b.attr("type").equals("hidden") && !SELECT_HIDDEN)
-                // continue; // Skip hidden elements unless explicitly selected
-                // Map<String, String> actionMeta = new HashMap<>();
-                // actionMeta.put("selector", buildSelector(b));
-                // actionMeta.put("text", b.text().trim());
-                // actionMeta.put("type", b.tagName());
-                // actionMeta.put("name", b.attr("name"));
-                // actionMeta.put("role", b.attr("role"));
-                // actionMeta.put("value", b.attr("value"));
-                // if (b.attr("aria-label").length() > 0)
-                // actionMeta.put("aria-label", b.attr("aria-label"));
-                // if (b.attr("href").length() > 0)
-                // actionMeta.put("href", b.attr("href"));
-                // c.actions.add(actionMeta);
-                // }
-
-                // Extract fields (inputs, selects, textareas)
-                // Add fields from the current element
-                // for (Element f : inputs) {
-                // if (f.attr("type").equals("hidden") && !SELECT_HIDDEN)
-                // continue; // Skip hidden elements unless explicitly selected
-                // if ("submit".equals(f.attr("type")) || "button".equals(f.attr("type"))
-                // || "reset".equals(f.attr("type")))
-                // continue;
-
-                // Map<String, String> fieldMeta = new HashMap<>();
-                // fieldMeta.put("selector", buildSelector(f));
-                // fieldMeta.put("text", f.text().trim());
-                // fieldMeta.put("type", f.attr("type").isEmpty() ? f.tagName() :
-                // f.attr("type"));
-                // fieldMeta.put("name", f.attr("name"));
-                // fieldMeta.put("role", f.attr("role"));
-                // fieldMeta.put("value", f.attr("value"));
-                // fieldMeta.put("placeholder", f.attr("placeholder"));
-                // fieldMeta.put("label", findLabelText(doc, f));
-                // if (f.attr("aria-label").length() > 0)
-                // fieldMeta.put("aria-label", f.attr("aria-label"));
-
-                // c.fields.add(fieldMeta);
-                // }
-
-                // // Avoid duplicates (same selector + type)
-                // boolean duplicate = components.stream()
-                // .anyMatch(existing -> existing.selector.equals(c.selector) &&
-                // existing.type.equals(c.type) ||
-                // (existing.fields.equals(c.fields) && existing.actions.equals(c.actions)));
-
-                // if (!duplicate) {
-                // components.add(c);
-                // }
 
                 // Avoid duplicates by selector+type
                 boolean duplicateSelector = components.stream()
@@ -277,6 +253,7 @@ public class WebPageExtractorJSON {
                 // Handle <select> elements
                 meta.put("options", String.join(",", getSelectOptions(element)));
             }
+
             if (element.attr("href").length() > 0)
                 meta.put("href", element.attr("href"));
             if (element.attr("aria-label").length() > 0)
@@ -308,23 +285,6 @@ public class WebPageExtractorJSON {
             return getXPath(el);
         }
     }
-
-    // private static String getXPath(Element el) {
-    // List<String> path = new ArrayList<>();
-    // Element current = el;
-    // while (current != null && !current.tagName().equals("html")) {
-    // int index = 1;
-    // Element sibling = current.previousElementSibling();
-    // while (sibling != null) {
-    // if (sibling.tagName().equals(current.tagName()))
-    // index++;
-    // sibling = sibling.previousElementSibling();
-    // }
-    // path.add(0, "/" + current.tagName() + "[" + index + "]");
-    // current = current.parent();
-    // }
-    // return "/html" + String.join("", path);
-    // }
 
     private static String getXPath(Element el) {
         if (el == null)
@@ -413,7 +373,6 @@ public class WebPageExtractorJSON {
         return String.join(" > ", parts);
     }
 
-    // Find <label for="id"> text if available
     private static String findLabelText(Document doc, Element input) {
         String id = input.id();
         if (id != null && !id.isEmpty()) {
