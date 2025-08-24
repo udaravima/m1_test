@@ -1,7 +1,5 @@
 package com.sdp.m1.Pages;
 
-import java.time.Duration;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
@@ -11,12 +9,9 @@ import com.epam.healenium.SelfHealingDriverWait;
 
 import java.util.logging.Logger;
 
-import com.sdp.m1.Runner.TestConfigs;
-import com.sdp.m1.Utils.TestUtils;
+import com.sdp.m1.Utils.TestConfigs;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
-
-import junit.framework.Test;
 
 public class ServiceProviderRegistrationPage {
     private static final Logger logger = Logger.getLogger(ServiceProviderRegistrationPage.class.getName());
@@ -49,6 +44,7 @@ public class ServiceProviderRegistrationPage {
         logger.info(String.format("Cookies before navigation: %s", driver.manage().getCookies().toString()));
         driver.navigate().to(String.format("%s/provisioning", TestConfigs.getBaseUrl()));
         driver.navigate().to(registrationUrl);
+        driver.navigate().to(registrationUrl); // Debugging
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("serviceProviderImpl")));
         logger.info("Navigated to Service Provider Registration page.");
     }
@@ -173,6 +169,25 @@ public class ServiceProviderRegistrationPage {
             return el.isDisplayed() && el.getText().contains(expectedMsg);
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public boolean isConfirmationDialogVisible() {
+        try {
+            wait.until(ExpectedConditions.alertIsPresent());
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void confirmRegistration() {
+        try {
+            wait.until(ExpectedConditions.alertIsPresent());
+            driver.switchTo().alert().accept();
+            logger.info("Confirmed the registration alert.");
+        } catch (Exception e) {
+            logger.warning("No alert present to confirm.");
         }
     }
 }

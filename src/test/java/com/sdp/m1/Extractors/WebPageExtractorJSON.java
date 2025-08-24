@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.time.Duration;
 import java.util.*;
 import java.net.URL;
+import java.net.URI;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -45,15 +46,8 @@ public class WebPageExtractorJSON {
     private static final Integer THREAD_DELAY = 8000;
     private static final String USE_URL = "https://m1-impl.hsenidmobile.com/provisioning/";
     private static final String NAV_URL = "https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html";
-    // private static final String USE_URL = "https://google.com";
-    // private static final String USE_URL =
-    // "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login";
-    // private static final String USE_URL = "https://facebook.com";
-    // private static final String USE_URL =
-    // "https://lms.jfn.ac.lk/lms-new/my/courses.php";
-
-    private static final String COOKIE_NAME = "MoodleSession";
-    private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "iv5e9cat70j6fsnf6kk9500fn4");
+    private static final String COOKIE_NAME = "JSESSIONID";
+    private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "0B0A5A6EF6D6D7C26B6542F95CD13291");
 
     @SuppressWarnings("unused")
     private static final class Component {
@@ -72,22 +66,25 @@ public class WebPageExtractorJSON {
     }
 
     public static void main(String[] args) throws Exception {
+        
         WebDriver driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
         driver.get(USE_URL);
 
         if (USE_COOKIE) {
+            driver.manage().deleteAllCookies();
             driver.manage().deleteCookieNamed(COOKIE_NAME);
-            // driver.manage().deleteCookieNamed("PHPSESSID");
+
             driver.manage().addCookie(COOKIE);
-            driver.get(USE_URL);
+            driver.navigate().refresh();
+
+            // Debugging
             try {
                 Thread.sleep(THREAD_DELAY);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-
             // Wait for a key element to be present after reload, confirming login state
             try {
                 new WebDriverWait(driver, Duration.ofSeconds(10))
@@ -98,16 +95,16 @@ public class WebPageExtractorJSON {
 
             System.out.println("Navigated with cookies");
         }
+        driver.navigate().to(NAV_URL);
 
         // Breaking URL to domain and locators
-        URL url = new URL(USE_URL);
+        URL url = new URI(USE_URL).toURL();
         String domain = url.getHost();
         String path = url.getPath();
         // Trim trailing slash if it's not the root path, to handle URLs like /login/
         if (path.endsWith("/") && path.length() > 1) {
             path = path.substring(0, path.length() - 1);
         }
-        System.out.printf("Domain: %s, Path: %s%n", domain, path);
         String pageName;
         if (path != null && !path.equals("/") && path.length() > 1) {
             // Get the last part of the path, e.g., "login" from "/auth/login"
@@ -352,6 +349,7 @@ public class WebPageExtractorJSON {
         return "/html/" + String.join("/", path);
     }
 
+    @SuppressWarnings("unused")
     private static String getCssSelector(Element el, Document doc) {
         if (el == null)
             return null;

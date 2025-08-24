@@ -8,10 +8,9 @@ import com.epam.healenium.SelfHealingDriver;
 import com.epam.healenium.SelfHealingDriverWait;
 
 import com.sdp.m1.Pages.ServiceProviderRegistrationPage;
-import com.sdp.m1.Runner.TestConfigs;
+import com.sdp.m1.Utils.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
 
-import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -138,9 +137,13 @@ public class ServiceProviderRegistrationSteps {
         registrationPage.submitForm();
     }
 
-    @Then("I should see a success message")
-    public void should_see_success_message() {
-        assertTrue(registrationPage.isSuccessMessageVisible());
+    // @Then("I should see a success message")
+    // public void should_see_success_message() {
+    // assertTrue(registrationPage.isSuccessMessageVisible());
+    // }
+    @Then("I should see a confirmation dialog")
+    public void should_see_confirmation_dialog() {
+        assertTrue(registrationPage.isConfirmationDialogVisible());
     }
 
     @Then("I should see error {string}")
@@ -148,5 +151,15 @@ public class ServiceProviderRegistrationSteps {
         assertTrue(registrationPage.isErrorMessageVisible(errorMsg));
     }
 
-    
+    @When("I confirm the registration")
+    public void confirm_registration() {
+        // Code to confirm the registration
+        registrationPage.confirmRegistration();
+    }
+
+    @Then("I should see a success message")
+    public void should_see_success_message() {
+        assertTrue(registrationPage.isSuccessMessageVisible());
+    }
+
 }

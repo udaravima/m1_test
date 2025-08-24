@@ -25,7 +25,6 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 
 import com.epam.healenium.SelfHealingDriver;
 import com.epam.healenium.SelfHealingDriverWait;
-import com.sdp.m1.Runner.TestConfigs;
 
 public class TestUtils {
 
@@ -336,7 +335,7 @@ public class TestUtils {
         long end = System.currentTimeMillis();
         long loadTime = end - start;
         // Get threshold from TestConfigs
-        long thresholdMs = com.sdp.m1.Runner.TestConfigs.getPageLoadThresholdMs();
+        long thresholdMs = com.sdp.m1.Utils.TestConfigs.getPageLoadThresholdMs();
         if (loadTime > thresholdMs) {
             logger.warning(
                     String.format("Page load time exceeded threshold: %dms (threshold: %dms)", loadTime, thresholdMs));
@@ -347,7 +346,11 @@ public class TestUtils {
 
     public static void removeDriver() {
         if (driver != null) {
-            driver.quit();
+            try {
+                driver.quit();
+            } catch (Exception e) {
+                logger.warning("Error occurred while quitting WebDriver: " + e.getMessage());
+            }
         }
         driver = null;
         waitDriver = null;
@@ -366,24 +369,24 @@ public class TestUtils {
                 switch (browserType.toLowerCase()) {
                     case "firefox" -> {
                         FirefoxOptions firefoxOptions = new FirefoxOptions();
-                        // firefoxOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        firefoxOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
                         if (TestConfigs.isHeadless()) {
                             firefoxOptions.addArguments("--headless");
                         } else {
                             firefoxOptions.addArguments("--headed");
                         }
-                        driver = SelfHealingDriver.create(new FirefoxDriver());
+                        driver = SelfHealingDriver.create(new FirefoxDriver(firefoxOptions));
                         break;
                     }
                     case "edge" -> {
                         EdgeOptions edgeOptions = new EdgeOptions();
-                        // edgeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        edgeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
                         if (TestConfigs.isHeadless()) {
                             edgeOptions.addArguments("--headless");
                         } else {
                             edgeOptions.addArguments("--headed");
                         }
-                        driver = SelfHealingDriver.create(new EdgeDriver());
+                        driver = SelfHealingDriver.create(new EdgeDriver(edgeOptions));
                         break;
                     }
                     default -> {
@@ -404,7 +407,8 @@ public class TestUtils {
             Exception e) {
                 System.out.println("Error occurred while initializing WebDriver: " + e.getMessage());
                 logger.severe(
-                        String.format("Failed to get WebDriver instance for %s: %s", browserType, e.getMessage()));
+                        String.format("Failed to get WebDriver instance for %s: %s\nCheck whether healenium is up!!",
+                                browserType, e.getMessage()));
             }
             if (driver == null) {
                 System.out.println("Failed to initialize WebDriver");

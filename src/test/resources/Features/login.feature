@@ -19,6 +19,7 @@ Feature: User Login Functionality
 
     Examples:
       | username | password |
+      | sdpadmin | test     |
       | sdpsp    | test     |
 
   @negative @validation @Login

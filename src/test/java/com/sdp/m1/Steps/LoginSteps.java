@@ -6,7 +6,7 @@ import com.epam.healenium.SelfHealingDriver;
 import com.epam.healenium.SelfHealingDriverWait;
 
 import com.sdp.m1.Pages.m1LoginPage;
-import com.sdp.m1.Runner.TestConfigs;
+import com.sdp.m1.Utils.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
 
 import io.cucumber.java.en.And;
