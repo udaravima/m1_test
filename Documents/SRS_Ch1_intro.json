@@ -1,0 +1,104 @@
+{
+  "document": {
+    "title": "System Requirement Specification - mChoice SDP",
+    "version": "1.5",
+    "date_last_edited": "2011-12-29",
+    "author": "hSenid Software International",
+    "customer": "MobileOne, Singapore",
+    "change_control": [
+      {
+        "version": "1.0",
+        "date": "2008-09-08",
+        "description": "SDP software requirements specification",
+        "author": "Roshni Hewamallika"
+      },
+      {
+        "version": "1.1",
+        "date": "2009-01-30",
+        "description": "Phase 2 requirements",
+        "author": "Roshni Hewamallika"
+      },
+      {
+        "version": "1.2",
+        "date": "2009-02-11",
+        "description": "Updated based on M1 feedback and added more phase 2 requirements",
+        "author": "Roshni Hewamallika"
+      },
+      {
+        "version": "1.3",
+        "date": "2009-02-12",
+        "description": "Updated after internal review",
+        "author": "Roshni Hewamallika"
+      },
+      {
+        "version": "1.4",
+        "date": "2009-02-13",
+        "description": "Updated based on M1 feedback",
+        "author": "Roshni Hewamallika"
+      },
+      {
+        "version": "1.5",
+        "date": "2009-02-13",
+        "description": "Updated based on M1 feedback",
+        "author": "Roshni Hewamallika"
+      }
+    ],
+    "about_document": {
+      "purpose": "Provide system requirements of the Service Delivery Platform solution.",
+      "audience": [
+        "MobileOne, Singapore",
+        "Engineering division of hSenid Mobile Solutions"
+      ]
+    },
+    "definitions": {
+      "API": "Application Programming Interface",
+      "BAS": "Billing As Service",
+      "CDR": "Caller Detail Records",
+      "DB": "Database",
+      "KBPS": "Kilo Bytes Per Second",
+      "MMS": "Multimedia Messaging Service",
+      "MMSC": "Multimedia Messaging Service Centre",
+      "MO": "Mobile Originated",
+      "MT": "Mobile Terminated",
+      "RA": "Resource Adapter",
+      "SBB": "Service Building Block",
+      "SDP": "Service Delivery Platform",
+      "SLA": "Service Level Agreement",
+      "SMPP": "Short Message Peer to Peer",
+      "SMS": "Short Messaging Service",
+      "SMSC": "Short Messaging Service Centre",
+      "SP": "Service Provider",
+      "TPD": "Transactions Per Day",
+      "TPS": "Transactions Per Second",
+      "WAP": "Wireless Access Protocol",
+      "XMSC": "SMSC or MMSC"
+    },
+    "conventions": {
+      "italic": "Document titles, email addresses, URLs, file/directory names",
+      "bold": "Emphasis and UI command options",
+      "letter_gothic": "Literal code (config files, class names, methods, API calls)",
+      "letter_gothic_italic": "Arguments/parameters replaced with actual values"
+    },
+    "introduction": {
+      "description": "MobileOne requires a state-of-the-art, comprehensive messaging and content delivery solution across SMS, MMS, and WAP. The platform will act as middleware, interfacing network elements during transactional flow, serving as a centralized but modular solution for business requirements across regions.",
+      "purpose": "Detail the requirements of M1 regarding the Service Delivery Platform implemented by hSenid.",
+      "scope": {
+        "description": "Provide content delivery and charging for MobileOne customers and 3rd party Service Providers using MobileOne as mediator.",
+        "benefits": [
+          "Flexible and scalable solution improving operational efficiency and service creation.",
+          "Rapid enhancement of offerings and rich content delivery to subscribers.",
+          "Delivery and charging of services by 3rd party SPs with SLA-based control and automated activation.",
+          "Reduced time-to-market and cost savings while preserving network security and integrity."
+        ],
+        "objectives": [
+          "Secure Access Gateway to core network",
+          "Standards-based Web Services and middleware architecture",
+          "Centralized management of platform & applications with integration to billing, rating, and payments",
+          "Support for message mediation, routing, throughput control, logging, multi-protocol support",
+          "Provisioning systems, CDR generation & reporting, CDR Query, and dashboards"
+        ]
+      },
+      "overview": "This SRS is structured by SDP components and covers both Phase 1 and Phase 2 requirements."
+    }
+  }
+}

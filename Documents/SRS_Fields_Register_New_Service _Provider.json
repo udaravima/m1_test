@@ -1,0 +1,127 @@
+{
+  "RegisterNewServiceProvider": {
+    "ServiceProviderID": {
+      "description": "Used to capture the service provider ID.",
+      "type": "String",
+      "validation": {
+        "mandatory": true,
+        "unique": true,
+        "length": 8,
+        "format": "digits only"
+      },
+      "errorResponses": {
+        "missing": "Service provider Id required",
+        "duplicate": "Service Provider Id already exists",
+        "invalidLength": "Please enter 8 digit number for Service Provider Id."
+      }
+    },
+    "CompanyName": {
+      "description": "Used to capture the name of the company.",
+      "type": "String",
+      "validation": {
+        "mandatory": true,
+        "maxLength": 50,
+        "unique": true
+      },
+      "errorResponses": {
+        "missing": "Company Name required",
+        "tooLong": "Company Name should be less than 50 characters",
+        "duplicate": "Service Provider already exists"
+      }
+    },
+    "Address": {
+      "description": "Used to capture the address of the company.",
+      "type": "String",
+      "validation": {
+        "mandatory": false,
+        "maxLength": 255
+      },
+      "errorResponses": {
+        "tooLong": "Address should be less than 255 characters"
+      }
+    },
+    "Description": {
+      "description": "Used to capture the description about the SP.",
+      "type": "String",
+      "validation": {
+        "mandatory": false,
+        "maxLength": 255
+      },
+      "errorResponses": {
+        "tooLong": "Description should be less than 255 characters"
+      }
+    },
+    "WhiteListedUsers": {
+      "description": "Used to capture the white-listed phone numbers.",
+      "type": "String (comma-separated list)",
+      "validation": {
+        "mandatory": true,
+        "minLength": 8,
+        "maxLength": 15,
+        "multipleAllowed": true
+      },
+      "errorResponses": {
+        "invalidFormat": "Should be comma-separated phone numbers having 15 digits as maximum and 8 digits as minimum",
+        "conflictWithBlacklist": "You can not have a White-listed user in the Blacklisted user list.",
+        "duplicates": "Msisdn are Duplicate in White listed Msisdn."
+      }
+    },
+    "BlackListedUsers": {
+      "description": "Used to capture the black-listed phone numbers.",
+      "type": "String (comma-separated list)",
+      "validation": {
+        "mandatory": false,
+        "minLength": 8,
+        "maxLength": 15,
+        "multipleAllowed": true
+      },
+      "errorResponses": {}
+    },
+    "DedicatedAlias": {
+      "description": "Alias dedicated for the service provider across all SP Apps (supports regex and alphanumeric).",
+      "type": "String (comma-separated, supports regex)",
+      "validation": {
+        "mandatory": false,
+        "uniqueAcrossSPs": true,
+        "multipleAllowed": true
+      },
+      "errorResponses": {
+        "duplicate": "Dedicated alias/es - [Alias Name] or a wildcard format is already in use",
+        "invalidRegex": "Invalid regular expression/s {Dedicated Alias} please enter valid regular expression."
+      }
+    },
+    "SPUsers": {
+      "description": "SP-typed user(s) assigned for the new SP.",
+      "type": "Multi-select list",
+      "validation": {
+        "mandatory": true,
+        "minSelected": 1
+      },
+      "errorResponses": {
+        "missing": "Select atleast one User Name."
+      }
+    },
+    "MarketingUsers": {
+      "description": "Marketing user(s) who are allowed to monitor the SP and applications.",
+      "type": "Multi-select list",
+      "validation": {
+        "mandatory": true,
+        "minSelected": 1
+      },
+      "errorResponses": {
+        "missing": "Allowed Marketing Users required."
+      }
+    },
+    "Resources": {
+      "description": "Resources to be allowed for the SP (SMS, MMS, BAS, WAPPUSH, USSD, SWS).",
+      "type": "Multi-select list",
+      "validation": {
+        "mandatory": true,
+        "minSelected": 1
+      },
+      "errorResponses": {
+        "missing": "Select atleast one resource."
+      }
+    }
+  }
+}

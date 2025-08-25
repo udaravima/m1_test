@@ -1,0 +1,53 @@
+{
+  "admin_module": {
+    "description": "Allows administration of SDP system. Includes user, group, role, permission, and module management.",
+    "manage_users": {
+      "requirements": {
+        "REQ-ADM-USR-1": "System supports creation, deletion, updating of users",
+        "REQ-ADM-USR-2": "Each user associated with one group and one or more roles",
+        "REQ-ADM-USR-3": "Password reset and account locking available"
+      },
+      "add_user_form": [
+        { "field": "First Name", "mandatory": false },
+        { "field": "Last Name", "mandatory": false },
+        { "field": "User Name", "mandatory": true },
+        { "field": "Password", "mandatory": true },
+        { "field": "Confirm Password", "mandatory": true },
+        { "field": "Email Address", "mandatory": true },
+        { "field": "Description", "mandatory": false },
+        { "field": "Group", "mandatory": true }
+      ]
+    },
+    "manage_groups": {
+      "requirements": {
+        "REQ-ADM-GRP-1": "System supports creation, deletion, update of groups",
+        "REQ-ADM-GRP-2": "Each group can have multiple roles attached"
+      },
+      "add_group_form": [
+        { "field": "Group Name", "mandatory": true },
+        { "field": "Description", "mandatory": false }
+      ]
+    },
+    "manage_roles": {
+      "requirements": {
+        "REQ-ADM-ROL-1": "System supports creation, deletion, update of roles",
+        "REQ-ADM-ROL-2": "Each role has permissions mapped"
+      }
+    },
+    "manage_permissions": {
+      "requirements": {
+        "REQ-ADM-PERM-1": "Permissions created, deleted, updated by admin",
+        "REQ-ADM-PERM-2": "Each permission is mapped to a module function"
+      }
+    },
+    "manage_modules": {
+      "requirements": {
+        "REQ-ADM-MOD-1": "System supports creation, deletion, update of modules",
+        "REQ-ADM-MOD-2": "Modules can be mapped to permissions"
+      }
+    },
+    "references": [
+      { "type": "file", "id": "appendix-c", "file": "Provisioning_Mock_GUI.zip" }
+    ]
+  }
+}

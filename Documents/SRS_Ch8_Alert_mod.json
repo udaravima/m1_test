@@ -1,0 +1,12 @@
+{
+  "alert_module": {
+    "description": "Generates alerts on system failures, SLA violations, or abnormal activity.",
+    "requirements": {
+      "REQ-ALT-1": "System sends alerts via Email and SMS",
+      "REQ-ALT-2": "Alerts configurable by severity (Critical, Major, Minor)",
+      "REQ-ALT-3": "Operations-User can configure thresholds per NCS",
+      "REQ-ALT-4": "Alert history stored for 6 months",
+      "REQ-ALT-5": "Escalation rules supported (if not resolved in time, escalate to higher authority)"
+    }
+  }
+}

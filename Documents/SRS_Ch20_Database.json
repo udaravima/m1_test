@@ -1,0 +1,131 @@
+{
+  "database_design": {
+    "description": "Relational database schema for SDP system, covering provisioning, SLA, application, user management, logging, charging, and CDR storage.",
+    "tables": [
+      {
+        "name": "service_provider",
+        "description": "Stores Service Provider details and SLA associations.",
+        "fields": [
+          { "name": "sp_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "company_name", "type": "VARCHAR(255)", "nullable": false },
+          { "name": "address", "type": "VARCHAR(255)", "nullable": true },
+          { "name": "description", "type": "TEXT", "nullable": true },
+          { "name": "email", "type": "VARCHAR(255)", "nullable": false },
+          { "name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ]
+      },
+      {
+        "name": "sla",
+        "description": "Defines SLA configurations for Service Providers and Applications.",
+        "fields": [
+          { "name": "sla_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "sp_id", "type": "BIGINT", "fk": "service_provider.sp_id" },
+          { "name": "sla_type", "type": "ENUM('testbed','production')", "nullable": false },
+          { "name": "tps_limit", "type": "INT", "nullable": false },
+          { "name": "tpd_limit", "type": "INT", "nullable": false },
+          { "name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ]
+      },
+      {
+        "name": "application",
+        "description": "Represents applications provisioned under each Service Provider.",
+        "fields": [
+          { "name": "app_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "sp_id", "type": "BIGINT", "fk": "service_provider.sp_id" },
+          { "name": "name", "type": "VARCHAR(255)", "nullable": false },
+          { "name": "description", "type": "TEXT", "nullable": true },
+          { "name": "state", "type": "ENUM('draft','testbed','production','suspended','retired')", "nullable": false },
+          { "name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ]
+      },
+      {
+        "name": "user",
+        "description": "System users with roles and groups.",
+        "fields": [
+          { "name": "user_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "username", "type": "VARCHAR(100)", "unique": true, "nullable": false },
+          { "name": "password_hash", "type": "VARCHAR(255)", "nullable": false },
+          { "name": "email", "type": "VARCHAR(255)", "nullable": false },
+          { "name": "group_id", "type": "BIGINT", "fk": "user_group.group_id" },
+          { "name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ]
+      },
+      {
+        "name": "user_group",
+        "description": "Groups of users (SP-User, Operations-User, etc.).",
+        "fields": [
+          { "name": "group_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "name", "type": "VARCHAR(100)", "nullable": false },
+          { "name": "description", "type": "TEXT", "nullable": true }
+        ]
+      },
+      {
+        "name": "role",
+        "description": "Defines user roles mapped to permissions.",
+        "fields": [
+          { "name": "role_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "name", "type": "VARCHAR(100)", "nullable": false },
+          { "name": "description", "type": "TEXT", "nullable": true }
+        ]
+      },
+      {
+        "name": "permission",
+        "description": "Individual permissions assignable to roles.",
+        "fields": [
+          { "name": "perm_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "name", "type": "VARCHAR(100)", "nullable": false },
+          { "name": "module", "type": "VARCHAR(100)", "nullable": false }
+        ]
+      },
+      {
+        "name": "cdr",
+        "description": "Call Detail Records for SMS, MMS, WAP, BAS, USSD transactions.",
+        "fields": [
+          { "name": "cdr_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "transaction_id", "type": "VARCHAR(100)", "unique": true, "nullable": false },
+          { "name": "sp_id", "type": "BIGINT", "fk": "service_provider.sp_id" },
+          { "name": "app_id", "type": "BIGINT", "fk": "application.app_id" },
+          { "name": "message_type", "type": "ENUM('SMS','MMS','WAP','USSD','BAS')", "nullable": false },
+          { "name": "status", "type": "ENUM('success','failed')", "nullable": false },
+          { "name": "charge_amount", "type": "DECIMAL(10,2)", "nullable": true },
+          { "name": "timestamp", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ]
+      },
+      {
+        "name": "log",
+        "description": "Logs all system activities with severity levels.",
+        "fields": [
+          { "name": "log_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "user_id", "type": "BIGINT", "fk": "user.user_id" },
+          { "name": "module", "type": "VARCHAR(100)", "nullable": false },
+          { "name": "action", "type": "VARCHAR(255)", "nullable": false },
+          { "name": "severity", "type": "ENUM('DEBUG','INFO','WARN','ERROR','FATAL')", "nullable": false },
+          { "name": "timestamp", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ]
+      },
+      {
+        "name": "alert",
+        "description": "Stores alert events and escalation details.",
+        "fields": [
+          { "name": "alert_id", "type": "BIGINT", "pk": true, "auto_increment": true },
+          { "name": "severity", "type": "ENUM('Critical','Major','Minor')", "nullable": false },
+          { "name": "message", "type": "TEXT", "nullable": false },
+          { "name": "status", "type": "ENUM('open','acknowledged','resolved')", "nullable": false },
+          { "name": "created_at", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP" }
+        ]
+      }
+    ],
+    "relationships": [
+      { "from": "sla.sp_id", "to": "service_provider.sp_id", "type": "many-to-one" },
+      { "from": "application.sp_id", "to": "service_provider.sp_id", "type": "many-to-one" },
+      { "from": "user.group_id", "to": "user_group.group_id", "type": "many-to-one" },
+      { "from": "cdr.sp_id", "to": "service_provider.sp_id", "type": "many-to-one" },
+      { "from": "cdr.app_id", "to": "application.app_id", "type": "many-to-one" },
+      { "from": "log.user_id", "to": "user.user_id", "type": "many-to-one" }
+    ],
+    "references": [
+      { "type": "figure", "id": "fig-20.1", "file": "SDP_Database_ERD.jpg" },
+      { "type": "file", "id": "appendix-h", "file": "Database_Schema.xls" }
+    ]
+  }
+}

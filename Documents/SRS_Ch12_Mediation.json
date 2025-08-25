@@ -1,0 +1,18 @@
+{
+  "mediation_module": {
+    "description": "Acts as middleware for message routing, transformation, logging, and SLA enforcement across SDP components.",
+    "requirements": {
+      "REQ-MED-1": "Handles synchronous and asynchronous message mediation",
+      "REQ-MED-2": "Supports protocol conversion (SMPP, MM7, HTTP, SOAP, USSD)",
+      "REQ-MED-3": "Performs SLA enforcement before message forwarding",
+      "REQ-MED-4": "Supports throughput control per SLA (TPS, TPD)",
+      "REQ-MED-5": "Provides error handling and retries for failed deliveries",
+      "REQ-MED-6": "Logs mediation transactions in CDR Module",
+      "REQ-MED-7": "Supports routing rules based on shortcode, keyword, application ID, and SLA parameters",
+      "REQ-MED-8": "Supports load balancing across multiple application endpoints"
+    },
+    "references": [
+      { "type": "figure", "id": "fig-12.1", "file": "Mediation_Sequence_Flow.jpg" }
+    ]
+  }
+}

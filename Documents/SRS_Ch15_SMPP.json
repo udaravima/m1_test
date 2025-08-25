@@ -1,0 +1,18 @@
+{
+  "smpp_adapter": {
+    "description": "Provides connectivity between SDP and SMSC using SMPP protocol.",
+    "requirements": {
+      "REQ-SMPP-1": "Supports SMPP v3.3, v3.4, and v5.0",
+      "REQ-SMPP-2": "Supports both transceiver and transmitter/receiver modes",
+      "REQ-SMPP-3": "Handles MO/MT SMS submission and delivery receipts",
+      "REQ-SMPP-4": "Supports concatenated SMS handling and charging",
+      "REQ-SMPP-5": "Implements message throttling based on SLA TPS limits",
+      "REQ-SMPP-6": "Provides error codes for SMPP failures and retries",
+      "REQ-SMPP-7": "Generates CDRs for all SMS transactions",
+      "REQ-SMPP-8": "Supports failover to backup SMSC if primary unavailable"
+    },
+    "references": [
+      { "type": "figure", "id": "fig-15.1", "file": "SMPP_Adapter_Architecture.jpg" }
+    ]
+  }
+}

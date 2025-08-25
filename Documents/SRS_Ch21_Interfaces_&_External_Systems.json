@@ -1,0 +1,52 @@
+{
+  "interfaces_external_systems": {
+    "description": "Defines integration points between SDP and external telecom/billing/network systems.",
+    "interfaces": [
+      {
+        "system": "SMSC",
+        "adapter": "SMPP Adapter",
+        "description": "Handles SMS MO/MT delivery and receipts"
+      },
+      {
+        "system": "MMSC",
+        "adapter": "MM7 Adapter",
+        "description": "Handles MMS MO/MT delivery and reports"
+      },
+      {
+        "system": "WAP Gateway",
+        "adapter": "WAP Adapter",
+        "description": "Delivers WAP Push messages (SI/SL)"
+      },
+      {
+        "system": "USSD Gateway / IN",
+        "adapter": "USSD Adapter",
+        "description": "Handles USSD MO/MT sessions and prepaid interactions"
+      },
+      {
+        "system": "Billing System",
+        "adapter": "Rating & BAS Module",
+        "description": "Provides charging, prepaid credit management, and topup functions"
+      },
+      {
+        "system": "External Applications",
+        "adapter": "Web Services",
+        "description": "Apps communicate with SDP via SOAP/HTTP APIs"
+      },
+      {
+        "system": "Reporting/BI Tools",
+        "adapter": "Report Module",
+        "description": "Exports CDR and SLA reports for analysis"
+      }
+    ],
+    "requirements": {
+      "REQ-INT-1": "All interfaces comply with respective telecom standards (SMPP 3.4/5.0, MM7, WAP SI/SL, USSD MAP)",
+      "REQ-INT-2": "Supports failover routing between primary and secondary external systems",
+      "REQ-INT-3": "Interfaces monitored via Alert Module for failures",
+      "REQ-INT-4": "All interactions logged in CDR Module",
+      "REQ-INT-5": "Message retries configurable per interface"
+    },
+    "references": [
+      { "type": "figure", "id": "fig-21.1", "file": "SDP_External_Interfaces_ERD.jpg" }
+    ]
+  }
+}
