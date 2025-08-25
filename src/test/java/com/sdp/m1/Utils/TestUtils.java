@@ -77,6 +77,14 @@ public class TestUtils {
         return sb.toString();
     }
 
+    public static String generateRandomNumber(int length) {
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(random.nextInt(10));
+        }
+        return sb.toString();
+    }
+
     /**
      * Generate a random email address
      */
