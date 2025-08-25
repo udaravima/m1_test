@@ -96,7 +96,7 @@ public class WebPageExtractorJSON {
         this.wait = wait;
     }
 
-    public void runExtractor(String fileName) {
+    private List<Component> extractPageComponents() {
         Document doc = Jsoup.parse(driver.getPageSource());
         List<Component> components = new ArrayList<>();
         // Main semantic elements
@@ -106,11 +106,22 @@ public class WebPageExtractorJSON {
         extractByTag(doc, driver, "aside", "sidebar", components);
         extractByTag(doc, driver, "main", "main", components);
         extractByTag(doc, driver, "footer", "footer", components);
-
         // // Fallback: sections and large DIVs
         extractByTag(doc, driver, "div", "section", components);
+        return components;
+    }
 
+    public String extractComponentsAsJsonString() {
+        List<Component> components = extractPageComponents();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        return gson.toJson(components);
+    }
+
+    public String runExtractor(String fileName) {
+        List<Component> components = extractPageComponents();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         writeFile(components, fileName);
+        return gson.toJson(components);
 
     }
 

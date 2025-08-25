@@ -1,0 +1,252 @@
+{
+  "SLAConfiguration": {
+    "SMS": {
+      "SMS_MO_MaximumMessagesPerSecond": {
+        "description": "Maximum number of mobile originated SMS per second that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 1000 },
+        "errorResponses": {
+          "missing": "Maximum messages per second required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per Second should not be greater than 1000 message per second."
+        }
+      },
+      "SMS_MO_MaximumMessagesPerDay": {
+        "description": "Maximum number of mobile originated SMS per day that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 50000000 },
+        "errorResponses": {
+          "missing": "Maximum messages per day required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per day should not be greater than 50000000 message per day.",
+          "invalidRelation": "Max message per day should be greater than message per Second."
+        }
+      },
+      "NCSDescription": {
+        "description": "Description entered by the user regarding the NCS configuration.",
+        "type": "String",
+        "validation": { "mandatory": false, "maxLength": 255 },
+        "errorResponses": { "tooLong": "NCS Description is too long." }
+      },
+      "SMS_MT_MaximumRecipientsPerSecond": {
+        "description": "Maximum number of recipients per second the service provider can deliver SMS messages to.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 1000 },
+        "errorResponses": {
+          "missing": "Maximum messages per second required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per Second should not be greater than 1000 message per second."
+        }
+      },
+      "SMS_MT_MaximumRecipientsPerDay": {
+        "description": "Maximum number of recipients per day the service provider can deliver SMS messages to.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 50000000 },
+        "errorResponses": {
+          "missing": "Maximum messages per day required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per day should not be greater than 50000000 message per day.",
+          "invalidRelation": "Max message per day should be greater than message per Second."
+        }
+      },
+      "successMessage": "SMS SLA for Service Provider configured successfully"
+    },
+
+    "MMS": {
+      "MMS_MO_MaximumMessagesPerSecond": {
+        "description": "Maximum number of mobile originated MMS per second that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 100 },
+        "errorResponses": {
+          "missing": "Maximum messages per second required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per Second should not be greater than 100 message per second."
+        }
+      },
+      "MMS_MO_MaximumMessagesPerDay": {
+        "description": "Maximum number of mobile originated MMS per day that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 50000000 },
+        "errorResponses": {
+          "missing": "Maximum messages per day required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per day should not be greater than 50000000 message per day.",
+          "invalidRelation": "Maximum messages per day should be greater than maximum messages per second."
+        }
+      },
+      "NCSDescription": {
+        "description": "Description entered by the user regarding the NCS configuration.",
+        "type": "String",
+        "validation": { "mandatory": false, "maxLength": 255 },
+        "errorResponses": { "tooLong": "NCS Description is too long." }
+      },
+      "MMS_MT_MaximumRecipientsPerSecond": {
+        "description": "Maximum number of recipients per second the service provider can deliver MMS messages to.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 100 },
+        "errorResponses": {
+          "missing": "Maximum messages per second required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per Second should not be greater than 100 message per second."
+        }
+      },
+      "MMS_MT_MaximumRecipientsPerDay": {
+        "description": "Maximum number of recipients per day the service provider can deliver MMS messages to.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 50000000 },
+        "errorResponses": {
+          "missing": "Maximum messages per day required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per day should not be greater than 50000000 message per day.",
+          "invalidRelation": "Max message per day should be greater than message per Second."
+        }
+      },
+      "successMessage": "MMS SLA for Service Provider configured successfully"
+    },
+
+    "USSD": {
+      "USSD_MO_MaximumMessagesPerSecond": {
+        "description": "Maximum number of mobile originated USSD messages per second that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 1000 },
+        "errorResponses": {
+          "missing": "Maximum messages per second required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per Second should not be greater than 1000 message per second."
+        }
+      },
+      "USSD_MO_MaximumMessagesPerDay": {
+        "description": "Maximum number of mobile originated USSD messages per day that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 50000000 },
+        "errorResponses": {
+          "missing": "Maximum messages per day required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per day should not be greater than 50000000 message per day.",
+          "invalidRelation": "Max message per day should be greater than message per Second."
+        }
+      },
+      "NCSDescription": {
+        "description": "Description entered by the user regarding the NCS configuration.",
+        "type": "String",
+        "validation": { "mandatory": false, "maxLength": 255 },
+        "errorResponses": { "tooLong": "NCS Description is too long." }
+      },
+      "USSD_MT_MaximumRecipientsPerSecond": {
+        "description": "Maximum number of recipients per second the service provider can deliver USSD messages to.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 1000 },
+        "errorResponses": {
+          "missing": "Maximum messages per second required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per Second should not be greater than 1000 message per second."
+        }
+      },
+      "USSD_MT_MaximumRecipientsPerDay": {
+        "description": "Maximum number of recipients per day the service provider can deliver USSD messages to.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 50000000 },
+        "errorResponses": {
+          "missing": "Maximum messages per day required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max message per day should not be greater than 50000000 message per day.",
+          "invalidRelation": "Max message per day should be greater than message per Second."
+        }
+      },
+      "successMessage": "USSD SLA for Service Provider configured successfully"
+    },
+
+    "WAPPUSH": {
+      "WAPPUSH_MaximumRecipientsPerSecond": {
+        "description": "Maximum number of recipients per second to whom WAP Push messages can be delivered.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 100 },
+        "errorResponses": {
+          "missing": "Max Recipients per Second required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max recipients per second should not be greater than 100 recipients per second."
+        }
+      },
+      "WAPPUSH_MaximumRecipientsPerDay": {
+        "description": "Maximum number of recipients per day to whom WAP Push messages can be delivered.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 50000000 },
+        "errorResponses": {
+          "missing": "Max Recipients per Day required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max recipients per day should not be greater than 500000000 recipients per day.",
+          "invalidRelation": "Max recipients per day should be greater than Max recipients per second."
+        }
+      },
+      "NCSDescription": {
+        "description": "Description entered by the user regarding the NCS configuration.",
+        "type": "String",
+        "validation": { "mandatory": false, "maxLength": 255 },
+        "errorResponses": { "tooLong": "NCS Description is too long." }
+      },
+      "successMessage": "WAP-PUSH SLA for Service Provider configured successfully"
+    },
+
+    "BAS": {
+      "BAS_MaximumIncomingRequestsPerSecond": {
+        "description": "Maximum number of Billing-as-a-Service incoming requests per second that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 100 },
+        "errorResponses": {
+          "missing": "Maximum BAS Incoming Requests per second required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max billing per second should not be greater than 100 billing per second."
+        }
+      },
+      "BAS_MaximumIncomingRequestsPerDay": {
+        "description": "Maximum number of Billing-as-a-Service incoming requests per day that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 50000000 },
+        "errorResponses": {
+          "missing": "Maximum BAS Incoming Requests per day required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Max billing per day should not be greater than 50000000 billing per day.",
+          "invalidRelation": "Maximum BAS Incoming Requests per day should be greater than maximum requests per second."
+        }
+      },
+      "NCSDescription": {
+        "description": "Description entered by the user regarding the NCS configuration.",
+        "type": "String",
+        "validation": { "mandatory": false, "maxLength": 255 },
+        "errorResponses": { "tooLong": "NCS Description is too long." }
+      },
+      "successMessage": "BAS SLA for Service Provider configured successfully"
+    },
+
+    "SWS": {
+      "SWS_MaximumIncomingRequestsPerSecond": {
+        "description": "Maximum number of SWS incoming requests per second that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 1000 },
+        "errorResponses": {
+          "missing": "Maximum SWS Incoming Requests per second required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Maximum SWS per second should be less than 1,000."
+        }
+      },
+      "SWS_MaximumIncomingRequestsPerDay": {
+        "description": "Maximum number of SWS incoming requests per day that the service provider can handle.",
+        "type": "String (digit)",
+        "validation": { "mandatory": true, "defaultValue": 0, "max": 50000000 },
+        "errorResponses": {
+          "missing": "Maximum SWS Incoming Requests per day required.",
+          "invalidType": "Please enter a valid input.",
+          "tooHigh": "Maximum SWS per second should be less than 50,000,000.",
+          "invalidRelation": "Maximum SWS incoming requests per day should be greater than maximum requests per second."
+        }
+      },
+      "NCSDescription": {
+        "description": "Description entered by the user regarding the NCS configuration.",
+        "type": "String",
+        "validation": { "mandatory": false, "maxLength": 255 },
+        "errorResponses": { "tooLong": "NCS Description is too long." }
+      },
+      "successMessage": "SWS for Service Provider configured successfully"
+    }
+  }
+}
