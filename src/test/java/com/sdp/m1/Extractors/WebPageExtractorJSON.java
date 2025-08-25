@@ -54,6 +54,7 @@ public class WebPageExtractorJSON {
     private final SelfHealingDriverWait wait;
     private final SelfHealingDriver driver;
     private static final Boolean SELECT_HIDDEN = false;
+    private final Gson gson;
     private static final Boolean USE_CSS_SELECTOR = false;
     private static final Boolean USE_COOKIE = false;
     private static final Integer THREAD_DELAY = 8000;
@@ -88,12 +89,14 @@ public class WebPageExtractorJSON {
         this.wait = TestUtils.getWaitDriver(this.driver);
         this.driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         this.driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
+        this.gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     }
 
     public WebPageExtractorJSON(SelfHealingDriver driver, SelfHealingDriverWait wait) {
         // This constructor is for use within the test framework.
         this.driver = driver;
         this.wait = wait;
+        this.gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     }
 
     private List<Component> extractPageComponents() {
@@ -113,16 +116,12 @@ public class WebPageExtractorJSON {
 
     public String extractComponentsAsJsonString() {
         List<Component> components = extractPageComponents();
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-        return gson.toJson(components);
+        return this.gson.toJson(components);
     }
 
-    public String runExtractor(String fileName) {
+    public void runExtractor(String fileName) {
         List<Component> components = extractPageComponents();
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         writeFile(components, fileName);
-        return gson.toJson(components);
-
     }
 
     public String getFileName(String urlString) throws Exception {
@@ -409,9 +408,23 @@ public class WebPageExtractorJSON {
         return "";
     }
 
-    private void writeFile(List<Component> components, String fileName) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    public String findFieldFromLabel(Document doc, String LabelStr) {
+        Element label = doc.selectFirst("label:contains(" + LabelStr + ")");
+        if (label != null) {
+            String forAttr = label.attr("for");
+            if (forAttr != null && !forAttr.isEmpty()) {
+                return forAttr;
+            }
+        }
+        return null;
+    }
 
+    public String findFieldFromLabel(SelfHealingDriver driver, String LabelStr) {
+        Document doc = Jsoup.parse(driver.getPageSource());
+        return findFieldFromLabel(doc, LabelStr);
+    }
+
+    private void writeFile(List<Component> components, String fileName) {
         // create directories if not exists
         try {
             java.nio.file.Files.createDirectories(java.nio.file.Paths.get("target/ExJson"));
@@ -420,7 +433,7 @@ public class WebPageExtractorJSON {
         }
 
         try (FileWriter fw = new FileWriter(fileName)) {
-            gson.toJson(components, fw);
+            this.gson.toJson(components, fw);
             logger.info(String.format("Extracted %d components -> %s", components.size(), fileName));
         } catch (Exception e) {
             logger.severe(String.format("Failed to write JSON file: %s", e.getMessage()));
@@ -474,3 +487,41 @@ public class WebPageExtractorJSON {
     }
 
 }
+
+/*
+ * List of All the functions available to Public
+ * 
+ * WebPageExtractorJSON(driver, waitDriver) : To use with other components
+ * WebPageExtractorJSON(driver, waitDriver) : Build for standalone use.
+ * getFileName(String url) -> String
+ * runExtractor(String fileName) -> void : will write the components to JSON
+ *      file in filename
+ * findFieldFromLabel(Document doc, String LabelStr) -> String
+ * findFieldFromLabel(SelfHealingDriver driver, String LabelStr) -> String
+ * extractComponentsAsJsonString() -> String : Extract components and returns
+ *      JSON string
+ * getFileName(String URL) -> String : Generate a filename based on the URL
+ * findFieldFromLabel(Document doc, String LabelStr) -> String : Find the form
+ *      field associated with a label in the document
+ * findFieldFromLabel(SelfHealingDriver driver, String LabelStr) -> String :
+ *      Find the form field associated with a label using the driver
+ * 
+ * List of All the functions available to private
+ * 
+ * extractByTag(Document doc, WebDriver driver, String tag, String type,
+ *      List<Component> components) -> void : Extract components by HTML tag
+ * writeFile(List<Component> components, String fileName) -> void : Write
+ *      components to a JSON file
+ * getXPath(Element el) -> String : Generate an XPath expression for a given
+ *      element
+ * buildSelector(Element el) -> String : Build a CSS selector for a given
+ *      element
+ * extractPageComponents() -> List<Component> : Extract all components from the
+ *      current page
+ * fieldBuilder(Elements elements, Set<Map<String, String>> fields) -> void :
+ *      Build form fields from the given elements
+ * getCssSelector(Element el, Document doc) -> String : Generate a CSS selector
+ *      for a given element
+ * findLabelText(Document doc, String label) -> String : Find the visible text
+ *      associated with a label in the document
+ */
