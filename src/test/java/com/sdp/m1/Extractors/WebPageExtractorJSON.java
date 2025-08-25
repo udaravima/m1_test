@@ -1,22 +1,38 @@
 package com.sdp.m1.Extractors;
 
 import java.io.FileWriter;
-import java.time.Duration;
-import java.util.*;
-import java.net.URL;
 import java.net.URI;
+import java.net.URL;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.epam.healenium.SelfHealingDriver;
+import com.epam.healenium.SelfHealingDriverWait;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sdp.m1.Utils.TestConfigs;
+import com.sdp.m1.Utils.TestUtils;
 
 // import com.sdp.m1.Runner.TestConfigs;
 
@@ -34,20 +50,18 @@ import com.google.gson.GsonBuilder;
 */
 public class WebPageExtractorJSON {
 
-    /**
-     * Private constructor to prevent instantiation of this utility class.
-     */
-    public WebPageExtractorJSON() {
-    }
-
+    @SuppressWarnings("unused")
+    private final SelfHealingDriverWait wait;
+    private final SelfHealingDriver driver;
     private static final Boolean SELECT_HIDDEN = false;
     private static final Boolean USE_CSS_SELECTOR = false;
-    private static final Boolean USE_COOKIE = true;
+    private static final Boolean USE_COOKIE = false;
     private static final Integer THREAD_DELAY = 8000;
-    private static final String USE_URL = "https://m1-impl.hsenidmobile.com/provisioning/";
-    private static final String NAV_URL = "https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html";
+    private static final String USE_URL = TestConfigs.getBaseUrl();
+    private static final String NAV_URL = USE_URL + "/registerServiceProvider.html";
     private static final String COOKIE_NAME = "JSESSIONID";
     private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "0B0A5A6EF6D6D7C26B6542F95CD13291");
+    private static final Logger logger = Logger.getLogger(WebPageExtractorJSON.class.getName());
 
     @SuppressWarnings("unused")
     private static final class Component {
@@ -65,46 +79,51 @@ public class WebPageExtractorJSON {
         Map<String, String> attributes = new HashMap<>();
     }
 
-    public static void main(String[] args) throws Exception {
-        
-        WebDriver driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
-        driver.get(USE_URL);
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
+    public WebPageExtractorJSON() {
+        // This constructor is for standalone execution via the main method.
+        this.driver = TestUtils.getDriver(TestConfigs.getBrowser());
+        this.wait = TestUtils.getWaitDriver(this.driver);
+        this.driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        this.driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
+    }
 
-        if (USE_COOKIE) {
-            driver.manage().deleteAllCookies();
-            driver.manage().deleteCookieNamed(COOKIE_NAME);
+    public WebPageExtractorJSON(SelfHealingDriver driver, SelfHealingDriverWait wait) {
+        // This constructor is for use within the test framework.
+        this.driver = driver;
+        this.wait = wait;
+    }
 
-            driver.manage().addCookie(COOKIE);
-            driver.navigate().refresh();
+    public void runExtractor(String fileName) {
+        Document doc = Jsoup.parse(driver.getPageSource());
+        List<Component> components = new ArrayList<>();
+        // Main semantic elements
+        extractByTag(doc, driver, "form", "form", components);
+        extractByTag(doc, driver, "nav", "navbar", components);
+        extractByTag(doc, driver, "header", "header", components);
+        extractByTag(doc, driver, "aside", "sidebar", components);
+        extractByTag(doc, driver, "main", "main", components);
+        extractByTag(doc, driver, "footer", "footer", components);
 
-            // Debugging
-            try {
-                Thread.sleep(THREAD_DELAY);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            // Wait for a key element to be present after reload, confirming login state
-            try {
-                new WebDriverWait(driver, Duration.ofSeconds(10))
-                        .until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
-            } catch (TimeoutException e) {
-                System.err.println("Page did not reload correctly after setting cookie.");
-            }
+        // // Fallback: sections and large DIVs
+        extractByTag(doc, driver, "div", "section", components);
 
-            System.out.println("Navigated with cookies");
-        }
-        driver.navigate().to(NAV_URL);
+        writeFile(components, fileName);
 
+    }
+
+    public String getFileName(String urlString) throws Exception {
         // Breaking URL to domain and locators
-        URL url = new URI(USE_URL).toURL();
+        URL url = new URI(urlString).toURL();
         String domain = url.getHost();
         String path = url.getPath();
         // Trim trailing slash if it's not the root path, to handle URLs like /login/
         if (path.endsWith("/") && path.length() > 1) {
             path = path.substring(0, path.length() - 1);
         }
+
         String pageName;
         if (path != null && !path.equals("/") && path.length() > 1) {
             // Get the last part of the path, e.g., "login" from "/auth/login"
@@ -128,53 +147,11 @@ public class WebPageExtractorJSON {
         String timestamp = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String fileName = String.format("target/ExJson/page_components_%s_%s.json", pageName, timestamp);
-
-        System.out.println("Waiting for page to be fully loaded...");
-        try {
-            new WebDriverWait(driver, Duration.ofSeconds(THREAD_DELAY / 1000))
-                    .until(ExpectedConditions.jsReturnsValue("return document.readyState == 'complete'"));
-        } catch (TimeoutException e) {
-            System.err.println("Page did not finish loading within the timeout.");
-        }
-
-        System.out.println("Done waiting!");
-        String pageSource = driver.getPageSource();
-        Document doc = Jsoup.parse(pageSource);
-
-        List<Component> components = new ArrayList<>();
-
-        // Main semantic elements
-        extractByTag(doc, driver, "form", "form", components);
-        extractByTag(doc, driver, "nav", "navbar", components);
-        extractByTag(doc, driver, "header", "header", components);
-        extractByTag(doc, driver, "aside", "sidebar", components);
-        extractByTag(doc, driver, "main", "main", components);
-        extractByTag(doc, driver, "footer", "footer", components);
-
-        // // Fallback: sections and large DIVs
-        extractByTag(doc, driver, "div", "section", components);
-
-        // Save JSON
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-
-        // create directories if not exists
-        try {
-            java.nio.file.Files.createDirectories(java.nio.file.Paths.get("target/ExJson"));
-        } catch (java.io.IOException e) {
-            System.err.println("Failed to create directories: " + e.getMessage());
-        }
-
-        try (FileWriter fw = new FileWriter(fileName)) {
-            gson.toJson(components, fw);
-        } catch (Exception e) {
-            System.err.println("Failed to write JSON file: " + e.getMessage());
-        }
-
-        System.out.printf("Extracted %d components -> %s%n", components.size(), fileName);
-        driver.quit();
+        logger.info(String.format("Output file will be: %s", fileName));
+        return fileName;
     }
 
-    private static void extractByTag(Document doc, WebDriver driver, String tag, String type,
+    private void extractByTag(Document doc, WebDriver driver, String tag, String type,
             List<Component> components) {
 
         Elements elements = doc.select(tag);
@@ -244,11 +221,13 @@ public class WebPageExtractorJSON {
                 // debugging.
                 System.err.printf("Could not find element in Selenium DOM, skipping: %s. Reason: %s%n",
                         buildSelector(el), e.getMessage());
+                logger.severe(String.format("Could not find element in Selenium DOM, skipping: %s. Reason: %s",
+                        buildSelector(el), e.getMessage()));
             }
         }
     }
 
-    private static Set<Map<String, String>> fieldBuilder(Elements elements, Set<Map<String, String>> fieldSets,
+    private Set<Map<String, String>> fieldBuilder(Elements elements, Set<Map<String, String>> fieldSets,
             Document doc, ArrayList<String> ignoreTypes) {
         if (elements == null || elements.isEmpty()) {
             return fieldSets;
@@ -291,7 +270,7 @@ public class WebPageExtractorJSON {
         return fieldSets;
     }
 
-    private static Set<String> getSelectOptions(Element selectElement) {
+    private Set<String> getSelectOptions(Element selectElement) {
         Set<String> options = new HashSet<>();
         for (Element option : selectElement.children()) {
             if (option.tagName().equals("option")) {
@@ -301,7 +280,7 @@ public class WebPageExtractorJSON {
         return options;
     }
 
-    private static String buildSelector(Element el) {
+    private String buildSelector(Element el) {
         if (!el.id().isEmpty()) {
             // Chrome prefers ID because it's unique
             return "#" + el.id();
@@ -313,7 +292,7 @@ public class WebPageExtractorJSON {
         }
     }
 
-    private static String getXPath(Element el) {
+    private String getXPath(Element el) {
         if (el == null)
             return null;
 
@@ -350,7 +329,7 @@ public class WebPageExtractorJSON {
     }
 
     @SuppressWarnings("unused")
-    private static String getCssSelector(Element el, Document doc) {
+    private String getCssSelector(Element el, Document doc) {
         if (el == null)
             return null;
 
@@ -401,7 +380,7 @@ public class WebPageExtractorJSON {
         return String.join(" > ", parts);
     }
 
-    private static String findLabelText(Document doc, Element input) {
+    private String findLabelText(Document doc, Element input) {
         String id = input.id();
         if (id != null && !id.isEmpty()) {
             Element label = doc.selectFirst("label[for=" + id + "]");
@@ -418,4 +397,69 @@ public class WebPageExtractorJSON {
         }
         return "";
     }
+
+    private void writeFile(List<Component> components, String fileName) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+        // create directories if not exists
+        try {
+            java.nio.file.Files.createDirectories(java.nio.file.Paths.get("target/ExJson"));
+        } catch (java.io.IOException e) {
+            logger.severe(String.format("Failed to create directories: %s", e.getMessage()));
+        }
+
+        try (FileWriter fw = new FileWriter(fileName)) {
+            gson.toJson(components, fw);
+            logger.info(String.format("Extracted %d components -> %s", components.size(), fileName));
+        } catch (Exception e) {
+            logger.severe(String.format("Failed to write JSON file: %s", e.getMessage()));
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        SelfHealingDriver driver = TestUtils.getDriver(TestConfigs.getBrowser());
+        String customUrl = "https://google.com";
+        driver.get(customUrl);
+
+        if (USE_COOKIE) {
+            driver.manage().deleteAllCookies();
+            driver.manage().deleteCookieNamed(COOKIE_NAME);
+
+            driver.manage().addCookie(COOKIE);
+            driver.navigate().refresh();
+
+            // Debugging
+            try {
+                Thread.sleep(THREAD_DELAY);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            // Wait for a key element to be present after reload, confirming login state
+            try {
+                new WebDriverWait(driver, Duration.ofSeconds(10))
+                        .until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+            } catch (TimeoutException e) {
+                logger.severe("Page did not reload correctly after setting cookie.");
+            }
+
+            logger.info("Navigated with cookies");
+            driver.navigate().to(NAV_URL);
+        }
+
+        logger.info("Waiting for page to be fully loaded...");
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(THREAD_DELAY / 1000))
+                    .until(ExpectedConditions.jsReturnsValue("return document.readyState == 'complete'"));
+        } catch (TimeoutException e) {
+            logger.severe("Page did not finish loading within the timeout.");
+        }
+
+        logger.info("Done waiting!");
+
+        WebPageExtractorJSON extractor = new WebPageExtractorJSON(driver, TestUtils.getWaitDriver(driver));
+        String fileName = extractor.getFileName(customUrl);
+        extractor.runExtractor(fileName);
+        driver.quit();
+    }
+
 }
