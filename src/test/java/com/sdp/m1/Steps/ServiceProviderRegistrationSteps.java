@@ -1,28 +1,35 @@
 package com.sdp.m1.Steps;
 
 import static org.junit.Assert.assertTrue;
+
 import java.util.logging.Logger;
-import java.time.Duration;
+import java.util.Map;
+// import java.time.Duration;
 
 import com.epam.healenium.SelfHealingDriver;
 import com.epam.healenium.SelfHealingDriverWait;
 
+import com.sdp.m1.Extractors.WebPageExtractorJSON;
 import com.sdp.m1.Pages.ServiceProviderRegistrationPage;
 import com.sdp.m1.Utils.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
 
-import io.cucumber.java.en.Given;
+import io.cucumber.java.en.And;
+// import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 public class ServiceProviderRegistrationSteps {
     private static final Logger logger = Logger.getLogger(ServiceProviderRegistrationSteps.class.getName());
     private final ServiceProviderRegistrationPage registrationPage;
+    private final WebPageExtractorJSON webPageExtractor;
+    private Map<String, String> testData;
 
     public ServiceProviderRegistrationSteps() {
         SelfHealingDriver driver = TestUtils.getDriver(TestConfigs.getBrowser());
         SelfHealingDriverWait wait = TestUtils.getWaitDriver(driver);
         this.registrationPage = new ServiceProviderRegistrationPage(driver, wait);
+        this.webPageExtractor = new WebPageExtractorJSON(driver, wait);
     }
 
     @Then("I navigate to the service provider registration page")
@@ -44,6 +51,9 @@ public class ServiceProviderRegistrationSteps {
 
     @When("I enter {string} in the Service Provider ID field")
     public void enter_service_provider_id(String spId) {
+        if (spId.equals("random")) {
+            spId = TestUtils.generateRandomNumber(8);
+        }
         registrationPage.enterServiceProviderId(spId);
     }
 
@@ -129,7 +139,7 @@ public class ServiceProviderRegistrationSteps {
 
     @When("I fill other required fields with valid data")
     public void fill_other_required_fields() {
-        registrationPage.fillRequiredFieldsWithValidData();
+        this.testData = registrationPage.fillRequiredFieldsWithValidData();
     }
 
     @When("I submit the registration form")
@@ -137,18 +147,28 @@ public class ServiceProviderRegistrationSteps {
         registrationPage.submitForm();
     }
 
-    // @Then("I should see a success message")
-    // public void should_see_success_message() {
-    // assertTrue(registrationPage.isSuccessMessageVisible());
-    // }
     @Then("I should see a confirmation dialog")
     public void should_see_confirmation_dialog() {
         assertTrue(registrationPage.isConfirmationDialogVisible());
     }
 
+    @And("I should see the confirmation with the correct data")
+    public void i_should_see_the_confirmation_with_the_correct_data() {
+        registrationPage.validateConfirmationData(this.testData);
+    }
+
     @Then("I should see error {string}")
     public void should_see_error_message(String errorMsg) {
         assertTrue(registrationPage.isErrorMessageVisible(errorMsg));
+    }
+
+    @And("I extract the page components")
+    public void i_extract_the_page_components() throws Exception {
+        logger.info("Starting page component extraction...");
+        String currentUrl = registrationPage.getCurrentUrl();
+        String fileName = webPageExtractor.getFileName(currentUrl);
+        webPageExtractor.runExtractor(fileName);
+        logger.info("Page component extraction finished.");
     }
 
     @When("I confirm the registration")
@@ -160,6 +180,10 @@ public class ServiceProviderRegistrationSteps {
     @Then("I should see a success message")
     public void should_see_success_message() {
         assertTrue(registrationPage.isSuccessMessageVisible());
+    }
+
+    public static void main(String[] args) {
+        // Main method for testing or running the application
     }
 
 }

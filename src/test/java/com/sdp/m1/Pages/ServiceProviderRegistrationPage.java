@@ -8,8 +8,12 @@ import com.epam.healenium.SelfHealingDriver;
 import com.epam.healenium.SelfHealingDriverWait;
 
 import java.util.logging.Logger;
+import java.util.Map;
+import java.util.LinkedHashMap;
 
 import com.sdp.m1.Utils.TestConfigs;
+import com.sdp.m1.Utils.TestUtils;
+import com.sdp.m1.Extractors.WebPageExtractorJSON;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -17,6 +21,7 @@ public class ServiceProviderRegistrationPage {
     private static final Logger logger = Logger.getLogger(ServiceProviderRegistrationPage.class.getName());
     private final SelfHealingDriver driver;
     private final SelfHealingDriverWait wait;
+    private final WebPageExtractorJSON extractor;
 
     // Locators
     private final By form = By.id("serviceProviderImpl");
@@ -31,12 +36,22 @@ public class ServiceProviderRegistrationPage {
     private final By marketingUsers = By.id("allowedMarketingUsers");
     private final By resources = By.id("allowedNcses");
     private final By submitButton = By.xpath("//*[@id='serviceProviderImpl']//input[@type='submit']");
-    private final By successMsg = By.id("msg");
+    private final By confirmButton = By.id("submitApplication");
+    private final By successMsg = By.cssSelector("#serviceProviderImpl > div > div.success-msg");
     private final By errorMsg = By.id("status");
+
+    // Locators for confirmation page values without IDs
+    private final By spUsersConfirm = By
+            .xpath("//label[text()='SP users']/following-sibling::label[@class='confirm-text']");
+    private final By marketingUsersConfirm = By
+            .xpath("//label[text()='Marketing Users']/following-sibling::label[@class='confirm-text']");
+    private final By resourcesConfirm = By
+            .xpath("//label[text()='Resources']/following-sibling::label[@class='ncs_confirm-text']");
 
     public ServiceProviderRegistrationPage(SelfHealingDriver driver, SelfHealingDriverWait wait) {
         this.driver = driver;
         this.wait = wait;
+        this.extractor = new WebPageExtractorJSON(driver, wait);
     }
 
     public void open() {
@@ -47,6 +62,18 @@ public class ServiceProviderRegistrationPage {
         driver.navigate().to(registrationUrl); // Debugging
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("serviceProviderImpl")));
         logger.info("Navigated to Service Provider Registration page.");
+        String filename;
+        try {
+            filename = extractor.getFileName(registrationUrl);
+        } catch (Exception e) {
+            logger.severe(String.format("Error occurred while getting file name: %s", e.getMessage()));
+            return;
+        }
+        extractor.runExtractor(filename);
+    }
+
+    public String getCurrentUrl() {
+        return driver.getCurrentUrl();
     }
 
     public boolean isFormVisible() {
@@ -136,16 +163,30 @@ public class ServiceProviderRegistrationPage {
         select.deselectAll();
     }
 
-    public void fillRequiredFieldsWithValidData() {
+    public Map<String, String> fillRequiredFieldsWithValidData() {
         logger.info("Filling required fields with valid data...");
-        enterCompanyName("Valid Company");
-        enterAddress("123 Main Street");
-        enterDescription("A valid description");
-        enterWhiteListedUsers("12345678,123456789012345");
-        selectSPUser("acrsp1");
-        selectMarketingUser("ThiostMktg");
-        selectResource("SMS");
+        Map<String, String> data = new LinkedHashMap<>();
+        data.put("Company name", TestUtils.generateRandomString(10));
+        data.put("Address", "123 Main Street");
+        data.put("Description", "A valid description");
+        data.put("White Listed Users", "12345678,123456789012345");
+        data.put("Black Listed Users", "");
+        data.put("Dedicated Alias", "");
+        data.put("SP users", "acrsp1");
+        data.put("Marketing Users", "ThiostMktg");
+        data.put("Resources", "SMS");
+
+        enterCompanyName(data.get("Company name"));
+        enterAddress(data.get("Address"));
+        enterDescription(data.get("Description"));
+        enterWhiteListedUsers(data.get("White Listed Users"));
+        enterBlackListedUsers(data.get("Black Listed Users"));
+        enterDedicatedAlias(data.get("Dedicated Alias"));
+        selectSPUser(data.get("SP users"));
+        selectMarketingUser(data.get("Marketing Users"));
+        selectResource(data.get("Resources"));
         logger.info("Finished filling required fields.");
+        return data;
     }
 
     public void submitForm() {
@@ -174,20 +215,72 @@ public class ServiceProviderRegistrationPage {
 
     public boolean isConfirmationDialogVisible() {
         try {
-            wait.until(ExpectedConditions.alertIsPresent());
+            wait.until(ExpectedConditions.visibilityOfElementLocated(confirmButton));
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
+    private String getConfirmationText(By locator) {
+        try {
+            WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            return el.getText();
+        } catch (Exception e) {
+            logger.warning(String.format("Could not find confirmation text for locator: %s. Error: %s", locator,
+                    e.getMessage()));
+            return null;
+        }
+    }
+
+    public String getConfirmationValue(String fieldName) {
+        logger.info(String.format("Getting confirmation value for field: %s", fieldName));
+        return switch (fieldName.toLowerCase().replaceAll("\\s+", "")) {
+            case "serviceproviderid" -> getConfirmationText(spId);
+            case "companyname" -> getConfirmationText(companyName);
+            case "address" -> getConfirmationText(address);
+            case "description" -> getConfirmationText(description);
+            case "whitelistedusers" -> getConfirmationText(whiteListedUsers);
+            case "blacklistedusers" -> getConfirmationText(blackListedUsers);
+            case "dedicatedalias" -> getConfirmationText(dedicatedAliases);
+            case "spusers" -> getConfirmationText(spUsersConfirm);
+            case "marketingusers" -> getConfirmationText(marketingUsersConfirm);
+            case "resources" -> getConfirmationText(resourcesConfirm);
+            default -> {
+                logger.warning(String.format("Unknown field name for confirmation: %s", fieldName));
+                yield null;
+            }
+        };
+    }
+
+    public void validateConfirmationData(Map<String, String> expectedData) {
+        logger.info("Validating data on confirmation page...");
+        expectedData.forEach((fieldName, expectedValue) -> {
+            String actualValue = getConfirmationValue(fieldName);
+
+            if (actualValue == null) {
+                actualValue = ""; // Treat null as empty string for comparison
+            }
+
+            if (!expectedValue.equals(actualValue)) {
+                String errMsg = String.format("Validation failed for field '%s'. Expected: '%s', but got: '%s'",
+                        fieldName, expectedValue, actualValue);
+                logger.severe(errMsg);
+                throw new AssertionError(errMsg);
+            }
+            logger.info(String.format("Field '%s' validated successfully. Value: '%s'", fieldName, actualValue));
+        });
+        logger.info("All fields on confirmation page validated successfully.");
+    }
+
     public void confirmRegistration() {
         try {
-            wait.until(ExpectedConditions.alertIsPresent());
-            driver.switchTo().alert().accept();
-            logger.info("Confirmed the registration alert.");
+            WebElement button = wait.until(ExpectedConditions.elementToBeClickable(confirmButton));
+            button.click();
+            logger.info("Clicked the 'Confirm' button on the registration confirmation page.");
         } catch (Exception e) {
-            logger.warning("No alert present to confirm.");
+            logger.severe(String.format("Could not find or click the 'Confirm' button: %s", e.getMessage()));
+            throw new RuntimeException("Failed to confirm registration", e);
         }
     }
 }

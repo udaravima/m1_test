@@ -8,10 +8,11 @@ Feature: Service Provider Registration
 
   @positive @Registration
   Scenario: Register with valid Service Provider ID
-    When I enter "57319564" in the Service Provider ID field
+    When I enter "random" in the Service Provider ID field
     And I fill other required fields with valid data
     And I submit the registration form
     Then I should see a confirmation dialog
+    And I should see the confirmation with the correct data
     When I confirm the registration
     Then I should see a success message
 
