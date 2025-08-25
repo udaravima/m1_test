@@ -1,4 +1,5 @@
 {
+  "DefaultPathURL": "https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html",
   "RegisterNewServiceProvider": {
     "ServiceProviderID": {
       "description": "Used to capture the service provider ID.",

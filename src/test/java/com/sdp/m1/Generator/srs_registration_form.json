@@ -1,0 +1,49 @@
+{
+  "feature": "Service Provider Registration",
+  "featureDescription": "Allows an operations user to register a new Service Provider in the system.",
+  "requirements": [
+    {
+      "id": "spId",
+      "label": "Service Provider ID",
+      "type": "text",
+      "validations": [
+        { "rule": "mandatory", "errorMessage": "Service Provider ID is required." },
+        { "rule": "numeric", "errorMessage": "Service Provider ID must be a number." },
+        { "rule": "length", "max": 8, "errorMessage": "Service Provider ID cannot exceed 8 digits." }
+      ]
+    },
+    {
+      "id": "companyName",
+      "label": "Company name",
+      "type": "text",
+      "validations": [
+        { "rule": "mandatory", "errorMessage": "Company Name is required." },
+        { "rule": "length", "max": 50, "errorMessage": "Company Name cannot exceed 50 characters." }
+      ]
+    },
+    {
+      "id": "address",
+      "label": "Address",
+      "type": "text",
+      "validations": [
+        { "rule": "length", "max": 255, "errorMessage": "Address cannot exceed 255 characters." }
+      ]
+    },
+    {
+      "id": "userNames",
+      "label": "SP users",
+      "type": "select",
+      "validations": [
+        { "rule": "mandatory", "errorMessage": "At least one SP User must be selected." }
+      ]
+    },
+    {
+      "id": "allowedNcses",
+      "label": "Resources",
+      "type": "select",
+      "validations": [
+        { "rule": "mandatory", "errorMessage": "At least one Resource must be selected." }
+      ]
+    }
+  ]
+}
