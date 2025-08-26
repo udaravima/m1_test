@@ -15,7 +15,7 @@ import com.sdp.m1.Utils.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
 
 import io.cucumber.java.en.And;
-// import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
@@ -99,6 +99,12 @@ public class ServiceProviderRegistrationSteps {
 
     @When("I enter {string} in the Black Listed Users field")
     public void enter_black_listed_users(String users) {
+        registrationPage.enterBlackListedUsers(users);
+    }
+
+    @When("I enter {string} in both White Listed and Black Listed Users fields")
+    public void enter_white_and_black_listed_users(String users) {
+        registrationPage.enterWhiteListedUsers(users);
         registrationPage.enterBlackListedUsers(users);
     }
 
@@ -186,4 +192,9 @@ public class ServiceProviderRegistrationSteps {
         // Main method for testing or running the application
     }
 
+    @Given("a service provider with ID {string} already exists")
+    public void a_service_provider_with_id_already_exists(String serviceProviderId) {
+        // Code to check if the service provider exists
+        // assertTrue(registrationPage.doesServiceProviderExist(serviceProviderId));
+    }
 }

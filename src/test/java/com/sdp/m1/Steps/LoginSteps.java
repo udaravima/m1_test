@@ -60,6 +60,16 @@ public class LoginSteps {
         TestUtils.wait(1);
     }
 
+        @Given("I am logged in  as admin successfully")
+    public void i_am_logged_in_as_admin_successfully() {
+        i_navigate_to_the_login_page();
+        i_enter_valid_username_and_password(TestConfigs.getAdminUsername(), TestConfigs.getAdminPassword());
+        i_click_the_login_button();
+        i_should_be_redirected_to_the_dashboard();
+        // Add a small wait to ensure session is fully established before next step
+        TestUtils.wait(1);
+    }
+
     @Given("I navigate to the login page using {string}")
     public void i_navigate_to_the_login_page_using_browser(String browser) {
         browserType = browser.toLowerCase();

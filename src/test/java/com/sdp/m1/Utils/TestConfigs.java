@@ -56,6 +56,14 @@ public class TestConfigs {
         return getProperty("password", DEFAULT_PASSWORD);
     }
 
+    public static String getAdminUsername() {
+        return getProperty("admin.username", DEFAULT_USERNAME);
+    }
+
+    public static String getAdminPassword() {
+        return getProperty("admin.password", DEFAULT_PASSWORD);
+    }
+
     public static String getDelay() {
         return getProperty("delay", DEFAULT_DELAY);
     }

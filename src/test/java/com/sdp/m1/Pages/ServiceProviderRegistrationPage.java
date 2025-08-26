@@ -10,6 +10,7 @@ import com.epam.healenium.SelfHealingDriverWait;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.function.Consumer;
 
 import com.sdp.m1.Utils.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
@@ -163,30 +164,124 @@ public class ServiceProviderRegistrationPage {
         select.deselectAll();
     }
 
-    public Map<String, String> fillRequiredFieldsWithValidData() {
-        logger.info("Filling required fields with valid data...");
-        Map<String, String> data = new LinkedHashMap<>();
-        data.put("Company name", TestUtils.generateRandomString(10));
-        data.put("Address", "123 Main Street");
-        data.put("Description", "A valid description");
-        data.put("White Listed Users", "12345678,123456789012345");
-        data.put("Black Listed Users", "");
-        data.put("Dedicated Alias", "");
-        data.put("SP users", "acrsp1");
-        data.put("Marketing Users", "ThiostMktg");
-        data.put("Resources", "SMS");
+    public String getServiceProviderId() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(spId)).getAttribute("value");
+    }
 
-        enterCompanyName(data.get("Company name"));
-        enterAddress(data.get("Address"));
-        enterDescription(data.get("Description"));
-        enterWhiteListedUsers(data.get("White Listed Users"));
-        enterBlackListedUsers(data.get("Black Listed Users"));
-        enterDedicatedAlias(data.get("Dedicated Alias"));
-        selectSPUser(data.get("SP users"));
-        selectMarketingUser(data.get("Marketing Users"));
-        selectResource(data.get("Resources"));
-        logger.info("Finished filling required fields.");
+    public String getCompanyName() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(companyName)).getAttribute("value");
+    }
+
+    public String getAddress() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(address)).getAttribute("value");
+    }
+
+    public String getDescription() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(description)).getAttribute("value");
+    }
+
+    public String getWhiteListedUsers() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(whiteListedUsers)).getAttribute("value");
+    }
+
+    public String getBlackListedUsers() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(blackListedUsers)).getAttribute("value");
+    }
+
+    public String getDedicatedAlias() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(dedicatedAliases)).getAttribute("value");
+    }
+
+    public static class FormDataBuilder {
+        private Map<String, String> data = new LinkedHashMap<>();
+
+        public FormDataBuilder() {
+            // Initialize with default valid data
+            data.put("Service Provider ID", TestUtils.generateRandomNumber(8));
+            data.put("Company name", TestUtils.generateRandomString(10));
+            data.put("Address", "123 Main Street");
+            data.put("Description", "A valid description");
+            data.put("White Listed Users", "12345678,123456789012345");
+            data.put("Black Listed Users", "");
+            data.put("Dedicated Alias", "");
+            data.put("SP users", "acrsp1");
+            data.put("Marketing Users", "ThiostMktg");
+            data.put("Resources", "SMS");
+        }
+
+        public FormDataBuilder withServiceProviderId(String spId) {
+            data.put("Service Provider ID", spId);
+            return this;
+        }
+
+        public FormDataBuilder withoutServiceProviderId() {
+            data.remove("Service Provider ID");
+            return this;
+        }
+
+        public FormDataBuilder withCompanyName(String companyName) {
+            data.put("Company name", companyName);
+            return this;
+        }
+
+        public FormDataBuilder withoutCompanyName() {
+            data.remove("Company name");
+            return this;
+        }
+
+        // Add with and without methods for other fields here
+
+        public Map<String, String> build() {
+            return data;
+        }
+    }
+
+    public void fillForm(Map<String, String> data) {
+        data.forEach((fieldName, value) -> {
+            switch (fieldName) {
+                case "Service Provider ID":
+                    enterServiceProviderId(value);
+                    break;
+                case "Company name":
+                    enterCompanyName(value);
+                    break;
+                case "Address":
+                    enterAddress(value);
+                    break;
+                case "Description":
+                    enterDescription(value);
+                    break;
+                case "White Listed Users":
+                    enterWhiteListedUsers(value);
+                    break;
+                case "Black Listed Users":
+                    enterBlackListedUsers(value);
+                    break;
+                case "Dedicated Alias":
+                    enterDedicatedAlias(value);
+                    break;
+                case "SP users":
+                    selectSPUser(value);
+                    break;
+                case "Marketing Users":
+                    selectMarketingUser(value);
+                    break;
+                case "Resources":
+                    selectResource(value);
+                    break;
+            }
+        });
+    }
+
+    @Deprecated
+    public Map<String, String> fillRequiredFieldsWithValidData() {
+        Map<String, String> data = new FormDataBuilder().build();
+        fillForm(data);
         return data;
+    }
+
+    public static FormDataBuilder getNewWithValidData() {
+        return new FormDataBuilder();
     }
 
     public void submitForm() {
@@ -206,8 +301,9 @@ public class ServiceProviderRegistrationPage {
 
     public boolean isErrorMessageVisible(String expectedMsg) {
         try {
-            WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(errorMsg));
-            return el.isDisplayed() && el.getText().contains(expectedMsg);
+            By errorLocator = By.xpath("//div[@class='error']/span[contains(text(), '" + expectedMsg + "')] ");
+            WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(errorLocator));
+            return el.isDisplayed();
         } catch (Exception e) {
             return false;
         }
@@ -235,7 +331,7 @@ public class ServiceProviderRegistrationPage {
 
     public String getConfirmationValue(String fieldName) {
         logger.info(String.format("Getting confirmation value for field: %s", fieldName));
-        return switch (fieldName.toLowerCase().replaceAll("\\s+", "")) {
+        return switch (fieldName.toLowerCase().replaceAll("\s+", "")) {
             case "serviceproviderid" -> getConfirmationText(spId);
             case "companyname" -> getConfirmationText(companyName);
             case "address" -> getConfirmationText(address);
