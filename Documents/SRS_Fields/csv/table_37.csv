@@ -1,0 +1,82 @@
+0,1
+Name,Description
+ROLE_LOGIN_PROV,Log in to the provisioning module.
+ROLE_CREATE_SP,Create service provider accounts.
+ROLE_VIEW_SP,View created service provider accounts list.
+ROLE_CREATE_APP,Create provisioning applications.
+ROLE_LIST_DRAFTS,View Applications which are saved in the system as drafts by the service provider users.
+ROLE_EDIT_SP,Edit service provider accounts.
+ROLE_SEARCH_SP,Search service provider accounts.
+ROLE_SEARCH_APP,Search created applications.
+ROLE_SP,To identify user is a SP user.
+ROLE_MARKERTING,To identify user is a marketing user.
+ROLE_PRODUCTION_OPERATION,To identify user is a production operation user.
+ROLE_TB_OPERATION,To identify user is a testbed operation user.
+ROLE_SDP_ADMIN,To identify user is a SDP admin and more.
+PROV_SUSPENDED_TESTBED,Suspend applications in the testbed state.
+PROV_SUSPENDED_PRODUCTION,Suspend applications in the production state.
+PROV_REACTIVATE_TESTBED,Reactivate suspended applications in the test bed state.
+PROV_REACTIVATE_PRODUCTION,Reactivate suspended applications in the production state.
+PROV_RETIRE_TESTBED,Retire suspended applications in the test bed state.
+PROV_RETIRE_PRODUCTION,Retire suspended applications in the production state.
+VIEW_ALL_APP_NCS_DETAIL,To view entire NCS SLA configurations in any state.
+VIEW_LIMITED_PRODUCTION_TIME,To view limited production time of the applications.
+VIEW_PRE_ACTIVE_TESTBED_ENG_APPROVAL_STATUS,"To view the approval status of a NCS by xMsc, Network, Prepaid, Postpaid engineers at pre active tb  state."
+VIEW_PRE_PROV_PRODUCTION_ENG_APPROVAL_STATUS,"To view the approval status of a NCS by xMsc, Network, Prepaid, Postpaid engineers at pre provisioned production state."
+PROV_REQUEST_CR_APPLICATION,This is to request a CR application request for an existing application which is in production given to SP.
+ROLE_CHANGE_PRODUCTION_SLA,"To change some values (Ex: Bill description, service type description, but not short code, keywords) by the Production Operation User when the application is in the Active Production."
+PROV_PRE_APPROVED_PRODUCTION_STATE,This is the role given to SDP Manager To approve the applications in PRE_APPROVED_PRODUCTION_STATE.
+PROV_PRE_ACTIVE_TESTBED_STATE_POSTPAID_CONFIG,This is given to the Post­paid engineer in PRE_ACTIVE_TESTBED_STATE.
+PROV_PRE_PROV_PRODUCTION_STATE_POSTPAID_CONFIG,This is given to the Post­paid engineer in PRE_PROV_PRODUCTION_STATE.
+ROLE_CHANGE_TESTBED_SLA,"To change some values (Ex: Bill description, service type description, but not short code, keywords) by the TB User when the application is in the Active Testbed state."
+ROLE_SEARCH_USER,Privilege to search for users.
+ROLE_SEARCH_MODULE,Privilege to search for modules.
+ROLE_SEARCH_GROUP,Privilege to search for groups.
+ROLE_SEARCH_PERMISSION,Privilege to search permissions.
+ROLE_ADD_USER,Privilege to add users.
+ROLE_ADD_MODULE,Privilege to add modules.
+ROLE_ADD_GROUP,Privilege to add group.
+ROLE_ADD_PERMISSION,Privilege to add permission.
+ROLE_MODIFY_USER,Privilege to modify users.
+ROLE_MODIFY_MODULE,Privilege to modify modules.
+ROLE_MODIFY_GROUP,Privilege to modify groups.
+ROLE_MODIFY_PERMISSION,Privilege to modify permission.
+ROLE_REMOVE_USER,Privilege to remove users.
+ROLE_REMOVE_MODULE,Privilege to remove modules.
+ROLE_REMOVE_GROUP,Privilege to remove groups.
+ROLE_REMOVE_PERMISSION,Privilege to remove permissions.
+ROLE_DEFAULT_MODULE,Privilege to change default module.
+ROLE_ASSIGN_MODULE,Privilege to assign default module.
+ROLE_SECURITY_USER,Privilege to modify security details of user.
+ROLE_CHANGE_PASSWORD,Privilege to change password for logged user.
+PROV_APPROVED_APPLICATION_STATE,To view applications in Approve Application Request state.
+PROV_REQUESTED_APPLICATION_STATE,To view applications in Requested Application state.
+PROV_ACTIVE_TESTBED_STATE,To view applications in Active Testbed state.
+PROV_PRE_ACTIVE_TESTBED_STATE_COMMON,Common Privileges for the Pre Active Testbed state.
+ROLE_SMSC_ENGINEER,Set of the Privileges for the SMS Center Engineer.
+PROV_PRE_ACTIVE_TESTBED_STATE_SMSC_CONFIG,Configuration Privileges for the SMSC Engineer in the Pre­Active Testbed state.
+ROLE_MMSC_ENGINEER,Set of the Privileges for the MMS Center Engineer.
+PROV_PRE_ACTIVE_TESTBED_STATE_MMSC_CONFIG,Configuration Privileges for the SMSC Engineer in the Pre­Active Testbed state.
+ROLE_PREPAID_IN_ENGINEER,To identify user is Pre­Paid IN Engineer user.
+PROV_PRE_ACTIVE_TESTBED_STATE_PREPAID_CONFIG,Configuration Privilegesfor the IN Engineer in the Pre­Active Testbed state.
+ROLE_POSTPAID_BILLING_ENGINEER,To identify user is Postpaid Billing Engineer user.
+PROV_PRE_ACTIVE_TESTBED_STATE_POSTPAID_CONFIG,Configuration Privileges for the Postpaid Engineer in the Pre­Active Testbed state.
+ROLE_CUSTOMERCARE,To identify user is Customer Care user.
+ROLE_NETWORK_ADMIN,To identify user is Network Administrator user.
+PROV_PRE_ACTIVE_TESTBED_STATE_NW_CONFIG,Configuration Privileges for the Network User in the Pre­Active Testbed state.
+ROLE_SDP_MANAGER,To identify the user is a SDP Manager.
+PROV_PRE_ACTIVE_PRODUCTION_STATE,To view and approve applications in Pre Active Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_COMMON,Common Privileges for the Pre­Production state.
+PROV_APPROVED_PRODUCTION_STATE,To view and approve applications in Approved Production state.
+PROV_LIMITED_PRODUCTION_STATE,To view and approve applications in Limited Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_NW_CONFIG,Configuration Privileges for the Network User in the Pre­Provisioned Production state.
+PROV_ACTIVE_PRODUCTION_STATE,Privileges for Active Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_SMSC_CONFIG,Configuration Privileges for the SMSC Engineer in the Pre­Provisioned Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_MMSC_CONFIG,Configuration Privileges for the MMSC Engineer in the Pre­Provisioned Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_PREPAID_CONFIG,Configuration Privileges for the IN Engineer in the Pre­Provisioned Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_POSTPAID_CONFIG,Configuration Privileges for the Postpaid Engineer in the Pre­Provisioned Production state.
+ROLE_LIST_RETIRED_APP,Privileges to search for retired applications.
+ROLE_USSD_ENGINEER,To identify user is a USSD Engineer.
+PROV_PRE_ACTIVE_TESTBED_STATE_USSD_CONFIG,Configuration Privileges for the USSD Engineer in the Pre­Active Testbed state.
+PROV_PRE_PROV_PRODUCTION_STATE_USSD_CONFIG,Configuration Privileges for the USSD Engineer in the Pre­Provisioned Production state.
+ROLE_VIEW_DASHBOARD,Privilege for the SDP Admin to see the dashboard view of the available SPs and Applications.

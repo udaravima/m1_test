@@ -1,0 +1,7 @@
+0,1
+Column,Description
+No,Auto incremented serial number for each search result.
+Service Provider ID,Service Provider ID entered by the operations­user during the SP profile registration.
+Company name,Company name entered by the operations­user during the SP profile registration.
+Enabled,"Indicates whether the SP profile is enabled or not. If enabled, the value displayed would be true. If disabled, the value displayed would be false."
+Change Status,"Provides the Operations­User the ability to disable the SP profile if it is currently enabled and vice versa. If the current SP profile status is enabled, the option displayed would be Disable. If the current SP profile status is Disabled, the option displayed would be Enable."

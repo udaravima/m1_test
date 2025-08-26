@@ -1,0 +1,10 @@
+0,1
+Service Provider,Description
+Service Provider,Indicates the Service Provider name. Shall display in the following format:  {Service Provider} {Service Provider Id}
+Enabled,Indicates whether the service provider profile is enabled or disabled. Available values:  ­ If the SP is enabled: true
+,­ If the SP is disabled: false
+Application ID,Indicates the application id which is auto generated as mentioned in REQ­APP­CRE 3.
+Application Name,Indicates the application name entered by the SP user during application creation.
+SMS Shortcode,Indicates the shortcode for SMS assigned by the SP user during application creation.
+MMS Shortcode,Indicates the shortcode for MMS assigned by the SP user during application creation.
+State,Indicates the state of the application which is created under the selected SP.

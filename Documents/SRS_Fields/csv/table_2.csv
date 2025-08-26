@@ -1,0 +1,15 @@
+0,1
+User,Access Rights
+SDP­Admin,"Create, edit, view, and search SP profiles and applications. Manage users, groups, modules, permissions. Suspend/ reactivate/ retire testbed and production apps. View dashboard. Manage the requested applications in all states upon the SP user creating an application request."
+SP Users,"Create, modify request applications and view, search both SP and application details. Create, search, modify anddiscard application drafts and CRs."
+,Test the application request at the Draft­Request state and in the Active­Testbed state.
+Marketing User,View and search SP profiles and applications.  Configure charging SLAs. Approve or discard the application request at the REQUESTED_APPLICATIONstate.
+Customer Care User,View and search SP profiles and applications.
+Testbed­Operations User,"View/ search SP profiles and applications. Configure testbed SLAs. Approve or discard the application request at APPROVED_APPLICATION_REQUEST state, Pre­Active­Testbed state. Manage the suspension/ re­activation/ retirement of the application request in any Testbed state."
+Production­Operations User,"View/ search SP profiles and applications. Configure production SLAs.  Configure the application request in Pre­Active­Production state, Pre­Provisioned­Production state, Approved­Application Request state, Limited­Production state, Active­Production state, Suspended­Production state. Manage suspension/ re­activation/ retirement in any Production state."
+SMSC Engineer,Verify and configure the relevant parameters of SMS and WAPPUSH in the application request at the Pre­Active Testbed state (Testbed configurations) and at the Pre­Provisioned Production state (Production configurations).
+MMSC Engineer,Verify and configure the relevant parameters of MMS in the application request at the Pre­Active Testbed state (Testbed configurations) and at the Pre­Provisioned Production state (Production configurations).
+Prepaid IN Engineer,"Verify and configure the relevant parameters of SMS, MMS, BAS, WAPPUSH and USSD in the application request at the Pre­Active Testbed state (Testbed configurations) and at the Pre­Provisioned Production state (Production configurations)."
+Postpaid Billing Engineer,"Verify and configure the relevant parameters of SMS, MMS, BAS, WAPPUSH and USSD in the application request at the Pre­Active Testbed state (Testbed configurations) and at the Pre­Provisioned Production state (Production configurations)"
+Network Admin,"Verify and configure the relevant parameters of SMS, MMS, BAS, WAPPUSH and USSD in the application request at the Pre­Active Testbed state (Testbed configurations) and at the Pre­Provisioned Production state (Production configurations)."
+USSD Engineer,Verify and configure the relevant parameters of USSD in the application request at the Pre­Active Testbed state (Testbed configurations) and at the Pre­Provisioned Production state (Production configurations).

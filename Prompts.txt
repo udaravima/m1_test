@@ -1,0 +1,6 @@
+So I will remind you again, I am building a process, flow to automate the test creation process to a given Web application using selenium and cucumber wrapped with healenium. My target is to automate this test creation and reporting using AI
+So, We will get a SRS(System Requirement Specification) with fields are described with there conditions and things (See Documents/). and we will have the web URL to the application.
+So we have to test each requirement for that we have to build the test cases and those gerking files in cucumber.
+To make this process easy I have build a WebExtractorJSON to extract web page elements to json to Interpret by AI And Authur.py to extract tables from SRS.pdf 
+And configs utils properties that we can use in common on all project 
+can u help me build the process and lem me know if there is anything I am doing wrong or mistakes in the process

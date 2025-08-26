@@ -1,0 +1,3 @@
+0,1,2,3,4
+Subject,From,To,Cc,Content Template
+[M1­SDP]  New ServiceProvider  <serviceprovider­name> Created,SDP­Admin@m1.com.sg,SP­User,Marketing­User,New ServiceProvider with the following details is created. ServiceProvider CompanyName : [serviceprovider_companyname] ServiceProvider Description : [serviceprovider_description] ServiceProvider Address : [serviceprovider_address] Provisioning UI Url : [provisioning_ui_url] Remarks : [remarks]

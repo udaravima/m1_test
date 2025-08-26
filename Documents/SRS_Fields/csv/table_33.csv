@@ -1,0 +1,5 @@
+0,1,2,3
+Name,Description,User Type,Mandatory/ Optional
+whitelisted_user_list White Listed user list.,,OPERATIONS_LEVEL,Mandatory
+blacklisted_user_list,Black Listed user list.,OPERATIONS_LEVEL,Optional
+allowed_ncs_list,Here possible values can be SMS/ MMS/ Billing/ WAP push/ USSD or a combination of them.,OPERATIONS_LEVEL,Mandatory

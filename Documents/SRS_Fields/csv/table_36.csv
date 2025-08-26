@@ -1,0 +1,9 @@
+0,1,2,3,4
+Name,Description,Validation,User Type,Mandatory/ Optional
+wap_push_max_recipients_day,"No. of Maximum WAP push recipients per day, this is an optional value if this is not  supplied then msg/day enforcement will not be enforced",Should be a number,OPERATIONS_LEVEL,Optional
+wap_push_max_receipients_second,No. of Maximum WAP push recipients per second,Should be a number,OPERATIONS_LEVEL,Mandatory
+Name,Description,Validation,User Type,Mandatory/ Optional
+ussd_mo_max_msg_day,"No. of Maximum MO msgs per day, this is an optional value if this is not  supplied then msg/day enforcement will not be enforced",Should be a number,OPERATIONS_LEVEL,Optional
+ussd_mo_max_msg_second,No. of Maximum MO msgs per second,Should be a number,OPERATIONS_LEVEL,Mandatory
+ussd_mt_max_recipients_per_day,No. of Maximum MT recipients per day. This is an optional value if this is not supplied then msg/day enforcement will not be enforced.,Should be a number,OPERATIONS_LEVEL,Optional
+ussd_mt_max_recipients_per_second,No. of Maximum MT recipients per second,Should be a number,OPERATIONS_LEVEL,Mandatory
