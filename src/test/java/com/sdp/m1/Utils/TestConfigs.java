@@ -145,3 +145,34 @@ public class TestConfigs {
         return getProperty("base.url", DEFAULT_LOGIN_URL);
     }
 }
+
+/*
+ * This class provides a centralized configuration management system for the test framework.
+ * It allows for easy retrieval of configuration properties, with support for default values,
+ * environment-specific settings, and legacy constants for backward compatibility.
+ * 
+ * getProperty(String key, String defaultValue): Retrieves a property value, prioritizing system properties, then loaded properties, and finally a default value.
+ * getLoginUrl(): Returns the configured login URL.
+ * getUsername(): Returns the configured username.
+ * getPassword(): Returns the configured password.
+ * getAdminUsername(): Returns the configured admin username.
+ * getAdminPassword(): Returns the configured admin password.
+ * getDelay(): Returns the configured delay value.
+ * getBrowser(): Returns the configured browser name (e.g., "chrome").
+ * isHeadless(): Returns true if headless browser mode is enabled, false otherwise.
+ * getTimeout(): Returns the configured timeout value.
+ * getPageLoadThresholdMs(): Returns the configured page load threshold in milliseconds.
+ * getEnvironment(): Returns the current environment name (e.g., "test", "production").
+ * isProduction(): Returns true if the environment is "production".
+ * isStaging(): Returns true if the environment is "staging".
+ * isTest(): Returns true if the environment is "test".
+ * isParallelExecution(): Returns true if parallel test execution is enabled.
+ * getThreadCount(): Returns the number of threads for parallel execution.
+ * isScreenshotOnFailure(): Returns true if screenshots are taken on test failure.
+ * isScreenshotOnSuccess(): Returns true if screenshots are taken on test success.
+ * getScreenshotPath(): Returns the path where screenshots are saved.
+ * getChromeDriverPath(): Returns the path to the ChromeDriver executable.
+ * getGeckoDriverPath(): Returns the path to the GeckoDriver executable.
+ * getEdgeDriverPath(): Returns the path to the EdgeDriver executable.
+ * getBaseUrl(): Returns the base URL for the application.
+ */
