@@ -1,3 +1,0 @@
-0,1,2,3,4
-Subject,From,To,Cc,Content Template
-[M1­SDP]  Service Provider <service­provider> status changed from <previous­status> to  <new­status>,SDP­Admin@m1.com.sg,SP­User,Marketing­User,ServiceProvider with the following details state is changed. ServiceProvider CompanyName : [serviceprovider_companyname] Previous Status : [previous­status] New Status : [new­status] Remarks : [remarks]

@@ -1,6 +1,0 @@
-0,1,2
-1,Literal escape,\x
-2,Grouping,[...]
-3,Range,a-z
-4,Union,[a-e][i-u]
-5,Intersection,[a-z&&[aeiou]]

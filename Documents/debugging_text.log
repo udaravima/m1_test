@@ -1,0 +1,2432 @@
+2025-08-27 10:05:32 Page 1:
+System Requirement Specification
+of Provisioning Module of SDP
+for M1, Singapore
+Document Version 0.1.0
+
+2025-08-27 10:05:32 Page 2:
+hSenid Mobile (Pte) Ltd
+7500A, Beach Road
+#11­320 The Plaza
+Singapore 199591
+Tel: +65­65332­140 Fax: +65­65332­140
+Document Code M1­SDP­PRO­SRS v0.1.0 Last edited: 01 July 2025
+Copyright © 1997­2025 hSenid Mobile Solutions (Pvt) Ltd. All rights reserved. No part of this publication may be
+reproduced, transmitted, transcribed, stored in a retrieval system, or translated into any language, in any form
+or by any means, electronic, mechanical, photocopying, recording, or otherwise, without prior written permission
+from hSenid Mobile. All copyright, confidential information, patents, design rights and all other intellectual
+property rights of whatsoever nature in and to any source code contained herein (including any header files and
+demonstration code that may be included), are and shall remain the sole and exclusive property of hSenid Mobile.
+The information furnished herein is believed to be accurate and reliable. However, no responsibility is assumed
+by hSenid Mobile for its use, or for any infringements of patents or other rights of third parties resulting from its
+use.
+All other trademarks in this publication are the property of their respective owners.
+
+2025-08-27 10:05:33 Page 3:
+System Requirement Specification of SDP for M1, Singapore
+Table of contents
+1 Introduction .......................................................................................................................... 8
+1.1 Purpose ..................................................................................................................................... 8
+1.2 Project Scope ............................................................................................................................ 8
+1.2.1 Benefits of the SDP Solution .............................................................................................. 8
+1.2.2 Objectives .......................................................................................................................... 9
+1.3 Project Scope ............................................................................................................................ 9
+2 Provisioning Module ............................................................................................................ 10
+2.1 Service Provider Profile Management .................................................................................... 13
+2.1.1 Register New Service Provider ......................................................................................... 14
+2.1.2 Search a Service Provider ................................................................................................. 39
+2.1.3 Service Provider Dashboard ............................................................................................. 42
+2.1.4 Disable a Service Provider ................................................................................................ 52
+2.1.5 Enable a Service Provider ................................................................................................. 54
+2.1.6 Service Provider Profile Update ....................................................................................... 56
+3 Appendix A – Profile Attributes ............................................................................................ 58
+3.1 Service Provider Parameters................................................................................................... 58
+3.2 Application Parameters .......................................................................................................... 58
+3.3 GUI User Parameters .............................................................................................................. 59
+3.4 Dedicated Alias Regex Pattern Guide ..................................................................................... 60
+4 Appendix B – SLA SP Level Attributes ................................................................................... 70
+4.1 General SLA ............................................................................................................................. 70
+4.2 SMS ......................................................................................................................................... 71
+4.3 MMS ........................................................................................................................................ 72
+4.4 BAS .......................................................................................................................................... 73
+4.5 WAPPUSH................................................................................................................................ 74
+4.6 USSD ........................................................................................................................................ 75
+5 Appendix C – User Roles and Permissions ............................................................................. 76
+6 Appendix D – Short Code and Keywords ............................................................................... 84
+6.1 Short Code .............................................................................................................................. 84
+6.2 Keywords ................................................................................................................................ 85
+© 2025 hSenid Mobile. All rights reserved Page 3 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 4:
+System Requirement Specification of SDP for M1, Singapore
+APPROVED BY
+IN WITNESS WHEREOF, the parties hereto have executed this Agreement through their duly authorized
+representatives on the dates set forth below:
+Signed for and on behalf of hSenid Mobile Solutions
+Signature
+Name
+Title
+Date
+Signed for and on behalf of M1, Singapore
+Signature
+Name
+Title
+Date
+© 2025 hSenid Mobile. All rights reserved Page 4 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 5:
+System Requirement Specification of SDP for M1, Singapore
+Change Control
+Version Date Description Author
+0.0.1 24/04/2025 Initial document for SP Provisioning. Muditha Samarasinghe
+0.1.0 17/06/2025 Updated with review comments. Muditha Samarasinghe
+© 2025 hSenid Mobile. All rights reserved Page 5 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 6:
+System Requirement Specification of SDP for M1, Singapore
+About this document
+The purpose of this hSenid Mobile Solutions document is to provide system requirements of the
+Service Delivery Platform solution.
+The intended audience for this document is M1, Singapore and the engineering division of hSenid
+Mobile Solutions.
+Definitions, Acronyms and Abbreviations used
+What follows is a list of definitions of all terms, acronyms and abbreviations required to properly
+interpret this document.
+API – Application Programming Interface
+BAS – Billing As Service
+CDR – Caller Detail Records
+DB – Database
+KBPS – Kilo Bytes Per Second
+MMS – Multimedia Messaging Service
+MMSC ­ Multimedia Messaging Service Centre
+MO – Mobile Originated
+MT – Mobile Terminated
+NCS – Network Capability Server
+RA – Resource Adapter
+SBB – Service Building Block
+SDP – Service Delivery Platform
+SLA – Service Level Agreement
+SMPP – Short Message Peer to Peer
+SMS – Short Messaging Service
+SMSC – Short Messaging Service Centre
+SWS – Signalling Web Service
+SP – Service Provider
+TPD – Transactions Per Day
+TPS – Transactions Per Second
+© 2025 hSenid Mobile. All rights reserved Page 6 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 7:
+System Requirement Specification of SDP for M1, Singapore
+VAS – Value Added Service
+WAP – Wireless Access Protocol
+WS – Web Socket
+XMSC – SMSC or MMSC
+References used
+What follows is a complete list of names and URL’s for documents, websites, publications, images and
+other similar materials used in this document as for references/examples. The objective of using such
+references is to provide better understanding of the problem and the proposed solution. Please note
+that hSenidMobile will not include the same exact content or images used as for references/examples
+in the actual solution.
+M1­SDP­SRS v1.5
+M1­SDP­PROV­UGD­v2.0_Admin_users_
+M1­SDP­PROV­UGD­v2.0_SP_Users_
+SLA_Attributes v0.5.xls
+© 2025 hSenid Mobile. All rights reserved Page 7 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 8:
+System Requirement Specification of SDP for M1, Singapore
+1 Introduction
+As a rapidly growing subscriber profile, M1 is looking for a state of the art, comprehensive messaging
+and content delivery solution which could be used across a wide spectrum such as BAS, SMS, MMS,
+USSD, SWS and WAPPUSH. The platform will be a middleware from a network point of view, from
+which all relevant network elements will be interfaced as required during transactional flow. The
+service delivery platform will be a single, centralized, yet modular solution designed to meet all
+business requirements across many geographical regions.
+1.1 Purpose
+The purpose of this SRS is to detail the requirements of M1 with regard to the Provisioning Module of
+the Service Delivery Platform that will be implemented and delivered by hSenid.
+The document serves as a guide to the exact requirements for the proposed features and will be used
+by hSenid engineering team to develop the product’s functional specification, detailing each
+requirement and its implementation.
+1.2 Project Scope
+The provisioning module that is described in this document will provide service delivery of content and
+charge different services rendered to/by the M1 end customers, 3rd party Service Providers that uses
+M1 as a mediator.
+1.2.1 Benefits of the SDP Solution
+This highly flexible and scalable solution will improve the operational efficiency and
+simplicity of service creation of 3rd party providers and adding new functionalities that
+could bring competitive advantage to M1.
+The platform will allow M1 to rapidly enhance their service offerings and deliver rich
+content and applications to mobile subscribers.
+It shall enable delivery and charging of different services and content to the end
+customers by 3rd party Service Providers with M1 as a mediator with full control via SLA
+mechanisms embedded within the solution. The process to finalise service level
+agreements (SLAs) and the subsequent activation of VAS applications to make the service
+available to mobile subscribers, shall be automated. This business sign­up process shall
+offer significant cost savings, and reduce time to market for new services, while preserving
+and maintaining the security and integrity of the core network.
+© 2025 hSenid Mobile. All rights reserved Page 8 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 9:
+System Requirement Specification of SDP for M1, Singapore
+1.2.2 Objectives
+The SDP’s objective is to act as a bridge between M1’s core network and third­party VAS developers
+and providers incorporating:
+A Secure Access Gateway to the core network.
+A standards­based Web Services and middleware architecture.
+Centralized management of platform and applications integrated with external network
+elements including billing, rating and payments.
+Synchronous message mediation, routing, throughput control, logging, management and
+multi­protocol support, provisioning systems, CDR generation and reporting, CDR Query
+and dashboard as part of the feature set.
+1.3 Project Scope
+This SRS is organized by, starting from the next chapter and each subsequent chapter detailing the
+Provisioning module of SDP.
+© 2025 hSenid Mobile. All rights reserved Page 9 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 10:
+System Requirement Specification of SDP for M1, Singapore
+2 Provisioning Module
+Provisioning module of SDP, which manages SP details and application shall be a secure HTTPS based
+web application, which will be used for registering new SPs and adding new applications for their
+profiles. The comprehensive GUI based provisioning module shall enable admin users to create and
+provision SP profiles with SLA(s) by providing necessary authentication details. SP users shall also be
+able to make new application requests with SLA(s). Application provisioning will be handled by the
+Provisioning Module, while the user accounts for accessing this module will be created and managed
+via the Admin Module.
+Provisioning Module shall have the following features.
+Service Provider Profile Management
+This shall provide functionality to carry out administration tasks such as creating, modifying, searching,
+disabling and enabling SP profiles.
+Application Management
+This shall provide functionalities that can be performed after the SP profile is created. Once the profile
+is created, SP will be able to request for one or more applications under the selected service provider.
+Once the SP request for application(s), the users in each state shall be able check the SLA and proceed
+with provisioning the application(s).
+Users shall be able to access the Provisioning Module, with access rights varying according to their
+assigned roles (Please refer Appendix C­ User Roles and Permissions for further information).
+User Access Rights
+SDP­Admin Create, edit, view, and search SP profiles and applications.
+Manage users, groups, modules, permissions.
+Suspend/ reactivate/ retire testbed and production apps.
+View dashboard.
+Manage the requested applications in all states upon the SP user creating an
+application request.
+SP Users Create, modify request applications and view, search both SP and application
+details.
+Create, search, modify anddiscard application drafts and CRs.
+© 2025 hSenid Mobile. All rights reserved Page 10 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 11:
+System Requirement Specification of SDP for M1, Singapore
+Test the application request at the Draft­Request state and in the Active­
+Testbed state.
+Marketing User View and search SP profiles and applications.
+Configure charging SLAs.
+Approve or discard the application request at the REQUESTED_APPLICATION
+state.
+Customer Care View and search SP profiles and applications.
+User
+Testbed­ View/ search SP profiles and applications.
+Operations User
+Configure testbed SLAs.
+Approve or discard the application request at
+APPROVED_APPLICATION_REQUEST state, Pre­Active­Testbed state.
+Manage the suspension/ re­activation/ retirement of the application request
+in any Testbed state.
+Production­ View/ search SP profiles and applications.
+Operations User
+Configure production SLAs.
+Configure the application request in Pre­Active­Production state, Pre­
+Provisioned­Production state, Approved­Application Request state, Limited­
+Production state, Active­Production state, Suspended­Production state.
+Manage suspension/ re­activation/ retirement in any Production state.
+SMSC Engineer Verify and configure the relevant parameters of SMS and WAPPUSH in the
+application request at the Pre­Active Testbed state (Testbed configurations)
+and at the Pre­Provisioned Production state (Production configurations).
+MMSC Engineer Verify and configure the relevant parameters of MMS in the application
+request at the Pre­Active Testbed state (Testbed configurations) and at the
+Pre­Provisioned Production state (Production configurations).
+Prepaid IN Engineer Verify and configure the relevant parameters of SMS, MMS, BAS, WAPPUSH
+and USSD in the application request at the Pre­Active Testbed state (Testbed
+configurations) and at the Pre­Provisioned Production state (Production
+configurations).
+© 2025 hSenid Mobile. All rights reserved Page 11 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 12:
+System Requirement Specification of SDP for M1, Singapore
+Postpaid Billing Verify and configure the relevant parameters of SMS, MMS, BAS, WAPPUSH
+Engineer and USSD in the application request at the Pre­Active Testbed state (Testbed
+configurations) and at the Pre­Provisioned Production state (Production
+configurations)
+Network Admin Verify and configure the relevant parameters of SMS, MMS, BAS, WAPPUSH
+and USSD in the application request at the Pre­Active Testbed state (Testbed
+configurations) and at the Pre­Provisioned Production state (Production
+configurations).
+USSD Engineer Verify and configure the relevant parameters of USSD in the application
+request at the Pre­Active Testbed state (Testbed configurations) and at the
+Pre­Provisioned Production state (Production configurations).
+© 2025 hSenid Mobile. All rights reserved Page 12 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 13:
+System Requirement Specification of SDP for M1, Singapore
+2.1 Service Provider Profile Management
+REQ­SP­PRO 1: SP SLA is an agreement between SDP and service provider which should be enforced
+before the application SLA during provisioning.
+REQ­SP­PRO 2: Each of the SP SLAs contain general information on SP and information per NCS.
+REQ­SP­PRO 3: SLA defined at SP level shall serve as the limit for application SLA. i.e. application SLA
+cannot be defined above SP SLA level restrictions.
+REQ­SP­PRO 4: The SP provisioning UI shall allow users to perform the following actions, based on the
+access rights assigned:
+Register new SP
+View/Edit SP profile
+Search SPs
+REQ­SP­PRO 5: Operations users with the user role MANAGE_OPERATIONS_LEVEL_SLA_PARAMETERS
+shall have the authority to create a SP.
+Note:
+To denote which user role is allowed to configure each parameter in SP and application SLA the
+following abbreviations are used in the SLA parameter lists in SLA_Attributes v0.5.xls (Appendix B):
+OPERATIONS_LEVEL – MANAGE_OPERATIONS_LEVEL_SLA_PARAMETERS
+APPLICATION_LEVEL – MANAGE_APPLICATION_LEVEL_SLA_PARAMETERS
+SYSTEM_LEVEL – SLA parameter shall be auto­generated by the system
+© 2025 hSenid Mobile. All rights reserved Page 13 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:33 Page 14:
+System Requirement Specification of SDP for M1, Singapore
+2.1.1 Register New Service Provider
+REQ­NSP­REG 1: Upon clicking on the “Provisioning” tab available in the header, SDP admin shall be
+directed to the Provisioning module home page as follows.
+Figure 2­1: Provisioning Module Home Page for Admin
+REQ­NSP­REG 2: Users with the ROLE_CREATE_SP permission shall be able to register a new SP by
+providing the required information upon,
+1. Selecting the SERVICE PROVIDER tab and clicking on the “Register” link.
+2. Clicking on the “Register” link under “Service Provider” which appearsin the Home page of the
+Provisioning Module.
+© 2025 hSenid Mobile. All rights reserved Page 14 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 15:
+System Requirement Specification of SDP for M1, Singapore
+Figure 2­2: Register Service Provider Form
+Note: Initially, the general attributes of SP SLA must be configured (Please refer the section 4.1
+General SLA for the list of parameters or General tab of SLA_Attributes v0.5.xls for further
+information).
+Field Description Type Validation Error Response
+Service Used to capture the String ­ Mandatory. If not entered: “Service
+Provider ID service provider ID. provider Id required”
+­ Unique. Cannot
+enter a Service If already used: “Service
+Provider Id which Provider Id already exists”
+already exists.
+If not 8 digits: “Please enter
+­ Should have 8 digits. 8 digit number for Service
+Provider Id.”
+© 2025 hSenid Mobile. All rights reserved Page 15 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 16:
+System Requirement Specification of SDP for M1, Singapore
+Company Used to capture the String ­ Mandatory. If not entered: “Company
+name name of the company. Name required”
+­ Maximum length 50
+characters. If maximum length
+exceeded: “Company
+­ Cannot enter a
+Name should be less than
+company name
+50 characters”
+which already exists.
+If the entered company
+name already exists:
+“Service Provider already
+exists”
+Address Used to capture the String ­ Optional. If maximum length
+address of the exceeded: “Address should
+­ Maximum length
+company. be less than 255
+255 characters.
+characters”
+Description Used to capture the String ­ Optional. If maximum length
+description about the exceeded: “Description
+­ Maximum length
+SP. should be less than 255
+255 characters.
+characters”
+White Used to capture the String ­ Mandatory. If less than the minimum
+Listed white­listed phone length, exceed the
+­ Maximum length 15
+Users numbers. maximum length:
+digits.
+“Description should be less
+­ Minimum length 8
+than 255 characters”
+digits.
+If the following conditions
+­ Multiple entries
+are not met:
+should be separated
+­ Maximum length 15 digits.
+by commas.
+­ Minimum length 8 digits.
+­ If a whitelisted
+phone number is ­ Multiple entries should be
+entered to black separated by commas.
+listed phone
+“Should be comma­
+numbers.
+separated phone numbers
+­ If the same MSISDN having 15 digits as
+is duplicated in the maximum and 8 digits as
+list. minimum”
+© 2025 hSenid Mobile. All rights reserved Page 16 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 17:
+System Requirement Specification of SDP for M1, Singapore
+If a whitelisted phone
+number is entered to black
+listed phone numbers:
+“You can not have a White­
+listed user in the Blacklisted
+user list.”
+If the same MSISDN is
+duplicated in the list:
+“Msisdn are Duplicate in
+White listed Msisdn.”
+Black Listed Used to capture the String ­ Optional.
+Users black­listed phone
+­ Maximum length 15
+numbers.
+digits.
+­ Minimum length 8
+digits.
+­ Multiple entries
+should be separated
+by commas.
+­
+Dedicated Used to capture the String ­ Optional. If already entered
+Alias alias dedicated for the dedicated alias of an SP
+­ Multiple entries
+respective service entered by another SP:
+should be separated
+provider across all the “Dedicated alias/es ­ [Alias
+by commas.
+SP Apps. Name] or a wildcard format
+­ Dedicated alias that
+is already in use”
+Will support regular
+has already been
+expressions (case If the entered regex is not
+entered for one SP
+sensitive) and valid: “Invalid regular
+should not be
+alphanumeric (e.g expression/s {Dedicated
+allowed to be used by
+H3lloPromo7). Alias} please enter valid
+another SP at the
+regular expression.”
+Please refer section same time.
+3.4 Dedicated Alias
+Pattern Guide in
+Appendix B for list
+of attributes.
+© 2025 hSenid Mobile. All rights reserved Page 17 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 18:
+System Requirement Specification of SDP for M1, Singapore
+SP users Used to select SP­ multi­ ­ Mandatory. If no SP­typed users
+typed User(s) to be select selected: “Select atleast
+­ At least one SP­
+assigned for the new list one User Name.”
+typed user should be
+SP. box
+selected.
+(Use Shift or Ctrl keys
+to select more than
+one SP­user)
+The list of SP users
+shall be obtained and
+listed out by referring
+to the SpUsersGroup.
+Marketing Used to select multi­ ­ Mandatory. If no marketing users
+Users marketing user(s) who select selected: “Allowed
+­ At least one
+is allowed to monitor list Marketing Users required.”
+marketing user
+the SP and box
+should be selected.
+applications.
+Using Shift or Ctrl keys,
+user shall be able to
+select more than one
+marketing user.
+The list of marketing
+users shall be obtained
+and listed out by
+referring to the
+MarketingUsersGroup.
+Resources Select the resources to multi­ ­ Mandatory. If no resources selected:
+be allowed for the SP. select “Select atleast one
+­ At least one
+list resource.”
+Using Shift or Ctrl keys, resource should be
+box
+user shall be able to selected.
+select more than one
+marketing user.
+Available options:
+SMS
+MMS
+BAS
+WAPPUSH
+© 2025 hSenid Mobile. All rights reserved Page 18 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 19:
+System Requirement Specification of SDP for M1, Singapore
+USSD
+SWS
+These options are
+maintained in a DB
+table.
+REQ­NSP­REG 2.1: When SP accounts get Terminated, Suspended or Removed, the alias associated
+with the SP account shall no longer be tied to that account.
+REQ­NSP­REG 3: Upon entering the necessary details and clicking on the Submit button, the following
+confirmation screen will appear with the entered details.
+Figure 2­3: Confirmation Screen with Submitted SP Details
+REQ­NSP­REG 4: If multiple phone numbers are included for the “Black Listed Users” field or the
+character count of the phone number or expression entered is greater than 30, upon submitting the
+entered information, a link to view the respective information shall appear.
+REQ­NSP­REG 5: Upon cancelling the confirmation page (Figure 3­3), the entered information shall be
+disregarded and the user shall be directed to the Provisioning module initial page (Figure 3­1).
+© 2025 hSenid Mobile. All rights reserved Page 19 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 20:
+System Requirement Specification of SDP for M1, Singapore
+REQ­NSP­REG 6: Once the user verifies the entered details and clicks upon the Confirm button, the SP
+profile shall be created.
+REQ­NSP­REG 6.1: If the profile is successfully created, the following success message shall be
+displayed, prompting the user to configure the Service Level Agreement (SLA) for each specified
+resource.
+“Service Provider Profile created successfully. Please configure the Service Level Agreement (SLA) for
+each resource.”
+Figure 2­4: Successful SP Profile Creation and SLA Configuration
+REQ­SP­REG 7: It is mandatory to configure NCS SLA parameters in order to complete SP provisioning.
+REQ­SP­REG 7.1: If the user clicks upon the Submit button, without configuring any of the SLA for each
+resource, the following error message shall be displayed.
+“{List of NCS resources for which SLA has not been configured} SLA should be configured”
+© 2025 hSenid Mobile. All rights reserved Page 20 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 21:
+System Requirement Specification of SDP for M1, Singapore
+Figure 2­5: Error Message for Not Configuring SLA
+REQ­SP­REG 8: For NCS (SMS/ MMS/ BAS/ WAPPUSH/ USSD/ SWS) selected when configuring the
+general attributes, the relevant parameters should be configured for each NCS by clicking upon the
+respective link (Please refer SMS, MMS, Billing As Service and WAP Push tabs of SLA_Attributes v0.5.xls
+(Appendix B) parameters listed for SP SLA).
+© 2025 hSenid Mobile. All rights reserved Page 21 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 22:
+System Requirement Specification of SDP for M1, Singapore
+2.1.1.1 Configuration of SLA for SMS
+Figure 2­6: Configurations for SMS SLA
+REQ­SLA­SMS 1: Upon clicking on the SMS link available under Resources, operations user shall be able
+to define the following information (Please refer the Section 4.2 SMS SLA for further information).
+Field Description Type Validation Error Response
+SMS MO
+Maximum Used to specify the String Mandatory. If not entered or negative
+Messages maximum number of values entered: “Maximum
+Should be a digit.
+Per Second mobile originated SMS messages per second
+Default value should
+per second that the required.”
+be 0.
+service provider is
+If a value other than a digit
+capable of handling. Should be less than
+entered: “Please enter a
+1,000.
+valid input.”
+If a value greater than 1,000
+entered: “Max message per
+Second should not be
+greater than 1000 message
+per second.”
+Maximum Used to specify the String Mandatory. If not entered or negative
+Messages maximum number of values entered: “Maximum
+Should be a digit.
+Per Day mobile originated SMS messages per day required.”
+per day that the
+© 2025 hSenid Mobile. All rights reserved Page 22 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 23:
+System Requirement Specification of SDP for M1, Singapore
+service provider is Default value should If a value other than a digit
+capable of handling. be 0. entered: “Please enter a
+valid input.”
+Should be less than
+50,000,000. If a value greater than
+50,000,000 entered: “Max
+message per day should not
+be greater than 50000000
+message per day.”
+If the value entered for
+Maximum Messages Per
+Second is greater than
+Maximum Messages Per
+Day: “Max message per day
+should be greater than
+message per Second.”
+NCS Used to capture the String Optional. If character count 255
+Description description entered by exceeded: “NCS Description
+Should be less than
+the user regarding the is too long.”
+255 characters.
+NCS configuration.
+SMS MT
+Maximum Used to specify the String Mandatory. If not entered or negative
+recipients maximum number of values entered: “Maximum
+Should be a digit.
+Per Second recipients that the messages per second
+Default value should
+service provider is required.”
+be 0.
+capable of delivering
+If a value other than a digit
+SMS messages to per Should be less than
+entered: “Please enter a
+second. 1,000.
+valid input.”
+If a value greater than 1,000
+entered: “Max message per
+Second should not be
+greater than 1000 message
+per second.”
+Maximum Used to specify the String Mandatory. If not entered or negative
+recipients maximum number of values entered: “Maximum
+Should be a digit.
+Per Day recipients that the messages per day required.”
+service provider is
+© 2025 hSenid Mobile. All rights reserved Page 23 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 24:
+System Requirement Specification of SDP for M1, Singapore
+capable of delivering Default value should If a value other than a digit
+SMS messages to per be 0. entered: “Please enter a
+day. valid input.”
+Should be less than
+50,000,000. If a value greater than
+50,000,000 entered: “Max
+message per day should not
+be greater than 50000000
+message per day.”
+If the value entered for
+Maximum Messages Per
+Second is greater than
+Maximum Messages Per
+Day: “Max message per day
+should be greater than
+message per Second.”
+REQ­SLA­SMS 2: The following success message shall be displayed after submitting the SLA
+configurations for SMS and it shall be displayed in a different color as indicated below.
+“SMS SLA for Service Provider configured successfully”
+Figure 2­7: Success Message for Configuring SMS SLA
+© 2025 hSenid Mobile. All rights reserved Page 24 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 25:
+System Requirement Specification of SDP for M1, Singapore
+2.1.1.2 Configuration of SLA for MMS
+Figure 2­8: Configurations for MMS SLA
+REQ­SLA­MMS 1: Upon clicking on the MMS link available under Resources, operations user shall be
+able to define the following information (Please refer the Section 4.3 MMS SLA for further
+information).
+Field Description Type Validation Error Response
+MMS MO
+Maximum Used to specify the String Mandatory. If not entered or negative
+Messages maximum number of values entered: “Maximum
+Should be a digit.
+Per Second mobile originated messages per second
+Default value should
+MMS per second that required.”
+be 0.
+the service provider is
+If a value other than a digit
+capable of handling. Should be less than
+entered: “Please enter a
+100.
+valid input.”
+If a value greater than 100
+entered: “Max message per
+Second should not be
+greater than 100 message
+per second.”
+Maximum Used to specify the String Mandatory. If not entered or negative
+Messages maximum number of values entered: “Maximum
+Should be a digit.
+Per Day mobile originated messages per day required.”
+© 2025 hSenid Mobile. All rights reserved Page 25 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 26:
+System Requirement Specification of SDP for M1, Singapore
+MMS per day that the Default value should If a value other than a digit
+service provider is be 0. entered: “Please enter a
+capable of handling. valid input.”
+Should be less than
+50,000,000. If a value greater than
+50,000,000 entered: “Max
+message per day should not
+be greater than 50000000
+message per day.”
+If the value entered for
+Maximum Messages Per
+Second is greater than
+Maximum Messages Per
+Day: “Maximum messages
+per day should be greater
+than maximum messages
+per second.”
+NCS Used to capture the String Optional. If character count 255
+Description description entered by exceeded: “NCS Description
+Should be less than
+the user regarding the is too long.”
+255 characters.
+NCS configuration.
+MMS MT
+Maximum Used to specify the String Mandatory. If not entered or negative
+recipients maximum number of values entered: “Maximum
+Should be a digit.
+Per Second recipients that the messages per second
+Default value should
+service provider is required.”
+be 0.
+capable of delivering
+If a value other than a digit
+MMS messages to per Should be less than
+entered: “Please enter a
+second. 100.
+valid input.”
+If a value greater than 100
+entered: “Max message per
+Second should not be
+greater than 100 message
+per second.”
+Maximum Used to specify the String Mandatory. If not entered or negative
+recipients maximum number of values entered: “Maximum
+Should be a digit.
+Per Day recipients that the messages per day required.”
+© 2025 hSenid Mobile. All rights reserved Page 26 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:34 Page 27:
+System Requirement Specification of SDP for M1, Singapore
+service provider is Default value should If a value other than a digit
+capable of delivering be 0. entered: “Please enter a
+MMS messages to per valid input.”
+Should be less than
+day.
+50,000,000. If a value greater than
+50,000,000 entered: “Max
+message per day should not
+be greater than 50000000
+message per day.”
+If the value entered for
+Maximum Messages Per
+Second is greater than
+Maximum Messages Per
+Day: “Max message per day
+should be greater than
+message per Second.”
+REQ­SLA­MMS 2: The following success message shall be displayed after submitting the SLA
+configurations for MMS.
+“MMS SLA for Service Provider configured successfully”
+Figure 2­9: Success Message for Configuring MMS SLA
+© 2025 hSenid Mobile. All rights reserved Page 27 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 28:
+System Requirement Specification of SDP for M1, Singapore
+2.1.1.3 Configuration of SLA for USSD
+Figure 2­10: Configurations for USSD SLA
+REQ­SLA­USSD 1: Upon clicking on the USSD link available under Resources, operations user shall be
+able to define the following information (Please refer the Section 4.6 USSD SLA for further
+information).
+Field Description Type Validation Error Response
+USSD MO
+Maximum Used to specify the String Mandatory. If not entered or negative
+Messages maximum number of values entered: “Maximum
+Should be a digit.
+Per Second mobile originated messages per second
+Default value should
+USSD messages per required.”
+be 0.
+second that the service
+If a value other than a digit
+provider is capable of Should be less than
+entered: “Please enter a
+handling. 1,000.
+valid input.”
+If a value greater than 1,000
+entered: “Max message per
+Second should not be
+greater than 1000 message
+per second.”
+Maximum Used to specify the String Mandatory. If not entered or negative
+Messages maximum number of values entered: “Maximum
+Should be a digit.
+Per Day mobile originated messages per day required.”
+© 2025 hSenid Mobile. All rights reserved Page 28 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 29:
+System Requirement Specification of SDP for M1, Singapore
+USSD per day that the Default value should If a value other than a digit
+service provider is be 0. entered: “Please enter a
+capable of handling. valid input.”
+Should be less than
+50,000,000. If a value greater than
+50,000,000 entered: “Max
+message per day should not
+be greater than 50000000
+message per day.”
+If the value entered for
+Maximum Messages Per
+Second is greater than
+Maximum Messages Per
+Day: “Max message per day
+should be greater than
+message per Second.”
+NCS Used to capture the String Optional. If character count 255
+Description description entered by exceeded: “NCS Description
+Should be less than
+the user regarding the is too long.”
+255 characters.
+NCS configuration.
+SMS MT
+Maximum Used to specify the String Mandatory. If not entered or negative
+recipients maximum number of values entered: “Maximum
+Should be a digit.
+Per Second recipients that the messages per second
+Default value should
+service provider is required.”
+be 0.
+capable of delivering
+If a value other than a digit
+USSD messages to per Should be less than
+entered: “Please enter a
+second. 1,000.
+valid input.”
+If a value greater than 1,000
+entered: “Max message per
+Second should not be
+greater than 1000 message
+per second.”
+Maximum Used to specify the String Mandatory. If not entered or negative
+recipients maximum number of values entered: “Maximum
+Should be a digit.
+Per Day recipients that the messages per day required.”
+service provider is
+© 2025 hSenid Mobile. All rights reserved Page 29 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 30:
+System Requirement Specification of SDP for M1, Singapore
+capable of delivering Default value should If a value other than a digit
+USSD messages to per be 0. entered: “Please enter a
+day. valid input.”
+Should be less than
+50,000,000. If a value greater than
+50,000,000 entered: “Max
+message per day should not
+be greater than 50000000
+message per day.”
+If the value entered for
+Maximum Messages Per
+Second is greater than
+Maximum Messages Per
+Day: “Max message per day
+should be greater than
+message per Second.”
+REQ­SLA­USSD 2: The following success message shall be displayed after submitting the SLA
+configurations for USSD.
+“USSD SLA for Service Provider configured successfully”
+Figure 2­11: Success Message for Configuring USSD SLA
+© 2025 hSenid Mobile. All rights reserved Page 30 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 31:
+System Requirement Specification of SDP for M1, Singapore
+2.1.1.4 Configuration of SLA for WAPPUSH
+Figure 2­12: Configurations for WAPPUSH SLA
+REQ­SLA­WAPPUSH 1: Upon clicking onthe WAPPUSH link available under Resources, operations user
+shall be able to define the following information for each service provider (Please refer the Section 4.5
+WAPPUSH SLA for further information).
+Field Description Type Validation Error Response
+Maximum Used to specify the String Mandatory. If not entered or negative
+Recipients maximum number of values entered: “Max
+Should be a digit.
+Per Second recipients to whom Recipients per Second
+Default value should
+WAP Push messages required.”
+be 0.
+can be delivered per
+If a value other than a digit
+second. Should be less than
+entered: “Please enter a
+100.
+valid input.”
+If a value greater than 100
+entered: “Max recipients per
+second should not be
+greater than 100 recipients
+per second.”
+Maximum Used to specify the String Mandatory. If not entered or negative
+Recipients maximum number of values entered: “Max
+Should be a digit.
+Per Day recipients to whom Recipients per Day
+Default value should
+WAP Push messages required.”
+be 0.
+© 2025 hSenid Mobile. All rights reserved Page 31 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 32:
+System Requirement Specification of SDP for M1, Singapore
+can be delivered per Should be less than If a value other than a digit
+day. 50,000,000. entered: “Please enter a
+valid input.”
+If a value greater than
+50,000,000 entered: “Max
+recipients per day should
+not be greater than
+500000000 recipients per
+day.”
+If the value entered for
+Maximum Recipients Per
+Second is greater than
+Maximum Recipients Per
+Day: “Max recipients per day
+should be greater than Max
+recipients per second.”
+NCS Used to capture the String Optional. If character count 255
+Description description entered by exceeded: “NCS Description
+Should be less than
+the user regarding the is too long.”
+255 characters.
+NCS configuration.
+REQ­SLA­WAPPUSH 2: The following success message shall be displayed after submitting the SLA
+configurations for WAP­PUSH.
+“WAP­PUSH SLA for Service Provider configured successfully”
+© 2025 hSenid Mobile. All rights reserved Page 32 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 33:
+System Requirement Specification of SDP for M1, Singapore
+Figure 2­13: Success Message for Configuring WAP­PUSH SLA
+2.1.1.5 Configuration of SLA for BAS
+Figure 2­14: Configurations for BAS SLA
+REQ­SLA­BAS 1: Upon clicking on the BAS link available under Resources, operations user shall be able
+to define the following information (Please refer the Section 4.4 BAS SLA for further information).
+Field Description Type Validation Error Response
+Maximum Used to specify the String Mandatory. If not entered or negative
+BAS maximum number of values entered: “Maximum
+Should be a digit.
+Incoming Billing­as­a­Service BAS Incoming Requests per
+Default value should
+Requests incoming requests per second required.”
+be 0.
+Per Second second that the service
+If a value other than a digit
+provider is capable of Should be less than
+entered: “Please enter a
+handling. 100.
+valid input.”
+If a value greater than 100
+entered: “Max billing per
+second should not be
+greater than 100 billing per
+second.”
+Maximum Used to specify the String Mandatory. If not entered or negative
+BAS maximum number of values entered: “Maximum
+Should be a digit.
+© 2025 hSenid Mobile. All rights reserved Page 33 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 34:
+System Requirement Specification of SDP for M1, Singapore
+Incoming Billing­as­a­Service Default value should BAS Incoming Requests per
+Requests incoming requests per be 0. day required.”
+Per Day day that the service
+Should be less than If a value other than a digit
+provider is capable of
+50,000,000. entered: “Please enter a
+handling.
+valid input.”
+If a value greater than
+50,000,000 entered: “Max
+billing per day should not be
+greater than 50000000
+billing per day.”
+If the value entered for
+Maximum BAS Incoming
+Requests Per Second is
+greater than Maximum BAS
+Incoming Requests Per Day:
+“Maximum BAS Incoming
+Requests per day should be
+greater than maximum
+requests per second.”
+NCS Used to capture the String Optional. If character count 255
+Description description entered by exceeded: “NCS Description
+Should be less than
+the user regarding the is too long.”
+255 characters.
+NCS configuration.
+REQ­SLA­BAS 2: The following success message shall be displayed after submitting the SLA
+configurations for BAS.
+“BAS SLA for Service Provider configured successfully”
+© 2025 hSenid Mobile. All rights reserved Page 34 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 35:
+System Requirement Specification of SDP for M1, Singapore
+Figure 2­15: Success Message for Configuring BAS SLA
+2.1.1.6 Configuration of SLA for SWS
+Figure 2­16: Configurations for SWS SLA
+REQ­SLA­SWS 1: Upon clicking on the SWS link available under Resources, operations user shall be able
+to define the following information.
+Field Description Type Validation Error Response
+Maximum Used to specify the String Mandatory. If not entered or negative
+SWS maximum number of values entered: “Maximum
+Should be a digit.
+Incoming SWS incoming
+© 2025 hSenid Mobile. All rights reserved Page 35 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 36:
+System Requirement Specification of SDP for M1, Singapore
+Requests requests per second Default value should SWS Incoming Requests per
+Per Second that the service be 0. second required.”
+provider is capable of
+Should be less than If a value other than a digit
+handling.
+1,000. entered: “Please enter a
+valid input.”
+If a value greater than 1,000
+entered: “Maximum SWS
+per second should be less
+than 1,000.”
+Maximum Used to specify the String Mandatory. If not entered, entered 0 or
+SWS maximum number of negative value entered:
+Should be a digit.
+Incoming SWS incoming “Maximum SWS Incoming
+Default value should
+Requests requests per day that Requests per day required.”
+be 0.
+Per Day the service provider is
+If a value other than a digit
+capable of handling. Should be less than
+entered: “Please enter a
+50,000,000.
+valid input.”
+If a value greater than
+50,000,000 entered:
+“Maximum SWS per second
+should be less than
+50,000,000.”
+If the value entered for
+Maximum SWS Incoming
+Requests Per Second is
+greater than Maximum SWS
+Incoming Requests Per Day:
+“Maximum SWS incoming
+requests per day should be
+greater than maximum
+requests per second.”
+NCS Used to capture the String Optional. If character count 255
+Description description entered by exceeded: “NCS Description
+Should be less than
+the user regarding the is too long.”
+255 characters.
+NCS configuration.
+© 2025 hSenid Mobile. All rights reserved Page 36 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 37:
+System Requirement Specification of SDP for M1, Singapore
+REQ­SLA­SWS 2: The following success message shall be displayed after submitting the SLA
+configurations for SWS.
+“SWS for Service Provider configured successfully”
+Figure 2­17: Success Message for Configuring SWS SLA
+REQ­SP­REG 9: Configured SLA of the selected resources are shown in a different colour and the SDP
+Admin can edit them by clicking on each link.
+REQ­SP­REG 10: Once the SLA parameters are configured for each selected resource under the
+respective Service Provider (SP), the SP profile will be created in SDP, and a success message shall be
+displayed as follows.
+“Service Provider registered successfully”
+Figure 2­18: Success Message for Configuring SLA of all the Resources
+REQ­SP­REG 11: A configuration email shall be sent from SDP­Admin to SP and Marketing users with
+the SP details.
+© 2025 hSenid Mobile. All rights reserved Page 37 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 38:
+System Requirement Specification of SDP for M1, Singapore
+Subject From To Cc Content Template
+[M1­SDP] New SDP­ SP­ Marketing­ New ServiceProvider with the
+ServiceProvider Admin@m1.com.sg User User following details is created.
+<serviceprovider­
+ServiceProvider CompanyName :
+name> Created
+[serviceprovider_companyname]
+ServiceProvider Description :
+[serviceprovider_description]
+ServiceProvider Address :
+[serviceprovider_address]
+Provisioning UI Url :
+[provisioning_ui_url]
+Remarks : [remarks]
+© 2025 hSenid Mobile. All rights reserved Page 38 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 39:
+System Requirement Specification of SDP for M1, Singapore
+2.1.2 Search a Service Provider
+REQ­SEA­ESP 1: Users with the ROLE_SEARCH_SP permission shall be able to search for the existing SP
+by providing the Service Provider Company Name upon,
+1. Selecting the Service Provider tab and clicking on the “Search” link.
+2. Clicking on the “Search” link under “Service Provider” which appears in the Home page of the
+Provisioning Module.
+Figure 2­19: Search SP Initial Page
+REQ­SEA­ESP 2: Upon entering the SP company name in the search bar and clicking on the Search
+button, the operations­user shall view with the following information.
+Figure 2­20: Search Results of SPs
+Column Description
+No Auto incremented serial number for each search result.
+Service Provider ID entered by the operations­user during the SP profile
+Service Provider ID
+registration.
+Company name entered by the operations­user during the SP profile
+Company name
+registration.
+© 2025 hSenid Mobile. All rights reserved Page 39 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:35 Page 40:
+System Requirement Specification of SDP for M1, Singapore
+Indicates whether the SP profile is enabled or not.
+Enabled If enabled, the value displayed would be true.
+If disabled, the value displayed would be false.
+Provides the Operations­User the ability to disable the SP profile if it is
+currently enabled and vice versa.
+If the current SP profile status is enabled, the option displayed would be
+Change Status
+Disable.
+If the current SP profile status is Disabled, the option displayed would be
+Enable.
+REQ­SEA­ESP 3: Upon clicking on the Service Provider Id, the admin user shall be able to view the
+following information regarding the Service Provider.
+REQ­SEA­ESP 3.1: All the information except the Service Provider Id shall remain editable for the admin.
+Figure 2­21: SP Information View
+© 2025 hSenid Mobile. All rights reserved Page 40 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 41:
+System Requirement Specification of SDP for M1, Singapore
+REQ­SEA­ESP 3.2: Upon clicking on each NCS links, the existing values for each SLA parameters shall be
+displayed (Figure 3­6, Figure 3­8, Figure 3­10, Figure 3­12, Figure 3­14, Figure 3­16).
+REQ­SEA­ESP 4: Upon saving, the operations­user shall be able to change any SLA parameters by
+clicking on the respective link under the Resources section.
+Figure 2­22: SP SLA View
+© 2025 hSenid Mobile. All rights reserved Page 41 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 42:
+System Requirement Specification of SDP for M1, Singapore
+2.1.3 Service Provider Dashboard
+REQ­SP­DSB 1: Users with the ROLE_VIEW_DASHBOARD permission shall be able to view a dashboard
+displaying relevant information for a specific service provider, by searching using the service provider
+company name.
+Figure 2­23: SP Search for Dashboard View
+REQ­SP­DSB 2: The following information shall be available with regards to the selected SP.
+Figure 2­24: SP Dashboard
+Service Provider Description
+Indicates the Service Provider name.
+Service Provider Shall display in the following format:
+{Service Provider} {Service Provider Id}
+Indicates whether the service provider profile is enabled or disabled.
+Enabled Available values:
+­ If the SP is enabled: true
+© 2025 hSenid Mobile. All rights reserved Page 42 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 43:
+System Requirement Specification of SDP for M1, Singapore
+­ If the SP is disabled: false
+Indicates the application id which is auto generated as mentioned in REQ­
+Application ID
+APP­CRE 3.
+Indicates the application name entered by the SP user during application
+Application Name
+creation.
+Indicates the shortcode for SMS assigned by the SP user during application
+SMS Shortcode
+creation.
+Indicates the shortcode for MMS assigned by the SP user during application
+MMS Shortcode
+creation.
+State Indicates the state of the application which is created under the selected SP.
+REQ­SP­DSB 3: The user should be able to download the information as a CSV.
+serviceProviderId
+serviceproviderCompanyname
+serviceproviderAddress
+serviceproviderDescription
+serviceproviderUserlist
+serviceproviderMarketingUserlist
+serviceproviderWhitelistedUserList
+serviceproviderAllowedNcsList
+serviceproviderStatus
+applicationId
+applicationName
+applicationDescription
+applicationAllowedHostAddresses
+applicationConnectionType
+applicationWsPassword
+applicationAllowedNcsList
+isSmsMoAllowed
+smsShortcode
+smsKeywords
+smsMoConnectionUrl
+smsMoallowedParties
+smsMoChargingType
+smsMoFreeServicetype
+© 2025 hSenid Mobile. All rights reserved Page 43 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 44:
+System Requirement Specification of SDP for M1, Singapore
+smsMoFreeServiceDescription
+smsMoFixedFlatRateServicetype
+smsMoFixedFlatRateServiceDescription
+smsMoFixedFlatRateFixedChargingValue
+smsMoFixedFlatRateIsTaxApplied
+smsMoKeywordChargePairKeyword
+smsMoKeywordChargePairServicetype
+smsMoKeywordChargePairServiceDescription
+smsMoKeywordChargePairChargingvalue
+smsMoKeywordChargePairIsTaxApplied
+smsMoMerchantId
+smsMoContentType
+smsMoUnitCost
+smsMoCreditLimit
+smsMoBalanceType
+isSmsMtAllowed
+smsMtBillingId
+smsMtDefaultSenderAddress
+smsMtConnectionUrlDeliveryReport
+smsMtChargeeField
+smsMtAllowedParties
+smsMtChargingType
+smsMtLocalFreeServicetype
+smsMtLocalFreeServiceDescription
+smsMtGlobalFreeServicetype
+smsMtGlobalFreeServiceDescription
+smsMtLocalFixedFlatRateServicetype
+smsMtLocalFixedFlatRateServiceDescription
+smsMtLocalFixedFlatRateFixedChargingValue
+smsMtLocalFixedFlatRateIsTaxApplied
+smsMtLocalFixedFlatRateContentType
+smsMtLocalFixedFlatRateUnitCost
+smsMtLocalFixedFlatRateCreditLimit
+smsMtGlobalFixedFlatRateServicetype
+smsMtGlobalFixedFlatRateServiceDescription
+smsMtGlobalFixedFlatRateFixedChargingValue
+smsMtGlobalFixedFlatRateIsTaxApplied
+smsMtGlobalFixedFlatRateContentType
+smsMtGlobalFixedFlatRateUnitCost
+smsMtGlobalFixedFlatRateCreditLimit
+smsMtLocalServicetypeValueListServicetype
+© 2025 hSenid Mobile. All rights reserved Page 44 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 45:
+System Requirement Specification of SDP for M1, Singapore
+smsMtLocalServicetypeValueListServiceDescription
+smsMtLocalServicetypeValueListMinChargingValue
+smsMtLocalServicetypeValueListMaxChargingValue
+smsMtLocalServicetypeValueListIsTaxApplied
+smsMtLocalServicetypeValueListContentType
+smsMtLocalServicetypeValueListUnitCost
+smsMtLocalServicetypeValueListCreditLimit
+smsMtGlobalServicetypeValueListServicetype
+smsMtGlobalServicetypeValueListServiceDescription
+smsMtGlobalServicetypeValueListMinChargingValue
+smsMtGlobalServicetypeValueListMaxChargingValue
+smsMtGlobalServicetypeValueListIsTaxApplied
+smsMtGlobalServicetypeValueListContentType
+smsMtGlobalServicetypeValueListUnitCost
+smsMtGlobalServicetypeValueListCreditLimit
+smsMtMerchantId
+smsMtBalanceType
+smsAlias
+isMmsMoAllowed
+mmsShortcode
+mmsKeywords
+mmsMoAllowedMimeTypes
+mmsMoConnectionUrl
+mmsMoAllowedParties
+mmsMoChargingType
+mmsMoFreeServicetype
+mmsMoFreeServiceDescription
+mmsMoFixedFlatRateServicetype
+mmsMoFixedFlatRateServiceDescription
+mmsMoFixedFlatRateFixedChargingValue
+mmsMoFixedFlatRateIsTaxApplied
+mmsMoKeywordChargePairKeyword
+mmsMoKeywordChargePairServicetype
+mmsMoKeywordChargePairServiceDescription
+mmsMoKeywordChargePairChargingvalue
+mmsMoKeywordChargePairIsTaxApplied
+mmsMoMerchantId
+mmsMoContentType
+mmsMoUnitCost
+mmsMoCreditLimit
+mmsMoBalanceType
+© 2025 hSenid Mobile. All rights reserved Page 45 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 46:
+System Requirement Specification of SDP for M1, Singapore
+isMmsMtAllowed
+mmsMtBillingId
+mmsMtDefaultSenderAddress
+mmsMtConnectionUrlDeliveryReport
+mmsMtChargeeField
+mmsMtAllowedParties
+mmsMtAllowedMimeTypes
+mmsMtChargingType
+mmsMtLocalFreeServicetype
+mmsMtLocalFreeServiceDescription
+mmsMtGlobalFreeServicetype
+mmsMtGlobalFreeServiceDescription
+mmsMtLocalFixedFlatRateServicetype
+mmsMtLocalFixedFlatRateServiceDescription
+mmsMtLocalFixedFlatRateFixedChargingValue
+mmsMtLocalFixedFlatRateIsTaxApplied
+mmsMtLocalFixedFlatRateCreditLimit
+mmsMtLocalFixedFlatRateContentType
+mmsMtLocalFixedFlatRateUnitCost
+mmsMtGlobalFixedFlatRateServicetype
+mmsMtGlobalFixedFlatRateServiceDescription
+mmsMtGlobalFixedFlatRateFixedChargingValue
+mmsMtGlobalFixedFlatRateIsTaxApplied
+mmsMtGlobalFixedFlatRateCreditLimit
+mmsMtGlobalFixedFlatRateContentType
+mmsMtGlobalFixedFlatRateUnitCost
+mmsMtLocalServicetypeValueListServicetype
+mmsMtLocalServicetypeValueListServiceDescription
+mmsMtLocalServicetypeValueListMinChargingValue
+mmsMtLocalServicetypeValueListMaxChargingValue
+mmsMtLocalServicetypeValueListIsTaxApplied
+mmsMtLocalServicetypeValueListCreditLimit
+mmsMtLocalServicetypeValueListContentType
+mmsMtLocalServicetypeValueListUnitCost
+mmsMtGlobalServicetypeValueListServicetype
+mmsMtGlobalServicetypeValueListServiceDescription
+mmsMtGlobalServicetypeValueListMinChargingValue
+mmsMtGlobalServicetypeValueListMaxChargingValue
+mmsMtGlobalServicetypeValueListIsTaxApplied
+mmsMtGlobalServicetypeValueListCreditLimit
+mmsMtGlobalServicetypeValueListContentType
+© 2025 hSenid Mobile. All rights reserved Page 46 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 47:
+System Requirement Specification of SDP for M1, Singapore
+mmsMtGlobalServicetypeValueListUnitCost
+mmsMtMerchantId
+mmsMtBalanceType
+mmsAlias
+isUssdMoAllowed
+ussdMoServiceCode
+ussdMoGatewaySystemId
+ussdMoGatewayPassword
+ussdMoConnectionUrl
+ussdMoAllowedParties
+ussdMoChargingType
+ussdMoVlrWhitelistedUsers
+ussdMoVlrBlacklistedUsers
+ussdMoFreeServicetype
+ussdMoFreeServiceDescription
+ussdMoFixedFlatRateServicetype
+ussdMoFixedFlatRateServiceDescription
+ussdMoFixedFlatRateFixedChargingValue
+ussdMoFixedFlatRateIsTaxApplied
+ussdMoMerchantId
+ussdMoContentType
+ussdMoUnitCost
+ussdMoCreditLimit
+ussdMoBalanceType
+isUssdMtAllowed
+ussdMtServiceCode
+ussdMtGatewaySystemId
+ussdMtGatewayPassword
+ussdMtAllowedParties
+ussdMtChargingType
+ussdMtFreeServicetype
+ussdMtFreeServiceDescription
+ussdMtFixedFlatRateServicetype
+ussdMtFixedFlatRateServiceDescription
+ussdMtFixedFlatRateFixedChargingValue
+ussdMtFixedFlatRateIsTaxApplied
+ussdMtServicetypeValueListServicetype
+ussdMtServicetypeValueListServiceDescription
+ussdMtServicetypeValueListMinChargingValue
+ussdMtServicetypeValueListMaxChargingValue
+ussdMtServicetypeValueListIsTaxApplied
+© 2025 hSenid Mobile. All rights reserved Page 47 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 48:
+System Requirement Specification of SDP for M1, Singapore
+ussdMtMerchantId
+ussdMtContentType
+ussdMtUnitCost
+ussdMtCreditLimit
+ussdMtBalanceType
+wapBillingId
+wapDefaultSenderAddress
+wapChargeeField
+wapConnectionUrlDeliveryReport
+wapAllowedParties
+wapChargingType
+wapLocalFreeServicetype
+wapLocalFreeServiceDescription
+wapGlobalFreeServicetype
+wapGlobalFreeServiceDescription
+wapLocalFixedFlatRateServicetype
+wapLocalFixedFlatRateServiceDescription
+wapLocalFixedFlatRateFixedChargingValue
+wapLocalFixedFlatRateIsTaxApplied
+wapLocalFixedFlatRateCreditLimit
+wapLocalFixedFlatRateContentType
+wapLocalFixedFlatRateUnitCost
+wapGlobalFixedFlatRateServicetype
+wapGlobalFixedFlatRateServiceDescription
+wapGlobalFixedFlatRateFixedChargingValue
+wapGlobalFixedFlatRateIsTaxApplied
+wapGlobalFixedFlatRateCreditLimit
+wapGlobalFixedFlatRateContentType
+wapGlobalFixedFlatRateUnitCost
+wapLocalServicetypeValueListServicetype
+wapLocalServicetypeValueListServiceDescription
+wapLocalServicetypeValueListMinChargingValue
+wapLocalServicetypeValueListMaxChargingValue
+wapLocalServicetypeValueListIsTaxApplied
+wapLocalServicetypeValueListCreditLimit
+wapLocalServicetypeValueListContentType
+wapLocalServicetypeValueListUnitCost
+wapGlobalServicetypeValueListServicetype
+wapGlobalServicetypeValueListServiceDescription
+wapGlobalServicetypeValueListMinChargingValue
+wapGlobalServicetypeValueListMaxChargingValue
+© 2025 hSenid Mobile. All rights reserved Page 48 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 49:
+System Requirement Specification of SDP for M1, Singapore
+wapGlobalServicetypeValueListIsTaxApplied
+wapGlobalServicetypeValueListCreditLimit
+wapGlobalServicetypeValueListContentType
+wapGlobalServicetypeValueListUnitCost
+wapMerchantId
+wapBalanceType
+basAllowedParties
+basAllowedServices
+basServicetype
+basServiceDdescription
+basMinChargingValue
+basMaxChargingValue
+basTaxApplied
+basMerchantId
+basContentType
+basUnitCost
+basCreditLimit
+basBalanceType
+REQ­SP­DSB 4: Service Providers shall be displayed as clickable links, and users shall be able to view
+the related SP information upon clicking on them.
+© 2025 hSenid Mobile. All rights reserved Page 49 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 50:
+System Requirement Specification of SDP for M1, Singapore
+Figure 2­25: SP View
+REQ­SP­DSB 4.1: The user should be redirected to the previous screen upon clicking on “Go Back”
+button (Refer Figure 2­24).
+REQ­SP­DSB 5: Applications under each Service Provider shall be displayed as clickable links, and users
+shall be able to view the related application information upon clicking on them.
+© 2025 hSenid Mobile. All rights reserved Page 50 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 51:
+System Requirement Specification of SDP for M1, Singapore
+Figure 2­26: Application View
+REQ­SP­DSB 5.1: The user should be redirected to the previous screen upon clicking on “Go Back”
+button (Refer Figure 3­25).
+© 2025 hSenid Mobile. All rights reserved Page 51 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 52:
+System Requirement Specification of SDP for M1, Singapore
+2.1.4 Disable a Service Provider
+REQ­DIS­ESP 1: Upon clicking on the “Disable” in the Change Status column (Figure 3­20), the system
+shall provide the ability to disable the SP profile status as follows.
+Figure 2­27: Disable SP Profile
+REQ­DIS­ESP 2: After disabling the SP profile successfully, the following success message shall be
+displayed and the Change Status column shall be updated to “Enable” for the respective disabled SP
+profile.
+© 2025 hSenid Mobile. All rights reserved Page 52 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 53:
+System Requirement Specification of SDP for M1, Singapore
+Figure 2­28: Disabled SP Profile Record
+REQ­DIS­ESP 3: Change of the Service Provider’s status will be notified by an email sent from SP­Admin
+to SP­User and other configured users. Status can be either ‘Active’ or ‘Blocked’.
+Subject From To Cc Content Template
+[M1­SDP] Service SDP­ SP­ Marketing­ ServiceProvider with the
+Provider <service­ Admin@m1.com.sg User User following details state is
+provider> status changed.
+changed from
+ServiceProvider CompanyName :
+<previous­status>
+[serviceprovider_companyname]
+to <new­status>
+Previous Status : [previous­
+status]
+New Status : [new­status]
+Remarks : [remarks]
+© 2025 hSenid Mobile. All rights reserved Page 53 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 54:
+System Requirement Specification of SDP for M1, Singapore
+2.1.5 Enable a Service Provider
+REQ­ENA­ESP 1: User shall be able to Enable the SP profile again upon clicking on “Enable” in the
+Change Status column for the respective disabled SP profile.
+Figure 2­29: Enable SP Profile
+REQ­ENA­ESP 2: After enabling the SP profile successfully, the following success message shall be
+displayed and the Change Status column shall be updated to “Disable” for the respective enabled SP
+profile.
+© 2025 hSenid Mobile. All rights reserved Page 54 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 55:
+System Requirement Specification of SDP for M1, Singapore
+Figure 2­30: Disabled SP Profile Record
+© 2025 hSenid Mobile. All rights reserved Page 55 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 56:
+System Requirement Specification of SDP for M1, Singapore
+2.1.6 Service Provider Profile Update
+REQ­SPP­PRO 1: When a SP­user logins to the Provisioning module, the home page shall be displayed
+as follows.
+Figure 2­31: Provisioning Module Home Page for SP Users
+REQ­SPP­PRO 2: Upon clicking the “Profile” link under Service Provider on the homepage, the SP user
+shall be able to view the list of SPs to which they have been assigned by the admin, during SP profile
+creation.
+Figure 2­32: SP Profile Information for SP User
+© 2025 hSenid Mobile. All rights reserved Page 56 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:36 Page 57:
+System Requirement Specification of SDP for M1, Singapore
+REQ­SPP­PRO 3: SP user shall be able to edit the Address and the Description of the SP profile by
+clicking on the Service Provider Id as follows.
+Figure 2­33: SP Profile View for SP User
+REQ­SPP­PRO 4: Clicking on “Go back” button shall redirect the user back to the list of SP profiles
+assigned to the logged in SP user (Figure 3­28)
+REQ­SPP­PRO 5: Regardless of making the necessary updates to Service Provider information, upon
+the user confirmation, a success message shall be displayed.
+“Service Provider updated successfully.”
+Figure 2­34: SP Profile Update Success for SP User
+© 2025 hSenid Mobile. All rights reserved Page 57 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:37 Page 58:
+System Requirement Specification of SDP for M1, Singapore
+3 Appendix A – Profile Attributes
+Reference: Profile_Attributes v0.5.xls
+3.1 Service Provider Parameters
+Parameter Name Description
+serviceprovider_id To identify a ServiceProvider uniquely. This is required for the cdr
+creation.
+serviceprovider_companyname This is the unique company name for a ServiceProvider.
+serviceprovider_address This address of the ServiceProvider.
+serviceprovider_description A small description about the ServiceProvider.
+serviceprovider_status Status can have “Active” or “Blocked”.
+Admin can set the status to control a particular service provider.
+serviceprovider_userlist UI Service Provider type user's list of reference to be assigned for a
+ServiceProvider. Any of these users can login to the UI system on
+behalf of the ServiceProvider.
+marketing_userlist This is the list of marketing users, who can monitor this particular
+service provider and their applications.
+3.2 Application Parameters
+Parameter Name Description
+application_name This is a unique value required for the cdr creation.
+application_state This provides the current state of the application, it can be either
+Initial­state/Testbed­state/Limited­
+Production/Production/Suspended/Retired
+application_description Description about the application.
+is_manager_approved_production Specify whether manager has approved the application for
+production.
+© 2025 hSenid Mobile. All rights reserved Page 58 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:37 Page 59:
+System Requirement Specification of SDP for M1, Singapore
+creation_state_timestamp Timestamp value for application reached the creation state.
+Testbed_state_timestamp Timestamp value for application reached the testbed state.
+Limited_production_timestamp Timestamp value for the limited production.
+suspended_state_timestamp Timestamp value for application reached the suspended state.
+retired_state_timestamp Timestamp value for application reached the retired state.
+production_timestamp Timestamp value for the production.
+parent_service_provider_id This is the reference to the Parent ServiceProvider's id.
+Testbed_sla This is the reference to the TestBed type SLA Object.
+production_sla This is the reference to the Production type SLA Object.
+application_host_location This is where the Application is hosted. (Used for Email­notification)
+Possible values can be
+* In M1
+* External in Singapore
+* External in Overseas
+branding_type This is the Branding Type of the Application. (Used for Email­
+notification)
+* M1 Branded
+* Corporate Customer
+physical_connectivity This attribute specifies how the Application is going to connect to
+our system
+* Leased Line
+* VPN
+* Internet
+(Used for Email­notification)
+3.3 GUI User Parameters
+Parameter Name Description
+username This unique username is required log into the GUI system.
+password This password is required log into the GUI system.
+contact_number Contact number of the user.
+© 2025 hSenid Mobile. All rights reserved Page 59 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:37 Page 60:
+System Requirement Specification of SDP for M1, Singapore
+email_address Email address of the user.
+usergroup_id User Group's id which the user belongs to.
+user_state User can be in Active or Blocked state.
+3.4 Dedicated Alias Regex Pattern Guide
+Summary of regular­expression constructs
+Construct Matches
+Character classes
+[abc] a, b, or c (simple class)
+[^abc] Any character except a, b, or c (negation)
+[a-zA-Z] a through z or A through Z, inclusive (range)
+[a-d[m-p]] a through d, or m through p: [a-dm-p] (union)
+[a-z&&[def]] d, e, or f (intersection)
+[a-z&&[^bc]] a through z, except for b and c: [ad-z] (subtraction)
+[a-z&&[^m-p]] a through z, and not m through p: [a-lq-z](subtraction)
+Predefined character classes
+. Any character (may or may not match line terminators)
+\d A digit: [0-9]
+\D A non­digit: [^0-9]
+\s A whitespace character: [ \t\n\x0B\f\r]
+\S A non­whitespace character: [^\s]
+\w A word character: [a-zA-Z_0-9]
+\W A non­word character: [^\w]
+Characters
+© 2025 hSenid Mobile. All rights reserved Page 60 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:37 Page 61:
+System Requirement Specification of SDP for M1, Singapore
+x The character x
+\\ The backslash character
+\0n The character with octal value 0n (0 <= n <= 7)
+\0nn The character with octal value 0nn (0 <= n <= 7)
+\0mnn The character with octal value 0mnn (0 <= m <= 3, 0 <= n <= 7)
+\xhh The character with hexadecimal value 0xhh
+\uhhhh The character with hexadecimal value 0xhhhh
+\x{h...h} The character with
+hexadecimal value 0xh...h (Character.MIN_CODE_POINT <= 0xh...h <= Char
+acter.MAX_CODE_POINT)
+\t The tab character ('\u0009')
+\n The newline (line feed) character ('\u000A')
+\r The carriage­return character ('\u000D')
+\f The form­feed character ('\u000C')
+\a The alert (bell) character ('\u0007')
+\e The escape character ('\u001B')
+\cx The control character corresponding to x
+POSIX character classes (US­ASCII only)
+\p{Lower} A lower­case alphabetic character: [a-z]
+\p{Upper} An upper­case alphabetic character:[A-Z]
+\p{ASCII} All ASCII:[\x00-\x7F]
+\p{Alpha} An alphabetic character:[\p{Lower}\p{Upper}]
+\p{Digit} A decimal digit: [0-9]
+\p{Alnum} An alphanumeric character:[\p{Alpha}\p{Digit}]
+\p{Punct} Punctuation: One of !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+© 2025 hSenid Mobile. All rights reserved Page 61 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:37 Page 62:
+System Requirement Specification of SDP for M1, Singapore
+\p{Graph} A visible character: [\p{Alnum}\p{Punct}]
+\p{Print} A printable character: [\p{Graph}\x20]
+\p{Blank} A space or a tab: [ \t]
+\p{Cntrl} A control character: [\x00-\x1F\x7F]
+\p{XDigit} A hexadecimal digit: [0-9a-fA-F]
+\p{Space} A whitespace character: [ \t\n\x0B\f\r]
+java.lang.Character classes (simple java character type)
+\p{javaLowerCa
+Equivalent to java.lang.Character.isLowerCase()
+se}
+\p{javaUpperCa
+Equivalent to java.lang.Character.isUpperCase()
+se}
+\p{javaWhitesp
+Equivalent to java.lang.Character.isWhitespace()
+ace}
+\p{javaMirrore
+Equivalent to java.lang.Character.isMirrored()
+d}
+Classes for Unicode scripts, blocks, categories and binary properties
+\p{IsLatin} A Latin script character (script)
+\p{InGreek} A character in the Greek block (block)
+\p{Lu} An uppercase letter (category)
+\p{IsAlphabeti
+An alphabetic character (binary property)
+c}
+\p{Sc} A currency symbol
+\P{InGreek} Any character except one in the Greek block (negation)
+[\p{L}&&[^\p{L
+Any letter except an uppercase letter (subtraction)
+u}]]
+Boundary matchers
+^ The beginning of a line
+© 2025 hSenid Mobile. All rights reserved Page 62 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:37 Page 63:
+System Requirement Specification of SDP for M1, Singapore
+$ The end of a line
+\b A word boundary
+\B A non­word boundary
+\A The beginning of the input
+\G The end of the previous match
+\Z The end of the input but for the final terminator, if any
+\z The end of the input
+Greedy quantifiers
+X? X, once or not at all
+X* X, zero or more times
+X+ X, one or more times
+X{n} X, exactly n times
+X{n,} X, at least n times
+X{n,m} X, at least n but not more than m times
+Reluctant quantifiers
+X?? X, once or not at all
+X*? X, zero or more times
+X+? X, one or more times
+X{n}? X, exactly n times
+X{n,}? X, at least n times
+X{n,m}? X, at least n but not more than m times
+Possessive quantifiers
+X?+
+X, once or not at all
+X*+
+X, zero or more times
+© 2025 hSenid Mobile. All rights reserved Page 63 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:37 Page 64:
+System Requirement Specification of SDP for M1, Singapore
+X++
+X, one or more times
+X{n}+
+X, exactly n times
+X{n,}+
+X, at least n times
+X{n,m}+
+X, at least n but not more than m times
+Logical operators
+XY
+X followed by Y
+X|Y
+Either X or Y
+(X)
+X, as a capturing group
+Back references
+Whatever the nth capturing group matched
+\n
+Whatever the named­capturing group "name" matched
+\k<name>
+Quotation
+\
+Nothing, but quotes the following character
+\Q
+Nothing, but quotes all characters until \E
+\E
+Nothing, but ends quoting started by \Q
+Special constructs (named­capturing and non­capturing)
+(?<name>X)
+X, as a named­capturing group
+(?:X)
+X, as a non­capturing group
+(?idmsuxU-
+Nothing, but turns match flags i d m s u x U on ­ off
+idmsuxU)
+(?idmsux-
+X, as a non­capturing group with the given flags i d m s u x on ­ off
+idmsux:X)
+(?=X)
+X, via zero­width positive lookahead
+(?!X)
+X, via zero­width negative lookahead
+(?<=X)
+X, via zero­width positive lookbehind
+(?<!X)
+X, via zero­width negative lookbehind
+© 2025 hSenid Mobile. All rights reserved Page 64 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:37 Page 65:
+System Requirement Specification of SDP for M1, Singapore
+(?>X)
+X, as an independent, non­capturing group
+Backslashes, escapes, and quoting
+The backslash character ('\') serves to introduce escaped constructs, as defined in the table above, as
+well as to quote characters that otherwise would be interpreted as unescaped constructs. Thus the
+expression \\ matches a single backslash and \{ matches a left brace.
+It is an error to use a backslash prior to any alphabetic character that does not denote an escaped
+construct; these are reserved for future extensions to the regular­expression language. A backslash
+may be used prior to a non­alphabetic character regardless of whether that character is part of an
+unescaped construct.
+Backslashes within string literals in Java source code are interpreted as required by The Java™
+Language Specification as either Unicode escapes (section 3.3) or other character escapes (section
+3.10.6) It is therefore necessary to double backslashes in string literals that represent regular
+expressions to protect them from interpretation by the Java bytecode compiler. The string literal "\b",
+for example, matches a single backspace character when interpreted as a regular expression,
+while "\\b" matches a word boundary. The string literal "\(hello\)" is illegal and leads to a compile­time
+error; in order to match the string (hello) the string literal "\\(hello\\)" must be used.
+Character Classes
+Character classes may appear within other character classes, and may be composed by the union
+operator (implicit) and the intersection operator (&&). The union operator denotes a class that
+contains every character that is in at least one of its operand classes. The intersection operator denotes
+a class that contains every character that is in both of its operand classes.
+The precedence of character­class operators is as follows, from highest to lowest:
+1 Literal escape \x
+2 Grouping [...]
+3 Range a-z
+4 Union [a-e][i-u]
+5 Intersection [a-z&&[aeiou]]
+Note that a different set of metacharacters are in effect inside a character class than outside a
+character class. For instance, the regular expression. loses its special meaning inside a character class,
+while the expression ­ becomes a range forming metacharacter.
+© 2025 hSenid Mobile. All rights reserved Page 65 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:38 Page 66:
+System Requirement Specification of SDP for M1, Singapore
+Line terminators
+A line terminator is a one­ or two­character sequence that marks the end of a line of the input
+character sequence. The following are recognized as line terminators:
+• A newline (line feed) character ('\n'),
+• A carriage­return character followed immediately by a newline character ("\r\n"),
+• A standalone carriage­return character ('\r'),
+• A next­line character ('\u0085'),
+• A line­separator character ('\u2028'), or
+• A paragraph­separator character ('\u2029).
+If UNIX_LINES mode is activated, then the only line terminators recognized are newline characters.
+The regular expression . matches any character except a line terminator unless the DOTALL flag is
+specified.
+By default, the regular expressions ^ and $ ignore line terminators and only match at the beginning
+and the end, respectively, of the entire input sequence. If MULTILINE mode is activated then ^ matches
+at the beginning of input and after any line terminator except at the end of input. When
+in MULTILINE mode $ matches just before a line terminator or the end of the input sequence.
+Groups and capturing
+Group number
+Capturing groups are numbered by counting their opening parentheses from left to right. In the
+expression ((A)(B(C))), for example, there are four such groups:
+1 ((A)(B(C)))
+2 (A)
+3 (B(C))
+4 (C)
+Group zero always stands for the entire expression.
+Capturing groups are so named because, during a match, each subsequence of the input sequence that
+matches such a group is saved. The captured subsequence may be used later in the expression, via a
+back reference, and may also be retrieved from the matcher once the match operation is complete.
+Group name
+© 2025 hSenid Mobile. All rights reserved Page 66 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:38 Page 67:
+System Requirement Specification of SDP for M1, Singapore
+A capturing group can also be assigned a "name", a named­capturing group, and then be back­
+referenced later by the "name". Group names are composed of the following characters. The first
+character must be a letter.
+• The uppercase letters 'A' through 'Z' ('\u0041' through '\u005a'),
+• The lowercase letters 'a' through 'z' ('\u0061' through '\u007a'),
+• The digits '0' through '9' ('\u0030' through '\u0039'),
+A named­capturing group is still numbered as described in Group number.
+The captured input associated with a group is always the subsequence that the group most recently
+matched. If a group is evaluated a second time because of quantification then its previously­captured
+value, if any, will be retained if the second evaluation fails. Matching the string "aba" against the
+expression (a(b)?)+, for example, leaves group two set to "b". All captured input is discarded at the
+beginning of each match.
+Groups beginning with (? are either pure, non­capturing groups that do not capture text and do not
+count towards the group total, or named­capturing group.
+Unicode support
+This class is in conformance with Level 1 of Unicode Technical Standard #18: Unicode Regular
+Expression, plus RL2.1 Canonical Equivalents.
+Unicode escape sequences such as \u2014 in Java source code are processed as described in section
+3.3 of The Java™ Language Specification. Such escape sequences are also implemented directly by the
+regular­expression parser so that Unicode escapes can be used in expressions that are read from files
+or from the keyboard. Thus the strings "\u2014" and "\\u2014", while not equal, compile into the
+same pattern, which matches the character with hexadecimal value 0x2014.
+A Unicode character can also be represented in a regular­expression by using its Hex notation
+(hexadecimal code point value) directly as described in construct \x{...}, for example a supplementary
+character U+2011F can be specified as \x{2011F}, instead of two consecutive Unicode escape
+sequences of the surrogate pair \uD840\uDD1F.
+Unicode scripts, blocks, categories andbinary properties are written with the \p and \P constructs as
+in Perl. \p{prop} matches if the input has the property prop, while \P{prop} does not match if the input
+has that property.
+Scripts, blocks, categories and binary properties can be used both inside and outside of a character
+class.
+Scripts are specified either with the prefix Is, as in IsHiragana, or by using the script keyword (or its
+short form sc)as in script=Hiragana or sc=Hiragana.
+The script names supported by Pattern are the valid script names accepted and defined
+by UnicodeScript.forName.
+© 2025 hSenid Mobile. All rights reserved Page 67 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:38 Page 68:
+System Requirement Specification of SDP for M1, Singapore
+Blocks are specified with the prefix In, as in InMongolian, or by using the keyword block (or its short
+form blk) as in block=Mongolian or blk=Mongolian.
+The block names supported by Pattern are the valid block names accepted and defined
+by UnicodeBlock.forName.
+Categories may be specified with the optional prefix Is: Both \p{L} and \p{IsL} denote the category of
+Unicode letters. Same as scripts and blocks, categories can also be specified by using the
+keyword general_category (or its short form gc) as in general_category=Lu or gc=Lu.
+The supported categories are those of The Unicode Standard in the version specified by
+the Character class. The category names are those defined in the Standard, both normative and
+informative.
+Binary properties are specified with the prefix Is, as in IsAlphabetic. The supported binary properties
+by Pattern are
+• Alphabetic
+• Ideographic
+• Letter
+• Lowercase
+• Uppercase
+• Titlecase
+• Punctuation
+• Control
+• White_Space
+• Digit
+• Hex_Digit
+• Noncharacter_Code_Point
+• Assigned
+Predefined Character classes and POSIX character classes are in conformance with the
+recommendation of Annex C: Compatibility Properties of Unicode Regular Expression ,
+when UNICODE_CHARACTER_CLASS flag is specified.
+Construct Matches
+\p{Lower} A lowercase character:\p{IsLowercase}
+\p{Upper} An uppercase character:\p{IsUppercase}
+© 2025 hSenid Mobile. All rights reserved Page 68 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:38 Page 69:
+System Requirement Specification of SDP for M1, Singapore
+\p{ASCII} All ASCII:[\x00-\x7F]
+\p{Alpha} An alphabetic character:\p{IsAlphabetic}
+\p{Digit} A decimal digit character:p{IsDigit}
+\p{Alnum} An alphanumeric character:[\p{IsAlphabetic}\p{IsDigit}]
+\p{Punct} A punctuation character:p{IsPunctuation}
+\p{Graph} A visible character: [^\p{IsWhite_Space}\p{gc=Cc}\p{gc=Cs}\p{gc=Cn}]
+\p{Print} A printable character: [\p{Graph}\p{Blank}&&[^\p{Cntrl}]]
+A space or a
+\p{Blank} tab: [\p{IsWhite_Space}&&[^\p{gc=Zl}\p{gc=Zp}\x0a\x0b\x0c\x0d\x8
+5]]
+\p{Cntrl} A control character: \p{gc=Cc}
+\p{XDigit
+A hexadecimal digit: [\p{gc=Nd}\p{IsHex_Digit}]
+}
+\p{Space} A whitespace character:\p{IsWhite_Space}
+\d A digit: \p{IsDigit}
+\D A non­digit: [^\d]
+\s A whitespace character: \p{IsWhite_Space}
+\S A non­whitespace character: [^\s]
+A word
+\w character: [\p{Alpha}\p{gc=Mn}\p{gc=Me}\p{gc=Mc}\p{Digit}\p{gc=Pc}
+]
+\W A non­word character: [^\w]
+Categories that behave like the java.lang.Character boolean ismethodname methods (except for the
+deprecated ones) are available through the same \p{prop} syntax where the specified property has the
+name javamethodname.
+© 2025 hSenid Mobile. All rights reserved Page 69 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:38 Page 70:
+System Requirement Specification of SDP for M1, Singapore
+4 Appendix B – SLA SP Level Attributes
+Reference: SLA_Attributes v0.5.xls
+4.1 General SLA
+Name Description User Type Mandatory/
+Optional
+whitelisted_user_list White Listed user list. OPERATIONS_LEVEL Mandatory
+blacklisted_user_list Black Listed user list. OPERATIONS_LEVEL Optional
+allowed_ncs_list Here possible values can be SMS/ MMS/ Billing/ OPERATIONS_LEVEL Mandatory
+WAP push/ USSD or a combination of them.
+© 2025 hSenid Mobile. All rights reserved Page 70 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:38 Page 71:
+System Requirement Specification of SDP for M1, Singapore
+4.2 SMS
+Name Description Validation User Type Mandatory/
+Optional
+SMS MO
+Note: Even though fields coming under MO are mentioned as Mandatory, these fields are mandatory if
+parameter “is_sms_mo_allowed” is set to true.
+sms_mo_max_msg_day No. of Maximum MO msgs per Should be OPERATIONS Optional
+day. a number _LEVEL
+This is an optional value and if
+not supplied, msg/day
+enforcement will not be
+enforced.
+sms_mo_max_msg_second No. of Maximum MO msgs per Should be OPERATIONS Mandatory
+second. a number _LEVEL
+SMS MT
+Note: Even though fields coming under MT are mentioned as Mandatory, these fields are mandatory if
+parameter “is_sms_mt_allowed” is set to true.
+sms_mt_max_recipients_per No. of Maximum MT recipients Should be OPERATIONS Optional
+_day per day. a number _LEVEL
+This is an optional value and if
+not supplied, msg/day
+enforcement will not be
+enforced.
+sms_mt_max_recipients_per No. of Maximum MT recipients Should be OPERATIONS Mandatory
+_second per second. a number _LEVEL
+© 2025 hSenid Mobile. All rights reserved Page 71 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:38 Page 72:
+System Requirement Specification of SDP for M1, Singapore
+4.3 MMS
+Mandatory/
+Name Description Validation User Type
+Optional
+mms_mo_max_msg_day No. of Maximum MO msgs per Should be OPERATIONS Optional
+day, this is an optional value if a number _LEVEL
+this is not
+supplied then msg/day
+enforcement will not be
+enforced
+mms_mo_max_msg_second No. of Maximum MO msgs per Should be OPERATIONS Mandatory
+second a number _LEVEL
+mms_mt_max_recipients_da No. of Maximum MT recipients Should be OPERATIONS Optional
+y per day, this is an optional a number _LEVEL
+value if this is not supplied
+then msg/day enforcement will
+not be enforced
+mms_mt_max_recipients_se No. of Maximum MT recipients Should be OPERATIONS Mandatory
+cond per second a number _LEVEL
+© 2025 hSenid Mobile. All rights reserved Page 72 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:38 Page 73:
+System Requirement Specification of SDP for M1, Singapore
+4.4 BAS
+Mandator
+Validatio
+Name Description User Type y/
+n
+Optional
+bas_max_billing_day No. of Maximum BAS Should OPERATION Optional
+incoming requests per day, be a S_LEVEL
+this is an optional value if number
+this is not
+supplied then msg/day
+enforcement will not be
+enforced
+bas_max_billing_second No. of Maximum Billing Should OPERATION Mandator
+msgs per second be a S_LEVEL y
+number
+© 2025 hSenid Mobile. All rights reserved Page 73 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:38 Page 74:
+System Requirement Specification of SDP for M1, Singapore
+4.5 WAPPUSH
+Mandatory/
+Name Description Validation User Type
+Optional
+wap_push_max_recipient No. of Maximum WAP push Should be a OPERATIONS_ Optional
+s_day recipients per day, this is an number LEVEL
+optional value if this is not
+supplied then msg/day
+enforcement will not be
+enforced
+wap_push_max_receipie No. of Maximum WAP push Should be a OPERATIONS_ Mandatory
+nts_second recipients per second number LEVEL
+© 2025 hSenid Mobile. All rights reserved Page 74 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:39 Page 75:
+System Requirement Specification of SDP for M1, Singapore
+4.6 USSD
+Mandatory/
+Name Description Validation User Type
+Optional
+ussd_mo_max_msg_ No. of Maximum MO msgs per Should be a OPERATIONS Optional
+day day, this is an optional value if number _LEVEL
+this is not
+supplied then msg/day
+enforcement will not be enforced
+ussd_mo_max_msg_ No. of Maximum MO msgs per Should be a OPERATIONS Mandatory
+second second number _LEVEL
+ussd_mt_max_reci No. of Maximum MT Should be a OPERATIONS Optional
+pients_per_day recipients per day. number _LEVEL
+This is an optional value if this
+is not supplied then msg/day
+enforcement will not be
+enforced.
+ussd_mt_max_reci No. of Maximum MT Should be a OPERATIONS Mandatory
+pients_per_second recipients per second number _LEVEL
+© 2025 hSenid Mobile. All rights reserved Page 75 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:39 Page 76:
+System Requirement Specification of SDP for M1, Singapore
+5 Appendix C – User Roles and Permissions
+Name Description
+ROLE_LOGIN_PROV Log in to the provisioning module.
+ROLE_CREATE_SP Create service provider accounts.
+ROLE_VIEW_SP View created service provider accounts list.
+ROLE_CREATE_APP Create provisioning applications.
+ROLE_LIST_DRAFTS View Applications which are saved in the system as drafts by the
+service provider users.
+ROLE_EDIT_SP Edit service provider accounts.
+ROLE_SEARCH_SP Search service provider accounts.
+ROLE_SEARCH_APP Search created applications.
+ROLE_SP To identify user is a SP user.
+ROLE_MARKERTING To identify user is a marketing user.
+ROLE_PRODUCTION_OPERATION To identify user is a production operation user.
+ROLE_TB_OPERATION To identify user is a testbed operation user.
+ROLE_SDP_ADMIN To identify user is a SDP admin and more.
+PROV_SUSPENDED_TESTBED Suspend applications in the testbed state.
+PROV_SUSPENDED_PRODUCTION Suspend applications in the production state.
+PROV_REACTIVATE_TESTBED Reactivate suspended applications in the test bed state.
+PROV_REACTIVATE_PRODUCTION Reactivate suspended applications in the production state.
+PROV_RETIRE_TESTBED Retire suspended applications in the test bed state.
+PROV_RETIRE_PRODUCTION Retire suspended applications in the production state.
+VIEW_ALL_APP_NCS_DETAIL To view entire NCS SLA configurations in any state.
+VIEW_LIMITED_PRODUCTION_TIME To view limited production time of the applications.
+© 2025 hSenid Mobile. All rights reserved Page 76 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:39 Page 77:
+System Requirement Specification of SDP for M1, Singapore
+VIEW_PRE_ACTIVE_TESTBED_ENG_APPR To view the approval status of a NCS by xMsc, Network, Prepaid,
+OVAL_STATUS Postpaid engineers at pre active tb state.
+VIEW_PRE_PROV_PRODUCTION_ENG_AP To view the approval status of a NCS by xMsc, Network, Prepaid,
+PROVAL_STATUS Postpaid engineers at pre provisioned production state.
+PROV_REQUEST_CR_APPLICATION This is to request a CR application request for an existing
+application which is in production given to SP.
+ROLE_CHANGE_PRODUCTION_SLA To change some values (Ex: Bill description, service type
+description, but not short code, keywords) by the Production
+Operation User when the application is in the Active Production.
+PROV_PRE_APPROVED_PRODUCTION_ST This is the role given to SDP Manager To approve the applications
+ATE in PRE_APPROVED_PRODUCTION_STATE.
+PROV_PRE_ACTIVE_TESTBED_STATE_POS This is given to the Post­paid engineer in
+TPAID_CONFIG PRE_ACTIVE_TESTBED_STATE.
+PROV_PRE_PROV_PRODUCTION_STATE_ This is given to the Post­paid engineer in
+POSTPAID_CONFIG PRE_PROV_PRODUCTION_STATE.
+ROLE_CHANGE_TESTBED_SLA To change some values (Ex: Bill description, service type
+description, but not short code, keywords) by the TB User when
+the application is in the Active Testbed state.
+ROLE_SEARCH_USER Privilege to search for users.
+ROLE_SEARCH_MODULE Privilege to search for modules.
+ROLE_SEARCH_GROUP Privilege to search for groups.
+ROLE_SEARCH_PERMISSION Privilege to search permissions.
+ROLE_ADD_USER Privilege to add users.
+ROLE_ADD_MODULE Privilege to add modules.
+ROLE_ADD_GROUP Privilege to add group.
+ROLE_ADD_PERMISSION Privilege to add permission.
+ROLE_MODIFY_USER Privilege to modify users.
+ROLE_MODIFY_MODULE Privilege to modify modules.
+ROLE_MODIFY_GROUP Privilege to modify groups.
+© 2025 hSenid Mobile. All rights reserved Page 77 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:39 Page 78:
+System Requirement Specification of SDP for M1, Singapore
+ROLE_MODIFY_PERMISSION Privilege to modify permission.
+ROLE_REMOVE_USER Privilege to remove users.
+ROLE_REMOVE_MODULE Privilege to remove modules.
+ROLE_REMOVE_GROUP Privilege to remove groups.
+ROLE_REMOVE_PERMISSION Privilege to remove permissions.
+ROLE_DEFAULT_MODULE Privilege to change default module.
+ROLE_ASSIGN_MODULE Privilege to assign default module.
+ROLE_SECURITY_USER Privilege to modify security details of user.
+ROLE_CHANGE_PASSWORD Privilege to change password for logged user.
+PROV_APPROVED_APPLICATION_STATE To view applications in Approve Application Request state.
+PROV_REQUESTED_APPLICATION_STATE To view applications in Requested Application state.
+PROV_ACTIVE_TESTBED_STATE To view applications in Active Testbed state.
+PROV_PRE_ACTIVE_TESTBED_STATE_CO Common Privileges for the Pre Active Testbed state.
+MMON
+ROLE_SMSC_ENGINEER Set of the Privileges for the SMS Center Engineer.
+PROV_PRE_ACTIVE_TESTBED_STATE_SM Configuration Privileges for the SMSC Engineer in the Pre­Active
+SC_CONFIG Testbed state.
+ROLE_MMSC_ENGINEER Set of the Privileges for the MMS Center Engineer.
+PROV_PRE_ACTIVE_TESTBED_STATE_M Configuration Privileges for the SMSC Engineer in the Pre­Active
+MSC_CONFIG Testbed state.
+ROLE_PREPAID_IN_ENGINEER To identify user is Pre­Paid IN Engineer user.
+PROV_PRE_ACTIVE_TESTBED_STATE_PRE Configuration Privileges for the IN Engineer in the Pre­Active
+PAID_CONFIG Testbed state.
+ROLE_POSTPAID_BILLING_ENGINEER To identify user is Postpaid Billing Engineer user.
+PROV_PRE_ACTIVE_TESTBED_STATE_POS Configuration Privileges for the Postpaid Engineer in the Pre­Active
+TPAID_CONFIG Testbed state.
+© 2025 hSenid Mobile. All rights reserved Page 78 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:39 Page 79:
+System Requirement Specification of SDP for M1, Singapore
+ROLE_CUSTOMERCARE To identify user is Customer Care user.
+ROLE_NETWORK_ADMIN To identify user is Network Administrator user.
+PROV_PRE_ACTIVE_TESTBED_STATE_NW Configuration Privileges for the Network User in the Pre­Active
+_CONFIG Testbed state.
+ROLE_SDP_MANAGER To identify the user is a SDP Manager.
+PROV_PRE_ACTIVE_PRODUCTION_STATE To view and approve applications in Pre Active Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_ Common Privileges for the Pre­Production state.
+COMMON
+PROV_APPROVED_PRODUCTION_STATE To view and approve applications in Approved Production state.
+PROV_LIMITED_PRODUCTION_STATE To view and approve applications in Limited Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_ Configuration Privileges for the Network User in the Pre­
+NW_CONFIG Provisioned Production state.
+PROV_ACTIVE_PRODUCTION_STATE Privileges for Active Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_ Configuration Privileges for the SMSC Engineer in the Pre­
+SMSC_CONFIG Provisioned Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_ Configuration Privileges for the MMSC Engineer in the Pre­
+MMSC_CONFIG Provisioned Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_ Configuration Privileges for the IN Engineer in the Pre­Provisioned
+PREPAID_CONFIG Production state.
+PROV_PRE_PROV_PRODUCTION_STATE_ Configuration Privileges for the Postpaid Engineer in the Pre­
+POSTPAID_CONFIG Provisioned Production state.
+ROLE_LIST_RETIRED_APP Privileges to search for retired applications.
+ROLE_USSD_ENGINEER To identify user is a USSD Engineer.
+PROV_PRE_ACTIVE_TESTBED_STATE_USS Configuration Privileges for the USSD Engineer in the Pre­Active
+D_CONFIG Testbed state.
+PROV_PRE_PROV_PRODUCTION_STATE_ Configuration Privileges for the USSD Engineer in the Pre­
+USSD_CONFIG Provisioned Production state.
+ROLE_VIEW_DASHBOARD Privilege for the SDP Admin to see the dashboard view of the
+available SPs and Applications.
+© 2025 hSenid Mobile. All rights reserved Page 79 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:39 Page 80:
+System Requirement Specification of SDP for M1, Singapore
+r e s U ­r e d iv o r P e c iv r e S r e s U ­g n it e k r a M
+r e
+s U ­s n o it a r e p O ­d e B t s e
+r
+e s
+U ­s n o it a r e p O ­n o it c u d o n im d A ­P D S r e g a n a M ­P D S r e e n ig n E ­C S M S r e e n ig n E ­C S M M r e e n ig n E ­N I
+r e
+e n ig n E ­g n illiB ­d ia P t s o r e s U ­e r a C r e m o t s u C r e e n ig n E ­D S S U r e s U ­n im d A ­k r o w t e N
+T r P
+P
+ROLE_LOGIN_PROV YES YES YES YES YES YES YES YES YES YES YES YES YES
+ROLE_NETWORK_ADMIN NO NO NO NO NO NO NO NO NO NO NO NO YES
+ROLE_SEARCH_SP NO YES NO NO YES NO YES YES YES YES NO YES YES
+ROLE_SEARCH_APP YES YES YES YES YES YES YES YES YES YES YES YES YES
+PROV_PRE_ACTIVE_TESTB NO NO NO NO NO NO NO NO NO NO NO NO YES
+ED_STATE_NW_CONFIG
+PROV_PRE_PROV_PRODU NO NO NO NO NO NO NO NO NO NO NO NO YES
+CTION_STATE_NW_CONFI
+G
+ROLE_CREATE_APP YES NO NO NO NO NO NO NO NO NO NO NO NO
+ROLE_VIEW_SP YES NO NO NO NO NO NO NO NO NO NO NO NO
+ROLE_LIST_DRAFTS YES NO NO NO NO NO NO NO NO NO NO NO NO
+ROLE_SP YES NO NO NO NO NO NO NO NO NO NO NO NO
+PROV_ACTIVE_TESTBED_S YES NO NO NO NO NO NO NO NO NO NO NO NO
+TATE
+PROV_APPROVED_PRODU YES NO NO NO NO NO NO NO NO NO NO NO NO
+CTION_STATE
+PROV_LIMITED_PRODUCT YES NO NO NO NO NO NO NO NO NO NO NO NO
+ION_STATE
+PROV_REQUEST_CR_APPL YES NO NO NO NO NO NO NO NO NO NO NO NO
+ICATION
+ROLE_MARKERTING NO YES NO NO NO NO NO NO NO NO NO NO NO
+PROV_REQUESTED_APPLI NO YES NO NO NO NO NO NO NO NO NO NO NO
+CATION_STATE
+ROLE_CREATE_SP NO NO NO NO YES NO NO NO NO NO NO NO NO
+© 2025 hSenid Mobile. All rights reserved Page 80 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:40 Page 81:
+System Requirement Specification of SDP for M1, Singapore
+ROLE_EDIT_SP NO NO NO NO YES NO NO NO NO NO NO NO NO
+ROLE_SDP_ADMIN NO NO NO NO YES NO NO NO NO NO NO NO NO
+PROV_PRE_APPROVED_P NO NO NO NO YES YES NO NO NO NO NO NO NO
+RODUCTION_STATE
+PROV_SUSPENDED_TESTB NO NO YES NO YES NO NO NO NO NO NO NO NO
+ED
+PROV_SUSPENDED_PROD NO NO NO YES YES NO NO NO NO NO NO NO NO
+UCTION
+PROV_REACTIVATE_TESTB NO NO YES NO YES NO NO NO NO NO NO NO NO
+ED
+PROV_REACTIVATE_PROD NO NO NO YES YES NO NO NO NO NO NO NO NO
+UCTION
+PROV_RETIRE_TESTBED NO NO YES NO YES NO NO NO NO NO NO NO NO
+PROV_RETIRE_PRODUCTI NO NO NO YES YES NO NO NO NO NO NO NO NO
+ON
+ROLE_LIST_RETIRED_APP NO NO NO NO YES NO NO NO NO NO NO NO NO
+ROLE_VIEW_DASHBOARD NO NO NO NO YES NO NO NO NO NO NO NO NO
+ROLE_TB_OPERATION NO NO YES NO NO NO NO NO NO NO NO NO NO
+PROV_APPROVED_APPLIC NO NO YES NO NO NO NO NO NO NO NO NO NO
+ATION_STATE
+PROV_PRE_ACTIVE_TESTB NO NO YES NO NO NO NO NO NO NO NO NO NO
+ED_STATE_COMMON
+VIEW_PRE_ACTIVE_TESTB NO NO YES NO NO NO NO NO NO NO NO NO NO
+ED_ENG_APPROVAL_STAT
+US
+ROLE_CHANGE_TESTBED_ NO NO YES NO NO NO NO NO NO NO NO NO NO
+SLA
+VIEW_ALL_APP_NCS_DET NO NO YES NO NO NO NO NO NO NO YES NO NO
+AIL
+ROLE_PRODUCTION_OPE NO NO NO YES NO NO NO NO NO NO NO NO NO
+RATION
+© 2025 hSenid Mobile. All rights reserved Page 81 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:40 Page 82:
+System Requirement Specification of SDP for M1, Singapore
+PROV_PRE_ACTIVE_PROD NO NO NO YES NO NO NO NO NO NO NO NO NO
+UCTION_STATE
+PROV_PRE_PROV_PRODU NO NO NO YES NO NO NO NO NO NO NO NO NO
+CTION_STATE_COMMON
+PROV_ACTIVE_PRODUCTI NO NO NO YES NO NO NO NO NO NO NO NO NO
+ON_STATE
+VIEW_PRE_PROV_PRODU NO NO NO YES NO NO NO NO NO NO NO NO NO
+CTION_ENG_APPROVAL_S
+TATUS
+VIEW_LIMITED_PRODUCT NO NO NO YES NO NO NO NO NO NO NO NO NO
+ION_TIME
+ROLE_CHANGE_PRODUCT NO NO NO YES NO NO NO NO NO NO NO NO NO
+ION_SLA
+ROLE_SDP_MANAGER NO NO NO NO NO YES NO NO NO NO NO NO NO
+ROLE_SMSC_ENGINEER NO NO NO NO NO NO YES NO NO NO NO NO NO
+PROV_PRE_ACTIVE_TESTB NO NO NO NO NO NO YES NO NO NO NO NO NO
+ED_STATE_SMSC_CONFIG
+PROV_PRE_PROV_PRODU NO NO NO NO NO NO YES NO NO NO NO NO NO
+CTION_STATE_SMSC_CON
+FIG
+ROLE_MMSC_ENGINEER NO NO NO NO NO NO NO YES NO NO NO NO NO
+PROV_PRE_ACTIVE_TESTB NO NO NO NO NO NO NO YES NO NO NO NO NO
+ED_STATE_MMSC_CONFI
+G
+PROV_PRE_PROV_PRODU NO NO NO NO NO NO NO YES NO NO NO NO NO
+CTION_STATE_MMSC_CO
+NFIG
+ROLE_PREPAID_IN_ENGIN NO NO NO NO NO NO NO NO YES NO NO NO NO
+EER
+PROV_PRE_ACTIVE_TESTB NO NO NO NO NO NO NO NO YES NO NO NO NO
+ED_STATE_PREPAID_CON
+FIG
+PROV_PRE_PROV_PRODU NO NO NO NO NO NO NO NO YES NO NO NO NO
+CTION_STATE_PREPAID_C
+ONFIG
+© 2025 hSenid Mobile. All rights reserved Page 82 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:40 Page 83:
+System Requirement Specification of SDP for M1, Singapore
+ROLE_POSTPAID_BILLING NO NO NO NO NO NO NO NO NO YES NO NO NO
+_ENGINEER
+PROV_PRE_ACTIVE_TESTB NO NO NO NO NO NO NO NO NO YES NO NO NO
+ED_STATE_POSTPAID_CO
+NFIG
+PROV_PRE_PROV_PRODU NO NO NO NO NO NO NO NO NO YES NO NO NO
+CTION_STATE_POSTPAID_
+CONFIG
+ROLE_CUSTOMER_CARE_ NO NO NO NO NO NO NO NO NO NO YES NO NO
+USER
+ROLE_USSD_ENGINEER NO NO NO NO NO NO NO NO NO NO NO YES NO
+PROV_PRE_ACTIVE_TESTB NO NO NO NO NO NO NO NO NO NO NO YES NO
+ED_STATE_USSD_CONFIG
+PROV_PRE_PROV_PRODU NO NO NO NO NO NO NO NO NO NO NO YES NO
+CTION_STATE_USSD_CON
+FIG
+© 2025 hSenid Mobile. All rights reserved Page 83 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:40 Page 84:
+System Requirement Specification of SDP for M1, Singapore
+6 Appendix D – Short Code and Keywords
+6.1 Short Code
+REQ­SHT­CDE 1: Short codes shall be used to route a request to the correct application.
+REQ­SHT­CDE 2: Two types of short codes can be defined:
+Shared short code– More than one application can have the same short code. In this case, the
+keyword will be used to route a request to the particular application.
+Exclusive short code – The short code is unique and is used by only one application in the SDP.
+REQ­SHT­CDE 3: A short code can be defined per NCS.
+REQ­SHT­CDE 4: The short code should be a regular expression. (Please Refer Section 3.4 Dedicated
+Alias Regex Pattern Guide in Appendix A ­ Profile Attributes for further information)
+Eg: 888 ***
+776****
+REQ­SHT­CDE 5: When requesting a new short code, the short code must not be accepted by SDP if
+The new short code is a subset of the previously defined set of short codes or
+A previously defined short code is a subset of the new one.
+REQ­SHT­CDE 6: The short code assigned to an application shall be used in both production and testbed
+environments.
+REQ­SHT­CDE 7: The system should not allow to have the same keyword assigned to multiple applications
+under the same short code.
+Ex:
+Allowed:
+JOIN on 12345 → App A
+JOIN on 67890 → App B
+(different short code with the same keyword)
+Not Allowed:
+JOIN on 12345 → App A
+JOIN on 12345 → App B
+(same short code and the same keyword)
+© 2025 hSenid Mobile. All rights reserved Page 84 of 85
+M1­SDP­PRO­SRS v0.1.0
+
+2025-08-27 10:05:41 Page 85:
+System Requirement Specification of SDP for M1, Singapore
+6.2 Keywords
+REQ­KEY­WRD 1: SDP shall allow configuration of a maximum of 50 keywords per short code.
+REQ­KEY­WRD 2: Duplicate keywords shall not be allowed for the same short code.
+REQ­KEY­WRD 3: For shared short codes, the routing of an incoming request to the correct application
+shall be based on the [short code + keyword] pair.
+REQ­KEY­WRD 4: For each keyword, it shall be possible to specify the charging amount.
+© 2025 hSenid Mobile. All rights reserved Page 85 of 85
+M1­SDP­PRO­SRS v0.1.0
+
