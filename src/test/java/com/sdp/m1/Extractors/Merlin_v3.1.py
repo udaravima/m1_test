@@ -7,7 +7,7 @@ import pandas as pd
 
 SRC_ROOT = "Documents/"
 SRC_FILE = f"{SRC_ROOT}M1-SDP-PRO-SRS_v0.1.0_annotated.pdf"
-OUTPUT_DIR = f"{SRC_ROOT}SRS_Fields_v3.7"
+OUTPUT_DIR = f"{SRC_ROOT}SRS_Fields_v3.91"
 
 FIELD_TABLE_HEADERS = ["Field", "Description",
                        "Type", "Validation", "Error Response"]
@@ -45,8 +45,8 @@ def extract_sections():
 
 def detect_context(page_text):
     """Find nearest section, requirement ID, and figure reference from text."""
-    section_match = re.findall(r"\d+(\.\d+)*\s+[A-Za-z].+", page_text)
-    req_match = re.findall(r"(REQ-[A-Z0-9\- ]+)", page_text)
+    section_match = re.findall(r"\d+(\.\d+)*\s+([A-Z][a-z]+\s)+", page_text)
+    req_match = re.findall(r"(REQ-[A-Z0-9\- ]+:[ A-Za-z0-9]+)", page_text)
     fig_match = re.findall(r"Figure\s+\d+[-–]\d+:[A-Za-z0-9 ]+", page_text)
     # Debugging
     # print("Sections:", section_match)
@@ -92,6 +92,7 @@ def merge_tables(tables):
     # current_df = normalize_headers(tables[0].df)
     current_df = tables[0].df
     current_page = tables[0].page
+    pages = [current_page]
 
     for i in range(1, len(tables)):
         # next_df = normalize_headers(tables[i].df)
@@ -108,12 +109,14 @@ def merge_tables(tables):
 
             current_df = pd.concat([current_df, next_df], ignore_index=True)
             current_page = next_page
+            pages.append(current_page)
         else:
-            merged.append((normalize_headers(current_df), current_page))
+            merged.append((normalize_headers(current_df), pages))
             current_df = next_df
             current_page = next_page
+            pages = [current_page]
 
-    merged.append((normalize_headers(current_df), current_page))
+    merged.append((normalize_headers(current_df), pages))
     return merged
 
 
@@ -163,27 +166,29 @@ def main():
 
     print("📑 Extracting tables with Camelot...")
     tables = camelot.read_pdf(SRC_FILE, pages="1-end", flavor="lattice",
-                              split_text=True, flag_size=True)
+                              split_text=True, flag_size=True, parallel=True)
 
     print(f"➡ Found {len(tables)} raw table fragments.")
 
     merged_tables = merge_tables(tables)
     print(f"✅ Merged into {len(merged_tables)} final tables.")
 
-    for idx, (df, page) in enumerate(merged_tables):
-        page_text = sections.get(page, "")
+    for idx, (df, pages) in enumerate(merged_tables):
+        page_text = "".join(sections.get(idx, "") for idx in pages)
         section, requirement, figure = detect_context(page_text)
-
         table_type = classify_table(df)
         # if table_type == "field-table":
         #     df = postprocess_field_table(df)
-
-        safe_section = section[-1].replace(" ", "_").replace(
-            ".", "-") if section[-1] else f"page_{page}"
+        l_sec = section[-1] if section else None
+        # debugging
+        print(f"Entire Section: {section}")
+        print(f"Last section: {l_sec}")
+        safe_section = l_sec.replace(" ", "_").replace(
+            ".", "-") if l_sec else f"page_{pages[-1]}"
         base_name = f"{safe_section}_{table_type}_table{idx}"
 
         metadata = {
-            "page": page,
+            "pages": pages,
             "section": [*section],
             "requirement": [*requirement],
             "figure": [*figure],
