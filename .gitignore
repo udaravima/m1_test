@@ -37,3 +37,4 @@ build/
 *~
 *.bak
 *.tmp
+*.tar.gz
