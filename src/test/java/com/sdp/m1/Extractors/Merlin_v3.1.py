@@ -7,7 +7,7 @@ import pandas as pd
 
 SRC_ROOT = "Documents/"
 SRC_FILE = f"{SRC_ROOT}M1-SDP-PRO-SRS_v0.1.0_annotated.pdf"
-OUTPUT_DIR = f"{SRC_ROOT}SRS_Fields_v3.5"
+OUTPUT_DIR = f"{SRC_ROOT}SRS_Fields_v3.7"
 
 FIELD_TABLE_HEADERS = ["Field", "Description",
                        "Type", "Validation", "Error Response"]
@@ -17,6 +17,17 @@ def clean_text(val):
     """Remove non-displayable characters and normalize whitespace."""
     if not isinstance(val, str):
         return val
+    val = re.sub(r"\xad", "-", val)  # replace soft hyphen with normal hyphen
+    val = re.sub(r"\u2013", "-", val)  # replace en-dash with hyphen
+    val = re.sub(r"\u2014", "-", val)  # replace em-dash with hyphen
+    # replace smart quotes with normal quotes
+    val = re.sub(r"\u2018|\u2019", "'", val)
+    val = re.sub(r"\u2026", "...", val)  # replace ellipsis with three dots
+    # replace smart quotes with normal quotes
+    val = re.sub(r"\u201C|\u201D", '"', val)
+    val = re.sub(r"\u2022", "*", val)  # replace bullet with asterisk
+    val = re.sub(r"\u2025", "..", val)  # replace two-dot leader with two dots
+    val = re.sub(r"\n", " ", val)  # replace newlines with spaces
     val = re.sub(r"[^\x20-\x7E\n\t]", " ", val)  # strip non-printables
     val = re.sub(r"\s+", " ", val)
     return val.strip()
@@ -28,7 +39,7 @@ def extract_sections():
     with pdfplumber.open(SRC_FILE) as pdf:
         for i, page in enumerate(pdf.pages, start=1):
             text = page.extract_text() or ""
-            sections[i] = text
+            sections[i] = clean_text(text)
     return sections
 
 
@@ -36,13 +47,17 @@ def detect_context(page_text):
     """Find nearest section, requirement ID, and figure reference from text."""
     section_match = re.findall(r"\d+(\.\d+)*\s+[A-Za-z].+", page_text)
     req_match = re.findall(r"(REQ-[A-Z0-9\- ]+)", page_text)
-    fig_match = re.findall(r"Figure\s+\d+[-–]\d+", page_text)
+    fig_match = re.findall(r"Figure\s+\d+[-–]\d+:[A-Za-z0-9 ]+", page_text)
+    # Debugging
+    # print("Sections:", section_match)
+    # print("Requirements:", req_match)
+    # print("Figures:", fig_match)
 
-    section = section_match[-1] if section_match else None
-    requirement = req_match[-1] if req_match else None
-    figure = fig_match[-1] if fig_match else None
+    # section = section_match[-1] if section_match else None
+    # requirement = req_match[-1] if req_match else None
+    # figure = fig_match[-1] if fig_match else None
 
-    return section, requirement, figure
+    return section_match, req_match, fig_match
 
 
 def normalize_headers(df):
@@ -163,15 +178,15 @@ def main():
         # if table_type == "field-table":
         #     df = postprocess_field_table(df)
 
-        safe_section = section.replace(" ", "_").replace(
-            ".", "-") if section else f"page_{page}"
+        safe_section = section[-1].replace(" ", "_").replace(
+            ".", "-") if section[-1] else f"page_{page}"
         base_name = f"{safe_section}_{table_type}_table{idx}"
 
         metadata = {
             "page": page,
-            "section": section,
-            "requirement": requirement,
-            "figure": figure,
+            "section": [*section],
+            "requirement": [*requirement],
+            "figure": [*figure],
             "headers": list(df.columns),
             "type": table_type
         }
