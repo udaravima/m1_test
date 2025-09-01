@@ -45,7 +45,8 @@ def extract_sections():
 
 def detect_context(page_text):
     """Find nearest section, requirement ID, and figure reference from text."""
-    section_match = re.findall(r"\d+(\.\d+)*\s+([A-Z][a-z]+\s)+", page_text)
+    section_match = re.findall(
+        r"(\d+(?:\.\d+)*\s+(?:[A-Z][a-z]+\s)+)+", page_text)
     req_match = re.findall(r"(REQ-[A-Z0-9\- ]+:[ A-Za-z0-9]+)", page_text)
     fig_match = re.findall(r"Figure\s+\d+[-–]\d+:[A-Za-z0-9 ]+", page_text)
     # Debugging
@@ -183,9 +184,9 @@ def main():
         # debugging
         print(f"Entire Section: {section}")
         print(f"Last section: {l_sec}")
-        safe_section = l_sec.replace(" ", "_").replace(
-            ".", "-") if l_sec else f"page_{pages[-1]}"
-        base_name = f"{safe_section}_{table_type}_table{idx}"
+        sec_t = l_sec.replace(" ", "_").replace(".", "-") if l_sec else ""
+        safe_section = f"page_{pages[-1]}"
+        base_name = f"{safe_section}_{table_type}_table{idx}_{sec_t}"
 
         metadata = {
             "pages": pages,
