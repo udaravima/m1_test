@@ -1,48 +1,695 @@
 {
-  "feature": "Service Provider Registration",
-  "featureDescription": "Allows an operations user to register a new Service Provider in the system.",
-  "requirements": [
+  "features": [
     {
-      "id": "spId",
-      "label": "Service Provider ID",
-      "type": "text",
-      "validations": [
-        { "rule": "mandatory", "errorMessage": "Service Provider ID is required." },
-        { "rule": "numeric", "errorMessage": "Service Provider ID must be a number." },
-        { "rule": "length", "max": 8, "errorMessage": "Service Provider ID cannot exceed 8 digits." }
+      "feature": "Service Provider Registration",
+      "featureDescription": "Allows an operations user to register a new Service Provider in the system.",
+      "requirements": [
+        {
+          "label": "Service Provider ID",
+          "type": "String",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Service provider Id required"
+            },
+            {
+              "rule": "unique",
+              "errorMessage": "Service Provider Id already exists"
+            },
+            {
+              "rule": "length",
+              "max": 8,
+              "errorMessage": "Please enter 8 digit number for Service Provider Id."
+            }
+          ]
+        },
+        {
+          "label": "Company name",
+          "type": "String",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Company Name required"
+            },
+            {
+              "rule": "length",
+              "max": 50,
+              "errorMessage": "Company Name should be less than 50 characters"
+            },
+            {
+              "rule": "unique",
+              "errorMessage": "Service Provider with the entered company name already exists"
+            }
+          ]
+        },
+        {
+          "label": "Address",
+          "type": "String",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "length",
+              "max": 255,
+              "errorMessage": "Address should be less than 255 characters"
+            }
+          ]
+        },
+        {
+          "label": "Description",
+          "type": "String",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "length",
+              "max": 255,
+              "errorMessage": "Description should be less than 255 characters"
+            }
+          ]
+        },
+        {
+          "label": "White Listed Users",
+          "type": "String",
+          "validations": [
+            {
+              "rule": "mandatory"
+            },
+            {
+              "rule": "length",
+              "min": 8,
+              "max": 15,
+              "errorMessage": "Should be comma-separated phone numbers having 15 digits as maximum and 8 digits as minimum"
+            },
+            {
+              "rule": "no_duplicate",
+              "errorMessage": "Msisdn are Duplicate in White listed Msisdn."
+            },
+            {
+              "rule": "no_blacklisted_duplicate",
+              "errorMessage": "You can not have a White-listed user in the Blacklisted user list."
+            }
+          ]
+        },
+        {
+          "label": "Black Listed Users",
+          "type": "String",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "length",
+              "min": 8,
+              "max": 15,
+              "errorMessage": "Should be comma-separated phone numbers having 15 digits as maximum and 8 digits as minimum"
+            },
+            {
+              "rule": "no_duplicate",
+              "errorMessage": "Msisdn are Duplicate in Black listed Msisdn."
+            }
+          ]
+        },
+        {
+          "label": "Dedicated Alias",
+          "type": "String",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "unique",
+              "errorMessage": "Dedicated alias/es - [Alias Name] or a wildcard format is already in use"
+            },
+            {
+              "rule": "valid_regex",
+              "errorMessage": "Invalid regular expression/s for Dedicated Alias please enter valid regular expression."
+            }
+          ]
+        },
+        {
+          "label": "SP users",
+          "type": "multi-select list box",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Select atleast one User Name."
+            }
+          ]
+        },
+        {
+          "label": "Marketing Users",
+          "type": "multi-select list box",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Allowed Marketing Users required."
+            }
+          ]
+        },
+        {
+          "label": "Resources",
+          "type": "multi-select list box",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Select atleast one resource."
+            }
+          ]
+        }
       ]
     },
     {
-      "id": "companyName",
-      "label": "Company name",
-      "type": "text",
-      "validations": [
-        { "rule": "mandatory", "errorMessage": "Company Name is required." },
-        { "rule": "length", "max": 50, "errorMessage": "Company Name cannot exceed 50 characters." }
+      "feature": "SLA Configuration for SMS",
+      "featureDescription": "Allows the operations user to define the Service Level Agreement for SMS, including maximum messages per second and per day for both Mobile Originated (MO) and Mobile Terminated (MT) messages.",
+      "requirements": [
+        {
+          "label": "Maximum Messages Per Second",
+          "type": "text",
+          "ncs": "SMS MO",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per second required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 1000,
+              "errorMessage": "Max message per second should not be greater than 1000 message per second."
+            }
+          ]
+        },
+        {
+          "label": "Maximum Messages Per Day",
+          "type": "text",
+          "ncs": "SMS MO",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per day required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 50000000,
+              "errorMessage": "Max message per day should not be greater than 50000000 message per day."
+            },
+            {
+              "rule": "comparison",
+              "comparison_with": "Maximum Messages Per Second",
+              "errorMessage": "Max message per day should be greater than message per Second."
+            }
+          ]
+        },
+        {
+          "label": "NCS Description",
+          "type": "text",
+          "ncs": "SMS MO",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "length",
+              "max": 255,
+              "errorMessage": "NCS Description is too long."
+            }
+          ]
+        },
+        {
+          "label": "Maximum recipients Per Second",
+          "type": "text",
+          "ncs": "SMS MT",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per second required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 1000,
+              "errorMessage": "Max message per Second should not be greater than 1000 message per second."
+            }
+          ]
+        },
+        {
+          "label": "Maximum recipients Per Day",
+          "type": "text",
+          "ncs": "SMS MT",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per day required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 50000000,
+              "errorMessage": "Max message per day should not be greater than 50000000 message per day."
+            },
+            {
+              "rule": "comparison",
+              "comparison_with": "Maximum Messages Per Second",
+              "errorMessage": "Max message per day should be greater than message per Second."
+            }
+          ]
+        }
       ]
     },
     {
-      "id": "address",
-      "label": "Address",
-      "type": "text",
-      "validations": [
-        { "rule": "length", "max": 255, "errorMessage": "Address cannot exceed 255 characters." }
+      "feature": "SLA Configuration for MMS",
+      "featureDescription": "Allows the operations user to define the Service Level Agreement for MMS, including maximum messages per second and per day for both Mobile Originated (MO) and Mobile Terminated (MT) messages.",
+      "requirements": [
+        {
+          "label": "Maximum Messages Per Second",
+          "type": "text",
+          "ncs": "MMS MO",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per second required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 100,
+              "errorMessage": "Max message per Second should not be greater than 100 message per second."
+            }
+          ]
+        },
+        {
+          "label": "Maximum Messages Per Day",
+          "type": "text",
+          "ncs": "MMS MO",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per day required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 50000000,
+              "errorMessage": "Max message per day should not be greater than 50000000 message per day."
+            },
+            {
+              "rule": "comparison",
+              "comparison_with": "Maximum Messages Per Second",
+              "errorMessage": "Maximum messages per day should be greater than maximum messages per second."
+            }
+          ]
+        },
+        {
+          "label": "NCS Description",
+          "type": "text",
+          "ncs": "MMS",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "length",
+              "max": 255,
+              "errorMessage": "NCS Description is too long."
+            }
+          ]
+        },
+        {
+          "label": "Maximum recipients Per Second",
+          "type": "text",
+          "ncs": "MMS MT",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per second required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 100,
+              "errorMessage": "Max message per Second should not be greater than 100 message per second."
+            }
+          ]
+        },
+        {
+          "label": "Maximum recipients Per Day",
+          "type": "text",
+          "ncs": "MMS MT",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per day required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 50000000,
+              "errorMessage": "Max message per day should not be greater than 50000000 message per day."
+            },
+            {
+              "rule": "comparison",
+              "comparison_with": "Maximum Messages Per Second",
+              "errorMessage": "Max message per day should be greater than message per Second."
+            }
+          ]
+        }
       ]
     },
     {
-      "id": "userNames",
-      "label": "SP users",
-      "type": "select",
-      "validations": [
-        { "rule": "mandatory", "errorMessage": "At least one SP User must be selected." }
+      "feature": "SLA Configuration for USSD",
+      "featureDescription": "Allows the operations user to define the Service Level Agreement for USSD, including maximum messages per second and per day for both Mobile Originated (MO) and Mobile Terminated (MT) messages.",
+      "requirements": [
+        {
+          "label": "Maximum Messages Per Second",
+          "type": "text",
+          "ncs": "USSD MO",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per second required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 1000,
+              "errorMessage": "Max message per Second should not be greater than 1000 message per second."
+            }
+          ]
+        },
+        {
+          "label": "Maximum Messages Per Day",
+          "type": "text",
+          "ncs": "USSD MO",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per day required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 50000000,
+              "errorMessage": "Max message per day should not be greater than 50000000 message per day."
+            },
+            {
+              "rule": "comparison",
+              "comparison_with": "Maximum Messages Per Second",
+              "errorMessage": "Max message per day should be greater than message per Second."
+            }
+          ]
+        },
+        {
+          "label": "NCS Description",
+          "type": "text",
+          "ncs": "USSD",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "length",
+              "max": 255,
+              "errorMessage": "NCS Description is too long."
+            }
+          ]
+        },
+        {
+          "label": "Maximum recipients Per Second",
+          "type": "text",
+          "ncs": "USSD MT",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per second required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 1000,
+              "errorMessage": "Max message per Second should not be greater than 1000 message per second."
+            }
+          ]
+        },
+        {
+          "label": "Maximum recipients Per Day",
+          "type": "text",
+          "ncs": "USSD MT",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum messages per day required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 50000000,
+              "errorMessage": "Max message per day should not be greater than 50000000 message per day."
+            },
+            {
+              "rule": "comparison",
+              "comparison_with": "Maximum Messages Per Second",
+              "errorMessage": "Max message per day should be greater than message per Second."
+            }
+          ]
+        }
       ]
     },
     {
-      "id": "allowedNcses",
-      "label": "Resources",
-      "type": "select",
-      "validations": [
-        { "rule": "mandatory", "errorMessage": "At least one Resource must be selected." }
+      "feature": "SLA Configuration for WAPPUSH",
+      "featureDescription": "Allows the operations user to define the Service Level Agreement for WAP Push, including maximum recipients per second and per day.",
+      "requirements": [
+        {
+          "label": "Maximum Recipients Per Second",
+          "type": "text",
+          "ncs": "WAPPUSH",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Max Recipients per second required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 100,
+              "errorMessage": "Max recipients per second should not be greater than 100 recipients per second."
+            }
+          ]
+        },
+        {
+          "label": "Maximum Recipients Per Day",
+          "type": "text",
+          "ncs": "WAPPUSH",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Max Recipients per day required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 50000000,
+              "errorMessage": "Max recipients per day should not be greater than 500000000 recipients per day."
+            },
+            {
+              "rule": "comparison",
+              "comparison_with": "Maximum Recipients Per Second",
+              "errorMessage": "Max recipients per day should be greater than Max recipients per second."
+            }
+          ]
+        },
+        {
+          "label": "NCS Description",
+          "type": "text",
+          "ncs": "WAPPUSH",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "length",
+              "max": 255,
+              "errorMessage": "NCS Description is too long."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "SLA Configuration for BAS",
+      "featureDescription": "Allows the operations user to define the Service Level Agreement for Billing as a Service (BAS), including maximum incoming requests per second and per day.",
+      "requirements": [
+        {
+          "label": "Maximum BAS Incoming Requests Per Second",
+          "type": "text",
+          "ncs": "BAS",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum BAS Incoming Requests per second required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 100,
+              "errorMessage": "Max billing per second should not be greater than 100 billing per second."
+            }
+          ]
+        },
+        {
+          "label": "Maximum BAS Incoming Requests Per Day",
+          "type": "text",
+          "ncs": "BAS",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum BAS Incoming Requests per day required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 50000000,
+              "errorMessage": "Max billing per day should not be greater than 50000000 billing per day."
+            },
+            {
+              "rule": "comparison",
+              "comparison_with": "Maximum BAS Incoming Requests Per Second",
+              "errorMessage": "Maximum BAS Incoming Requests per day should be greater than maximum requests per second."
+            }
+          ]
+        },
+        {
+          "label": "NCS Description",
+          "type": "text",
+          "ncs": "BAS",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "length",
+              "max": 255,
+              "errorMessage": "NCS Description is too long."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "SLA Configuration for SWS",
+      "featureDescription": "Allows the operations user to define the Service Level Agreement for Signalling Web Service (SWS), including maximum incoming requests per second and per day.",
+      "requirements": [
+        {
+          "label": "Maximum SWS Incoming Requests Per Second",
+          "type": "text",
+          "ncs": "SWS",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum SWS Incoming Requests per second required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 1000,
+              "errorMessage": "Maximum SWS per second should be less than 1,000."
+            }
+          ]
+        },
+        {
+          "label": "Maximum SWS Incoming Requests Per Day",
+          "type": "text",
+          "ncs": "SWS",
+          "validations": [
+            {
+              "rule": "mandatory",
+              "errorMessage": "Maximum SWS Incoming Requests per day required."
+            },
+            {
+              "rule": "numeric",
+              "errorMessage": "Please enter a valid input."
+            },
+            {
+              "rule": "length",
+              "max": 50000000,
+              "errorMessage": "Maximum SWS per second should be less than 50,000,000."
+            },
+            {
+              "rule": "comparison",
+              "comparison_with": "Maximum SWS Incoming Requests Per Second",
+              "errorMessage": "Maximum SWS incoming requests per day should be greater than maximum requests per second."
+            }
+          ]
+        },
+        {
+          "label": "NCS Description",
+          "type": "text",
+          "ncs": "SWS",
+          "validations": [
+            {
+              "rule": "optional"
+            },
+            {
+              "rule": "length",
+              "max": 255,
+              "errorMessage": "NCS Description is too long."
+            }
+          ]
+        }
       ]
     }
   ]

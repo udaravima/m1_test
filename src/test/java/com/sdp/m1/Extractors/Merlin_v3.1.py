@@ -17,18 +17,17 @@ def clean_text(val):
     """Remove non-displayable characters and normalize whitespace."""
     if not isinstance(val, str):
         return val
-    val = re.sub(r"\xad", "-", val)  # replace soft hyphen with normal hyphen
-    val = re.sub(r"\u2013", "-", val)  # replace en-dash with hyphen
-    val = re.sub(r"\u2014", "-", val)  # replace em-dash with hyphen
-    # replace smart quotes with normal quotes
-    val = re.sub(r"\u2018|\u2019", "'", val)
-    val = re.sub(r"\u2026", "...", val)  # replace ellipsis with three dots
-    # replace smart quotes with normal quotes
-    val = re.sub(r"\u201C|\u201D", '"', val)
-    val = re.sub(r"\u2022", "*", val)  # replace bullet with asterisk
-    val = re.sub(r"\u2025", "..", val)  # replace two-dot leader with two dots
+    replacements = {
+        '\u00ad': '-', '\u2013': '-', '\u2014': '-',
+        '\u2018': "'", '\u2019': "'", '\u2026': '...',
+        '\u201c': '"', '\u201d': '"', '\u2022': '*',
+        '\u2025': '..', '\u00a0': ' ', '\u00c9': 'E',
+        '\xad': '-'
+    }
+    for char, replacement in replacements.items():
+        val = val.replace(char, replacement)
     val = re.sub(r"\n", " ", val)  # replace newlines with spaces
-    val = re.sub(r"[^\x20-\x7E\n\t]", " ", val)  # strip non-printables
+    val = re.sub(r"[^\x20-\x7E\t]", " ", val)  # strip non-printables
     val = re.sub(r"\s+", " ", val)
     return val.strip()
 

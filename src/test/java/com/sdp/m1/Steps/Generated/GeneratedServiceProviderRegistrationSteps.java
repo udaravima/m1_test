@@ -12,11 +12,13 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import com.epam.healenium.SelfHealingDriverWait;
 import com.epam.healenium.SelfHealingDriver;
 import com.sdp.m1.Utils.TestUtils;
+
 import com.sdp.m1.Utils.TestConfigs;
 
 public class GeneratedServiceProviderRegistrationSteps {
 
     private final SelfHealingDriver driver;
+
     private final SelfHealingDriverWait wait;
 
     public GeneratedServiceProviderRegistrationSteps(SelfHealingDriver driver, SelfHealingDriverWait wait) {
@@ -49,4 +51,4 @@ public class GeneratedServiceProviderRegistrationSteps {
         driver.findElement(By.cssSelector("#allowedNcses")).sendKeys("some_value");
     }
 
-}
+}    
