@@ -5,13 +5,14 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.epam.healenium.SelfHealingDriver;
 import com.epam.healenium.SelfHealingDriverWait;
 
-import java.time.Duration;
+// import java.time.Duration;
 import java.util.logging.Logger;
+
+// import com.codeborne.selenide.conditions.webdriver.Url;
 
 public class m1LoginPage {
     private static final Logger logger = Logger.getLogger(m1LoginPage.class.getName());
@@ -22,9 +23,9 @@ public class m1LoginPage {
     private final By usernameField = By.id("username");
     private final By passwordField = By.id("password");
     private final By errorMessage = By.id("status");
-    private final By successMsg = By.id("msg");
+    // private final By successMsg = By.id("msg");
     private final By loginButton = By.xpath("//*[@id=\"login\"]/div[3]/input[3]");
-    private final By pageTitle = By.tagName("title");
+    // private final By pageTitle = By.tagName("title");
     private final By usernameLabel = By.xpath("//label[@for=\"username\"]");
     private final By passwordLabel = By.xpath("//label[@for=\"password\"]");
 
@@ -161,23 +162,33 @@ public class m1LoginPage {
 
     public void verifyDashboard() {
         try {
-            WebElement successElement = wait.until(ExpectedConditions.visibilityOfElementLocated(successMsg));
-            WebElement titleElement = successElement.findElement(By.tagName("h2"));
-            String actualTitle = titleElement.getText();
+            // WebElement successElement =
+            // wait.until(ExpectedConditions.visibilityOfElementLocated(pageTitle));
+            // WebElement titleElement = successElement.findElement(By.tagName("h2"));
+            // String actualTitle = titleElement.getText();
 
-            logger.info(String.format("Actual success message: %s", actualTitle));
+            // logger.info(String.format("Actual success message: %s",
+            // successElement.getText()));
 
-            // More flexible success validation
-            if (actualTitle == null || actualTitle.trim().isEmpty()) {
-                throw new AssertionError("Success message is empty or null");
+            // Check if the current URL matches the expected provisioning pattern
+            String currentUrl = driver.getCurrentUrl();
+            logger.info(String.format("Current URL: %s", currentUrl));
+            if (!currentUrl.matches("https://m1-impl\\.hsenidmobile\\.com/provisioning/.*")) {
+                throw new AssertionError("Current URL does not match expected provisioning pattern: " + currentUrl);
             }
 
-            // Check if the message contains expected keywords
-            String lowerTitle = actualTitle.toLowerCase();
-            if (!lowerTitle.contains("success") && !lowerTitle.contains("welcome")
-                    && !lowerTitle.contains("dashboard")) {
-                logger.warning(String.format("Success message may not indicate successful login: %s", actualTitle));
-            }
+            // // More flexible success validation
+            // if (actualTitle == null || actualTitle.trim().isEmpty()) {
+            // throw new AssertionError("Success message is empty or null");
+            // }
+
+            // // Check if the message contains expected keywords
+            // String lowerTitle = actualTitle.toLowerCase();
+            // if (!lowerTitle.contains("success") && !lowerTitle.contains("welcome")
+            // && !lowerTitle.contains("M1-SDP Provisioning")) {
+            // logger.warning(String.format("Success message may not indicate successful
+            // login: %s", actualTitle));
+            // }
         } catch (TimeoutException e) {
             logger.severe(String.format("Success message not displayed within timeout: %s", e.getMessage()));
             throw new RuntimeException("Success message not displayed", e);

@@ -56,7 +56,7 @@ public class ServiceProviderRegistrationPage {
     }
 
     public void open() {
-        String registrationUrl = TestConfigs.getBaseUrl() + "/provisioning/registerServiceProvider.html";
+        String registrationUrl = TestConfigs.getBaseUrl() + "/registerServiceProvider.html";
         logger.info(String.format("Cookies before navigation: %s", driver.manage().getCookies().toString()));
         driver.navigate().to(String.format("%s/provisioning", TestConfigs.getBaseUrl()));
         driver.navigate().to(registrationUrl);

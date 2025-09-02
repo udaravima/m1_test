@@ -8,7 +8,7 @@ public class TestConfigs {
     private static Properties properties;
 
     // Default values
-    private static final String DEFAULT_LOGIN_URL = "https://m1-impl.hsenidmobile.com";
+    private static final String DEFAULT_LOGIN_URL = "https://m1-impl.hsenidmobile.com/provisioning";
     private static final String DEFAULT_USERNAME = "sdpsp";
     private static final String DEFAULT_PASSWORD = "test";
     private static final String DEFAULT_DELAY = "10";

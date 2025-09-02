@@ -59,9 +59,10 @@ public class WebPageExtractorJSON {
     private static final Boolean USE_COOKIE = false;
     private static final Integer THREAD_DELAY = 8000;
     private static final String USE_URL = TestConfigs.getBaseUrl();
-    private static final String NAV_URL = USE_URL + "/registerServiceProvider.html";
+    // private static final String NAV_URL = USE_URL + "/registerServiceProvider.html";
+    private static final String NAV_URL = TestConfigs.getBaseUrl() + "/registerServiceProvider.html";
     private static final String COOKIE_NAME = "JSESSIONID";
-    private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "0B0A5A6EF6D6D7C26B6542F95CD13291");
+    private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "412887E1FC827446C377BFE9D4BEB332");
     private static final Logger logger = Logger.getLogger(WebPageExtractorJSON.class.getName());
 
     @SuppressWarnings("unused")
@@ -78,6 +79,17 @@ public class WebPageExtractorJSON {
         Set<Map<String, String>> actions = new HashSet<>();
         Set<Map<String, String>> fields = new HashSet<>();
         Map<String, String> attributes = new HashMap<>();
+    }
+
+    @SuppressWarnings("unused")
+    private static final class PageData {
+        String pageUrl;
+        List<Component> components;
+
+        PageData(String pageUrl, List<Component> components) {
+            this.pageUrl = pageUrl;
+            this.components = components;
+        }
     }
 
     /**
@@ -99,7 +111,8 @@ public class WebPageExtractorJSON {
         this.gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     }
 
-    private List<Component> extractPageComponents() {
+    private PageData extractPageData() {
+        String currentUrl = driver.getCurrentUrl();
         Document doc = Jsoup.parse(driver.getPageSource());
         List<Component> components = new ArrayList<>();
         // Main semantic elements
@@ -111,17 +124,17 @@ public class WebPageExtractorJSON {
         extractByTag(doc, driver, "footer", "footer", components);
         // // Fallback: sections and large DIVs
         extractByTag(doc, driver, "div", "section", components);
-        return components;
+        return new PageData(currentUrl, components);
     }
 
     public String extractComponentsAsJsonString() {
-        List<Component> components = extractPageComponents();
-        return this.gson.toJson(components);
+        PageData pageData = extractPageData();
+        return this.gson.toJson(pageData);
     }
 
     public void runExtractor(String fileName) {
-        List<Component> components = extractPageComponents();
-        writeFile(components, fileName);
+        PageData pageData = extractPageData();
+        writeFile(pageData, fileName);
     }
 
     public String getFileName(String urlString) throws Exception {
@@ -424,7 +437,7 @@ public class WebPageExtractorJSON {
         return findFieldFromLabel(doc, LabelStr);
     }
 
-    private void writeFile(List<Component> components, String fileName) {
+    private void writeFile(PageData pageData, String fileName) {
         // create directories if not exists
         try {
             java.nio.file.Files.createDirectories(java.nio.file.Paths.get("target/ExJson"));
@@ -433,8 +446,8 @@ public class WebPageExtractorJSON {
         }
 
         try (FileWriter fw = new FileWriter(fileName)) {
-            this.gson.toJson(components, fw);
-            logger.info(String.format("Extracted %d components -> %s", components.size(), fileName));
+            this.gson.toJson(pageData, fw);
+            logger.info(String.format("Extracted %d components -> %s", pageData.components.size(), fileName));
         } catch (Exception e) {
             logger.severe(String.format("Failed to write JSON file: %s", e.getMessage()));
         }
@@ -442,8 +455,8 @@ public class WebPageExtractorJSON {
 
     public static void main(String[] args) throws Exception {
         SelfHealingDriver driver = TestUtils.getDriver(TestConfigs.getBrowser());
-        String customUrl = "https://google.com";
-        driver.get(customUrl);
+        // String customUrl = "https://google.com";
+        driver.get(NAV_URL);
 
         if (USE_COOKIE) {
             driver.manage().deleteAllCookies();
@@ -468,6 +481,7 @@ public class WebPageExtractorJSON {
 
             logger.info("Navigated with cookies");
             driver.navigate().to(NAV_URL);
+            driver.navigate().to(NAV_URL);
         }
 
         logger.info("Waiting for page to be fully loaded...");
@@ -481,7 +495,7 @@ public class WebPageExtractorJSON {
         logger.info("Done waiting!");
 
         WebPageExtractorJSON extractor = new WebPageExtractorJSON(driver, TestUtils.getWaitDriver(driver));
-        String fileName = extractor.getFileName(customUrl);
+        String fileName = extractor.getFileName(NAV_URL);
         extractor.runExtractor(fileName);
         driver.quit();
     }
@@ -510,13 +524,13 @@ public class WebPageExtractorJSON {
  * 
  * extractByTag(Document doc, WebDriver driver, String tag, String type,
  *      List<Component> components) -> void : Extract components by HTML tag
- * writeFile(List<Component> components, String fileName) -> void : Write
+ * writeFile(PageData pageData, String fileName) -> void : Write
  *      components to a JSON file
  * getXPath(Element el) -> String : Generate an XPath expression for a given
  *      element
  * buildSelector(Element el) -> String : Build a CSS selector for a given
  *      element
- * extractPageComponents() -> List<Component> : Extract all components from the
+ * extractPageData() -> PageData : Extract all components from the
  *      current page
  * fieldBuilder(Elements elements, Set<Map<String, String>> fields) -> void :
  *      Build form fields from the given elements
