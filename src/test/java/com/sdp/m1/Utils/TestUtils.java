@@ -447,52 +447,42 @@ public class TestUtils {
 }
 
 /*
- * This class provides utility methods for working with Selenium WebDriver
- * instances.
- * 
- * Here are the functions available in the TestUtils class with short
- * descriptions:
+ * Public Methods:
+ * - markTestFailed(): Marks the current test as failed.
+ * - markTestPassed(): Marks the current test as passed.
+ * - isTestFailed(): Returns true if the test is marked as failed.
+ * - resetTestStatus(): Resets the test failure status.
+ * - generateRandomString(int length): Generates a random alphanumeric string.
+ * - generateRandomNumber(int length): Generates a random numeric string.
+ * - generateRandomEmail(): Generates a random email address.
+ * - generateRandomUsername(): Generates a random username.
+ * - generateRandomPassword(): Generates a random password.
+ * - generateRandomPhone(): Generates a random phone number.
+ * - takeScreenshot(String testName): Takes a screenshot and saves it with a
+ * timestamp.
+ * - wait(int seconds): Pauses execution for the given seconds.
+ * - waitMillis(long milliseconds): Pauses execution for the given milliseconds.
+ * - isValidEmail(String email): Validates email format.
+ * - isValidPhone(String phone): Validates phone number format.
+ * - isStrongPassword(String password): Checks password strength.
+ * - cleanupTestData(String... filePaths): Deletes specified files.
+ * - getCurrentTimestamp(): Returns current timestamp in readable format.
+ * - getCurrentTimestampForFile(): Returns current timestamp in file-safe
+ * format.
+ * - fileExists(String filePath): Checks if a file exists.
+ * - getFileSize(String filePath): Returns file size in bytes.
+ * - createTestDirectory(String directoryPath): Creates a directory if not
+ * exists.
+ * - deleteTestDirectory(String directoryPath): Deletes a directory and its
+ * contents.
+ * - assertPageLoadWithinThreshold(Runnable pageLoadAction, Logger logger):
+ * Asserts page load time within threshold.
+ * - removeDriver(): Quits and cleans up the WebDriver instance.
+ * - getDriver(String browserType): Initializes and returns a SelfHealingDriver
+ * for the browser.
+ * - getWaitDriver(SelfHealingDriver driver): Returns a SelfHealingDriverWait
+ * for explicit waits.
  *
- * markTestFailed(): Marks the current test as failed.
- * markTestPassed(): Marks the current test as passed.
- * isTestFailed(): Checks if the current test has been marked as failed.
- * resetTestStatus(): Resets the test failure status.
- * generateRandomString(int length): Generates a random alphanumeric string of a
- * -specified length.
- * generateRandomNumber(int length): Generates a random numeric string of a
- * -specified length.
- * generateRandomEmail(): Generates a random email address.
- * generateRandomUsername(): Generates a random username.
- * generateRandomPassword(): Generates a random password.
- * generateRandomPhone(): Generates a random phone number.
- * takeScreenshot(String testName): Takes a screenshot and saves it to the
- * -specified directory with a timestamp.
- * wait(int seconds): Pauses the execution for a specified number of seconds.
- * waitMillis(long milliseconds): Pauses the execution for a specified number of
- * -milliseconds.
- * isValidEmail(String email): Validates if the given string is a valid email
- * -format.
- * isValidPhone(String phone): Validates if the given string is a valid phone
- * -number format.
- * isStrongPassword(String password): Checks if the given password meets
- * -strength requirements.
- * cleanupTestData(String... filePaths): Deletes specified files, typically used
- * -for test data cleanup.
- * getCurrentTimestamp(): Returns the current timestamp in a readable format.
- * getCurrentTimestampForFile(): Returns the current timestamp in a file-safe
- * -format for filenames.
- * fileExists(String filePath): Checks if a file exists at the given path.
- * getFileSize(String filePath): Returns the size of the file in bytes.
- * createTestDirectory(String directoryPath): Creates a directory if it does not
- * -exist.
- * deleteTestDirectory(String directoryPath): Deletes a directory and its
- * -contents.
- * assertPageLoadWithinThreshold(Runnable pageLoadAction, Logger logger):
- * -Measures the time taken for a page load action and asserts if it's within a
- * -defined threshold.
- * removeDriver(): Quits the WebDriver instance and cleans up related resources.
- * getDriver(String browserType): Initializes and returns a SelfHealingDriver
- * -instance for the specified browser type.
- * getWaitDriver(SelfHealingDriver driver): Returns a SelfHealingDriverWait
- * -instance for explicit waits with the given driver.
+ * Private Methods:
+ * (None. All methods in this class are public.)
  */

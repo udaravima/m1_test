@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import com.epam.healenium.SelfHealingDriver;
 import com.epam.healenium.SelfHealingDriverWait;
 
-import com.sdp.m1.Pages.m1LoginPage;
+import com.sdp.m1.Pages.LoginPage;
 import com.sdp.m1.Utils.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
 
@@ -19,13 +19,13 @@ public class LoginSteps {
     private static final Logger logger = Logger.getLogger(LoginSteps.class.getName());
     private SelfHealingDriver driver;
     private SelfHealingDriverWait wait;
-    private final m1LoginPage loginPage;
+    private final LoginPage loginPage;
     private String browserType = TestConfigs.getBrowser();
 
     public LoginSteps() {
         this.driver = TestUtils.getDriver(TestConfigs.getBrowser());
         this.wait = TestUtils.getWaitDriver(driver);
-        this.loginPage = new m1LoginPage(driver, wait);
+        this.loginPage = new LoginPage(driver, wait);
     }
 
     @When("I enter valid password")

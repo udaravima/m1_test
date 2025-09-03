@@ -6,7 +6,7 @@ import com.sdp.m1.Generator.Model.CorrelatedField;
 import com.sdp.m1.Generator.Model.PageData;
 import com.sdp.m1.Generator.Model.Srs;
 import com.sdp.m1.Generator.Model.UiComponent;
-import com.sdp.m1.Pages.m1LoginPage;
+import com.sdp.m1.Pages.LoginPage;
 import com.sdp.m1.Utils.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
 import com.epam.healenium.SelfHealingDriver;
@@ -105,7 +105,7 @@ public class TestGenerator {
     }
 
     private static void login(SelfHealingDriver driver, SelfHealingDriverWait wait) {
-        m1LoginPage loginPage = new m1LoginPage(driver, wait);
+        LoginPage loginPage = new LoginPage(driver, wait);
         driver.get(TestConfigs.getBaseUrl());
         loginPage.waitForPageLoad();
         loginPage.enterUsername(TestConfigs.getUsername());

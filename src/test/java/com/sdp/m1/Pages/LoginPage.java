@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 
 // import com.codeborne.selenide.conditions.webdriver.Url;
 
-public class m1LoginPage {
-    private static final Logger logger = Logger.getLogger(m1LoginPage.class.getName());
+public class LoginPage {
+    private static final Logger logger = Logger.getLogger(LoginPage.class.getName());
     private final SelfHealingDriver driver;
     private final SelfHealingDriverWait wait;
 
@@ -29,7 +29,7 @@ public class m1LoginPage {
     private final By usernameLabel = By.xpath("//label[@for=\"username\"]");
     private final By passwordLabel = By.xpath("//label[@for=\"password\"]");
 
-    public m1LoginPage(SelfHealingDriver driver, SelfHealingDriverWait wait) {
+    public LoginPage(SelfHealingDriver driver, SelfHealingDriverWait wait) {
         this.driver = driver;
         this.wait = wait;
     }

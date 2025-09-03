@@ -31,6 +31,7 @@ import com.epam.healenium.SelfHealingDriver;
 import com.epam.healenium.SelfHealingDriverWait;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.sdp.m1.Pages.LoginPage;
 import com.sdp.m1.Utils.TestConfigs;
 import com.sdp.m1.Utils.TestUtils;
 
@@ -59,7 +60,8 @@ public class WebPageExtractorJSON {
     private static final Boolean USE_COOKIE = false;
     private static final Integer THREAD_DELAY = 8000;
     private static final String USE_URL = TestConfigs.getBaseUrl();
-    // private static final String NAV_URL = USE_URL + "/registerServiceProvider.html";
+    // private static final String NAV_URL = USE_URL +
+    // "/registerServiceProvider.html";
     private static final String NAV_URL = TestConfigs.getBaseUrl() + "/registerServiceProvider.html";
     private static final String COOKIE_NAME = "JSESSIONID";
     private static final Cookie COOKIE = new Cookie(COOKIE_NAME, "412887E1FC827446C377BFE9D4BEB332");
@@ -453,10 +455,24 @@ public class WebPageExtractorJSON {
         }
     }
 
+    private static void login(SelfHealingDriver driver, SelfHealingDriverWait wait) {
+        LoginPage loginPage = new LoginPage(driver, wait);
+        driver.get("https://m1-impl.hsenidmobile.com/provisioning/home.html");
+        loginPage.waitForPageLoad();
+        loginPage.enterUsername("sdpadmin");
+        loginPage.enterPassword("test");
+        loginPage.clickLoginButton();
+        loginPage.verifyDashboard();
+    }
+
     public static void main(String[] args) throws Exception {
         SelfHealingDriver driver = TestUtils.getDriver(TestConfigs.getBrowser());
-        // String customUrl = "https://google.com";
-        driver.get(NAV_URL);
+        SelfHealingDriverWait wait = TestUtils.getWaitDriver(driver);
+
+        String customUrl = "https://m1-impl.hsenidmobile.com/provisioning/home.html";
+        driver.get(customUrl);
+
+        login(driver, wait);
 
         if (USE_COOKIE) {
             driver.manage().deleteAllCookies();
@@ -481,21 +497,22 @@ public class WebPageExtractorJSON {
 
             logger.info("Navigated with cookies");
             driver.navigate().to(NAV_URL);
-            driver.navigate().to(NAV_URL);
         }
+        driver.navigate().to("https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html");
+        driver.navigate().to("https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html");
 
-        logger.info("Waiting for page to be fully loaded...");
-        try {
-            new WebDriverWait(driver, Duration.ofSeconds(THREAD_DELAY / 1000))
-                    .until(ExpectedConditions.jsReturnsValue("return document.readyState == 'complete'"));
-        } catch (TimeoutException e) {
-            logger.severe("Page did not finish loading within the timeout.");
-        }
+        // logger.info("Waiting for page to be fully loaded...");
+        // try {
+        //     new WebDriverWait(driver, Duration.ofSeconds(THREAD_DELAY / 1000))
+        //             .until(ExpectedConditions.jsReturnsValue("return document.readyState == 'complete'"));
+        // } catch (TimeoutException e) {
+        //     logger.severe("Page did not finish loading within the timeout.");
+        // }
 
         logger.info("Done waiting!");
 
         WebPageExtractorJSON extractor = new WebPageExtractorJSON(driver, TestUtils.getWaitDriver(driver));
-        String fileName = extractor.getFileName(NAV_URL);
+        String fileName = extractor.getFileName("https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html");
         extractor.runExtractor(fileName);
         driver.quit();
     }
@@ -509,33 +526,33 @@ public class WebPageExtractorJSON {
  * WebPageExtractorJSON(driver, waitDriver) : Build for standalone use.
  * getFileName(String url) -> String
  * runExtractor(String fileName) -> void : will write the components to JSON
- *      file in filename
+ * file in filename
  * findFieldFromLabel(Document doc, String LabelStr) -> String
  * findFieldFromLabel(SelfHealingDriver driver, String LabelStr) -> String
  * extractComponentsAsJsonString() -> String : Extract components and returns
- *      JSON string
+ * JSON string
  * getFileName(String URL) -> String : Generate a filename based on the URL
  * findFieldFromLabel(Document doc, String LabelStr) -> String : Find the form
- *      field associated with a label in the document
+ * field associated with a label in the document
  * findFieldFromLabel(SelfHealingDriver driver, String LabelStr) -> String :
- *      Find the form field associated with a label using the driver
+ * Find the form field associated with a label using the driver
  * 
  * List of All the functions available to private
  * 
  * extractByTag(Document doc, WebDriver driver, String tag, String type,
- *      List<Component> components) -> void : Extract components by HTML tag
+ * List<Component> components) -> void : Extract components by HTML tag
  * writeFile(PageData pageData, String fileName) -> void : Write
- *      components to a JSON file
+ * components to a JSON file
  * getXPath(Element el) -> String : Generate an XPath expression for a given
- *      element
+ * element
  * buildSelector(Element el) -> String : Build a CSS selector for a given
- *      element
+ * element
  * extractPageData() -> PageData : Extract all components from the
- *      current page
+ * current page
  * fieldBuilder(Elements elements, Set<Map<String, String>> fields) -> void :
- *      Build form fields from the given elements
+ * Build form fields from the given elements
  * getCssSelector(Element el, Document doc) -> String : Generate a CSS selector
- *      for a given element
+ * for a given element
  * findLabelText(Document doc, String label) -> String : Find the visible text
- *      associated with a label in the document
+ * associated with a label in the document
  */
