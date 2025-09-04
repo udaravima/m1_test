@@ -1,0 +1,1444 @@
+ROLE: You are an expert QA Automation Engineer. Your expertise is in creating robust, maintainable, and comprehensive test suites using Java 21, Selenium 4, Cucumber 7, and Maven. You adhere strictly to the Page Object Model and BDD best practices.
+
+---
+CODE STYLE AND STRUCTURE EXAMPLES:
+You MUST generate code that strictly follows the style, patterns, and conventions of the examples below.
+
+**1. Feature File Example (`service_provider_registration.feature`):**
+Note the use of Background, Scenario Outlines, and Examples tables.
+```gherkin
+Feature: Service Provider Registration
+  As an administrator, I want to register a new service provider
+  so that they can start using the platform.
+
+  Background:
+    Given I am logged in as an administrator
+    And I am on the service provider registration page
+
+  @Registration
+  Scenario: Successfully register a new service provider with all valid details
+    When I fill the "Service Provider ID" field with "54689515"
+    And I fill the "Company name" field with "BlueSky Telecom"
+    And I fill the "Address" field with "100 Market Street"
+    And I fill the "Description" field with "A new and promising telecom partner"
+    And I fill the "White Listed Users" field with "98765432"
+    And I select "SdpSp" from the "SP users" list
+    And I select "SdpMktg" from the "Marketing Users" list
+    And I select the "SMS" resource
+    And I click the "Submit" button
+    Then I should see the success message "Service Provider registered successfully"
+
+  @Registration
+  Scenario Outline: Validate the 'Service Provider ID' field
+    When I fill the "Service Provider ID" field with "<VALUE>"
+    And I click the "Submit" button
+    Then I should see the error message "<ERROR_MESSAGE>"
+
+    Examples:
+      | VALUE      | ERROR_MESSAGE                                          | Description          |
+      |            | "Service Provider Id required"                         | Mandatory check      |
+      | "1234567"  | "Please enter 8 digit number for Service Provider Id." | Length check (short) |
+      | "abcdefgh" | "Please enter 8 digit number for Service Provider Id." | Format check (text)  |
+
+  @Registration
+  Scenario Outline: Validate the 'Company name' field
+    When I fill the "Company name" field with "<VALUE>"
+    And I click the "Submit" button
+    Then I should see the error message "<ERROR_MESSAGE>"
+
+    Examples:
+      | VALUE                                               | ERROR_MESSAGE                                    | Description      |
+      |                                                     | "Company Name required"                          | Mandatory check  |
+      | "A Very Long Company Name That Exceeds Fifty Chars" | "Company Name should be less than 50 characters" | Max length check |
+
+  @Registration
+  Scenario: Validate the 'SP users' field
+    When I fill all mandatory fields for a valid registration
+    But I do not select any user from the "SP users" list
+    And I click the "Submit" button
+    Then I should see the error message "Select atleast one User Name."
+
+  @Registration
+  Scenario: Validate the 'Marketing Users' field
+    When I fill all mandatory fields for a valid registration
+    But I do not select any user from the "Marketing Users" list
+    And I click the "Submit" button
+    Then I should see the error message "Allowed Marketing Users required."
+
+  @Registration
+  Scenario: Validate the 'Resources' field
+    When I fill all mandatory fields for a valid registration
+    But I do not select any "Resources"
+    And I click the "Submit" button
+    Then I should see the error message "Select atleast one list resource."
+
+```
+
+**2. Page Object Class Example (`ServiceProviderRegistrationPage.java`):**
+Note the constructor, @FindBy annotations, private WebElements, and public methods for interactions and assertions. All Selenium calls are encapsulated here.
+```java
+package com.sdp.m1.Pages;
+
+import com.epam.healenium.SelfHealingDriver;
+import com.epam.healenium.SelfHealingDriverWait;
+import com.sdp.m1.Utils.TestConfigs;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
+
+public class ServiceProviderRegistrationPage {
+
+    private final SelfHealingDriver driver;
+    private final SelfHealingDriverWait wait;
+
+    public ServiceProviderRegistrationPage(SelfHealingDriver driver, SelfHealingDriverWait wait) {
+        this.driver = driver;
+        this.wait = wait;
+        PageFactory.initElements(driver, this);
+    }
+
+    // --- Field Locators ---
+    @FindBy(id = "spId")
+    private WebElement serviceProviderIdInput;
+
+    @FindBy(id = "companyName")
+    private WebElement companyNameInput;
+
+    @FindBy(id = "address")
+    private WebElement addressInput;
+
+    @FindBy(id = "description")
+    private WebElement descriptionInput;
+
+    @FindBy(id = "whiteListedUsers")
+    private WebElement whiteListedUsersInput;
+
+    @FindBy(id = "userNames")
+    private WebElement spUsersSelect;
+
+    @FindBy(id = "allowedMarketingUsers")
+    private WebElement marketingUsersSelect;
+
+    @FindBy(id = "allowedNcses")
+    private WebElement resourcesSelect;
+
+    @FindBy(id = "submitApplication")
+    private WebElement submitButton;
+
+    // --- Message Locators ---
+    // TODO: Replace with a more specific locator for error messages if available
+    @FindBy(xpath = "//div[contains(@class, 'error')]/span")
+    private WebElement errorMessageContainer;
+
+    // TODO: Replace with a more specific locator for the success message
+    @FindBy(className = "success-message") // Placeholder locator
+    private WebElement successMessageContainer;
+
+    // --- Interaction Methods ---
+
+    public void navigateToPage() {
+        // The URL is derived from the SRS JSON, but TestConfigs should be the source of
+        // truth for base URLs
+        driver.get(TestConfigs.getBaseUrl() + "/registerServiceProvider.html");
+    }
+
+    public void enterServiceProviderId(String spId) {
+        if (spId != null) {
+            serviceProviderIdInput.sendKeys(spId);
+        } else {
+            serviceProviderIdInput.clear();
+        }
+    }
+
+    public void enterCompanyName(String companyName) {
+        if (companyName != null) {
+            companyNameInput.sendKeys(companyName);
+        } else {
+            companyNameInput.clear();
+        }
+    }
+
+    public void enterAddress(String address) {
+        addressInput.sendKeys(address);
+    }
+
+    public void enterDescription(String description) {
+        descriptionInput.sendKeys(description);
+    }
+
+    public void enterWhiteListedUsers(String users) {
+        whiteListedUsersInput.sendKeys(users);
+    }
+
+    public void selectSpUser(String userName) {
+        new Select(spUsersSelect).selectByVisibleText(userName);
+    }
+
+    public void deselectAllSpUsers() {
+        new Select(spUsersSelect).deselectAll();
+    }
+
+    public void selectMarketingUser(String userName) {
+        new Select(marketingUsersSelect).selectByVisibleText(userName);
+    }
+
+    public void deselectAllMarketingUsers() {
+        new Select(marketingUsersSelect).deselectAll();
+    }
+
+    public void selectResource(String resource) {
+        new Select(resourcesSelect).selectByVisibleText(resource);
+    }
+
+    public void deselectAllResources() {
+        new Select(resourcesSelect).deselectAll();
+    }
+
+    public void clickSubmitButton() {
+        submitButton.click();
+    }
+
+    // --- Assertion Methods ---
+
+    public String getErrorMessage() {
+        // This assumes errors appear in a single container. This may need refinement.
+        return wait.until(d -> errorMessageContainer.getText());
+    }
+
+    public String getSuccessMessage() {
+        return wait.until(d -> successMessageContainer.getText());
+    }
+}
+
+```
+
+**3. Step Definition Class Example (`ServiceProviderRegistrationSteps.java`):**
+Note the dependency injection in the constructor, how it calls methods on the Page Object, and that it contains NO Selenium `driver` calls.
+```java
+package com.sdp.m1.Steps;
+
+import com.sdp.m1.Pages.LoginPage;
+import com.sdp.m1.Pages.ServiceProviderRegistrationPage;
+import com.sdp.m1.Utils.TestConfigs;
+import com.sdp.m1.Utils.TestUtils;
+import com.epam.healenium.SelfHealingDriver;
+import com.epam.healenium.SelfHealingDriverWait;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.And;
+import io.cucumber.java.Before;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class ServiceProviderRegistrationSteps {
+
+    private final SelfHealingDriver driver;
+    private final SelfHealingDriverWait wait;
+    private ServiceProviderRegistrationPage registrationPage;
+    private LoginPage loginPage;
+
+    public ServiceProviderRegistrationSteps() {
+        this.driver = TestUtils.getDriver(TestConfigs.getBrowser());
+        this.wait = TestUtils.getWaitDriver(this.driver);
+        this.registrationPage = new ServiceProviderRegistrationPage(driver, wait);
+        this.loginPage = new LoginPage(driver, wait);
+    }
+
+    @Given("I am logged in as an administrator")
+    public void i_am_logged_in_as_an_administrator() {
+        driver.get(TestConfigs.getBaseUrl());
+        loginPage.waitForPageLoad();
+        loginPage.enterUsername(TestConfigs.getAdminUsername());
+        loginPage.enterPassword(TestConfigs.getAdminPassword());
+        loginPage.clickLoginButton();
+        loginPage.verifyDashboard();
+    }
+
+    @Given("I am on the service provider registration page")
+    public void i_am_on_the_service_provider_registration_page() {
+        registrationPage.navigateToPage();
+    }
+
+    @When("I fill the {string} field with {string}")
+    public void i_fill_the_field_with(String fieldName, String value) {
+        switch (fieldName) {
+            case "Service Provider ID":
+                registrationPage.enterServiceProviderId(value);
+                break;
+            case "Company name":
+                registrationPage.enterCompanyName(value);
+                break;
+            case "Address":
+                registrationPage.enterAddress(value);
+                break;
+            case "Description":
+                registrationPage.enterDescription(value);
+                break;
+            case "White Listed Users":
+                registrationPage.enterWhiteListedUsers(value);
+                break;
+        }
+    }
+
+    @When("I select {string} from the {string} list")
+    public void i_select_from_the_list(String item, String listName) {
+        switch (listName) {
+            case "SP users":
+                registrationPage.selectSpUser(item);
+                break;
+            case "Marketing Users":
+                registrationPage.selectMarketingUser(item);
+                break;
+        }
+    }
+
+    @When("I select the {string} resource")
+    public void i_select_the_resource(String resource) {
+        registrationPage.selectResource(resource);
+    }
+
+    @When("I click the {string} button")
+    public void i_click_the_button(String buttonName) {
+        if ("Submit".equals(buttonName)) {
+            registrationPage.clickSubmitButton();
+        }
+    }
+
+    @Then("I should see the success message {string}")
+    public void i_should_see_the_success_message(String expectedMessage) {
+        assertEquals(expectedMessage, registrationPage.getSuccessMessage());
+    }
+
+    @Then("I should see the error message {string}")
+    public void i_should_see_the_error_message(String expectedMessage) {
+        assertEquals(expectedMessage, registrationPage.getErrorMessage());
+    }
+
+    @When("I fill all mandatory fields for a valid registration")
+    public void i_fill_all_mandatory_fields_for_a_valid_registration() {
+        registrationPage.enterServiceProviderId("87654321");
+        registrationPage.enterCompanyName("Temp Valid Company");
+        registrationPage.enterWhiteListedUsers("98765432");
+        registrationPage.selectSpUser("SdpSp");
+        registrationPage.selectMarketingUser("SdpMktg");
+        registrationPage.selectResource("SMS");
+    }
+
+    @And("I do not select any user from the {string} list")
+    public void i_do_not_select_any_user_from_the_list(String listName) {
+        switch (listName) {
+            case "SP users":
+                registrationPage.deselectAllSpUsers();
+                break;
+            case "Marketing Users":
+                registrationPage.deselectAllMarketingUsers();
+                break;
+        }
+    }
+
+    @And("I do not select any {string}")
+    public void i_do_not_select_any(String listName) {
+        if ("Resources".equals(listName)) {
+            registrationPage.deselectAllResources();
+        }
+    }
+}
+```
+
+**4. Configuration Utility (`TestConfigs.java`):**
+Use these static methods to get configuration values like URLs and credentials. Do NOT hardcode them.
+Available methods include: `getBaseUrl()`, `getAdminUsername()`, `getAdminPassword()`, `getBrowser()`.
+```java
+package com.sdp.m1.Utils;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
+public class TestConfigs {
+    private static Properties properties;
+
+    // Default values
+    private static final String DEFAULT_LOGIN_URL = "https://m1-impl.hsenidmobile.com/provisioning";
+    private static final String DEFAULT_USERNAME = "sdpsp";
+    private static final String DEFAULT_PASSWORD = "test";
+    private static final String DEFAULT_DELAY = "10";
+    private static final String DEFAULT_BROWSER = "chrome";
+    private static final String DEFAULT_HEADLESS = "false";
+    private static final String DEFAULT_TIMEOUT = "30";
+    private static final String DEFAULT_PAGE_LOAD_THRESHOLD_MS = "20000";
+
+    static {
+        loadProperties();
+    }
+
+    private static void loadProperties() {
+        properties = new Properties();
+        try {
+            // Try to load from test.properties first
+            String configFile = System.getProperty("config.file", "src/test/resources/test.properties");
+            try (FileInputStream input = new FileInputStream(configFile)) {
+                properties.load(input);
+            }
+        } catch (IOException e) {
+            // If file doesn't exist, use default values
+            System.out.println("Configuration file not found, using default values");
+        }
+    }
+
+    public static String getProperty(String key, String defaultValue) {
+        String value = System.getProperty(key);
+        if (value == null) {
+            value = properties.getProperty(key);
+        }
+        return value != null ? value : defaultValue;
+    }
+
+    // Configuration getters
+    public static String getLoginUrl() {
+        return getProperty("login.url", DEFAULT_LOGIN_URL);
+    }
+
+    public static String getUsername() {
+        return getProperty("username", DEFAULT_USERNAME);
+    }
+
+    public static String getPassword() {
+        return getProperty("password", DEFAULT_PASSWORD);
+    }
+
+    public static String getAdminUsername() {
+        return getProperty("admin.username", DEFAULT_USERNAME);
+    }
+
+    public static String getAdminPassword() {
+        return getProperty("admin.password", DEFAULT_PASSWORD);
+    }
+
+    public static String getDelay() {
+        return getProperty("delay", DEFAULT_DELAY);
+    }
+
+    public static String getBrowser() {
+        return getProperty("browser", DEFAULT_BROWSER);
+    }
+
+    public static boolean isHeadless() {
+        return Boolean.parseBoolean(getProperty("headless", DEFAULT_HEADLESS));
+    }
+
+    public static String getTimeout() {
+        return getProperty("timeout", DEFAULT_TIMEOUT);
+    }
+
+    public static long getPageLoadThresholdMs() {
+        return Long.parseLong(getProperty("page.load.threshold.ms", DEFAULT_PAGE_LOAD_THRESHOLD_MS));
+    }
+
+    // Legacy constants for backward compatibility
+    public static final String LOGIN_URL = getLoginUrl();
+    public static final String USERNAME = getUsername();
+    public static final String PASSWORD = getPassword();
+    public static final String DELAY = getDelay();
+
+    // Environment-specific configurations
+    public static String getEnvironment() {
+        return getProperty("environment", "test");
+    }
+
+    public static boolean isProduction() {
+        return "production".equalsIgnoreCase(getEnvironment());
+    }
+
+    public static boolean isStaging() {
+        return "staging".equalsIgnoreCase(getEnvironment());
+    }
+
+    public static boolean isTest() {
+        return "test".equalsIgnoreCase(getEnvironment());
+    }
+
+    // Test execution configurations
+    public static boolean isParallelExecution() {
+        return Boolean.parseBoolean(getProperty("parallel.execution", "false"));
+    }
+
+    public static int getThreadCount() {
+        return Integer.parseInt(getProperty("thread.count", "2"));
+    }
+
+    public static boolean isScreenshotOnFailure() {
+        return Boolean.parseBoolean(getProperty("screenshot.on.failure", "true"));
+    }
+
+    public static boolean isScreenshotOnSuccess() {
+        return Boolean.parseBoolean(getProperty("screenshot.on.success", "false"));
+    }
+
+    public static String getScreenshotPath() {
+        return getProperty("screenshot.path", "target/screenshots");
+    }
+
+    // Driver path configurations
+    public static String getChromeDriverPath() {
+        return getProperty("chromedriver.path", "");
+    }
+
+    public static String getGeckoDriverPath() {
+        return getProperty("geckodriver.path", "");
+    }
+
+    public static String getEdgeDriverPath() {
+        return getProperty("edgedriver.path", "");
+    }
+
+    public static String getBaseUrl() {
+        return getProperty("base.url", DEFAULT_LOGIN_URL);
+    }
+}
+
+/*
+ * Public Methods:
+ * ---------------
+ * getProperty(String key, String defaultValue)
+ * - Retrieves a property value, prioritizing system properties, then loaded
+ * properties, and finally a default value.
+ *
+ * getLoginUrl()
+ * - Returns the configured login URL.
+ *
+ * getUsername()
+ * - Returns the configured username.
+ *
+ * getPassword()
+ * - Returns the configured password.
+ *
+ * getAdminUsername()
+ * - Returns the configured admin username.
+ *
+ * getAdminPassword()
+ * - Returns the configured admin password.
+ *
+ * getDelay()
+ * - Returns the configured delay value.
+ *
+ * getBrowser()
+ * - Returns the configured browser name (e.g., "chrome").
+ *
+ * isHeadless()
+ * - Returns true if headless browser mode is enabled, false otherwise.
+ *
+ * getTimeout()
+ * - Returns the configured timeout value.
+ *
+ * getPageLoadThresholdMs()
+ * - Returns the configured page load threshold in milliseconds.
+ *
+ * getEnvironment()
+ * - Returns the current environment name (e.g., "test", "production").
+ *
+ * isProduction()
+ * - Returns true if the environment is "production".
+ *
+ * isStaging()
+ * - Returns true if the environment is "staging".
+ *
+ * isTest()
+ * - Returns true if the environment is "test".
+ *
+ * isParallelExecution()
+ * - Returns true if parallel test execution is enabled.
+ *
+ * getThreadCount()
+ * - Returns the number of threads for parallel execution.
+ *
+ * isScreenshotOnFailure()
+ * - Returns true if screenshots are taken on test failure.
+ *
+ * isScreenshotOnSuccess()
+ * - Returns true if screenshots are taken on test success.
+ *
+ * getScreenshotPath()
+ * - Returns the path where screenshots are saved.
+ *
+ * getChromeDriverPath()
+ * - Returns the path to the ChromeDriver executable.
+ *
+ * getGeckoDriverPath()
+ * - Returns the path to the GeckoDriver executable.
+ *
+ * getEdgeDriverPath()
+ * - Returns the path to the EdgeDriver executable.
+ *
+ * getBaseUrl()
+ * - Returns the base URL for the application.
+ *
+ * Private Methods:
+ * ----------------
+ * loadProperties()
+ * - Loads configuration properties from a file or uses default values if the
+ * file is not found.
+ */
+```
+
+**5. General Utility (`TestUtils.java`):**
+Use these static methods for common tasks like getting the driver instance (`TestUtils.getDriver()`) or creating explicit waits (`TestUtils.getWaitDriver()`).
+```java
+package com.sdp.m1.Utils;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.Date;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
+
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+// import org.openqa.selenium.support.ui.WebDriverWait;
+
+import com.epam.healenium.SelfHealingDriver;
+import com.epam.healenium.SelfHealingDriverWait;
+
+public class TestUtils {
+
+    private static final Logger logger = Logger.getLogger(TestUtils.class.getName());
+    private static final Random random = new Random();
+    private static final AtomicBoolean testFailed = new AtomicBoolean(false);
+    private static SelfHealingDriver driver;
+    private static SelfHealingDriverWait waitDriver;
+
+    /**
+     * Mark test as failed
+     */
+    public static void markTestFailed() {
+        testFailed.set(true);
+        logger.warning("Test marked as failed");
+    }
+
+    /**
+     * Mark test as passed
+     */
+    public static void markTestPassed() {
+        testFailed.set(false);
+        logger.info("Test marked as passed");
+    }
+
+    /**
+     * Check if test has failed
+     */
+    public static boolean isTestFailed() {
+        return testFailed.get();
+    }
+
+    /**
+     * Reset test failure status
+     */
+    public static void resetTestStatus() {
+        testFailed.set(false);
+        logger.info("Test status reset");
+    }
+
+    /**
+     * Generate a random string of specified length
+     */
+    public static String generateRandomString(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
+    }
+
+    public static String generateRandomNumber(int length) {
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(random.nextInt(10));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Generate a random email address
+     */
+    public static String generateRandomEmail() {
+        return "test." + generateRandomString(8) + "@example.com";
+    }
+
+    /**
+     * Generate a random username
+     */
+    public static String generateRandomUsername() {
+        return "user_" + generateRandomString(6);
+    }
+
+    /**
+     * Generate a random password
+     */
+    public static String generateRandomPassword() {
+        return "Pass" + generateRandomString(8) + "123!";
+    }
+
+    /**
+     * Generate a random phone number
+     */
+    public static String generateRandomPhone() {
+        return "+1" + (random.nextInt(900) + 100) + "-"
+                + (random.nextInt(900) + 100) + "-"
+                + (random.nextInt(9000) + 1000);
+    }
+
+    /**
+     * Take a screenshot and save it to the specified directory
+     */
+    public static String takeScreenshot(String testName) {
+        if (driver == null) {
+            logger.warning("Cannot take screenshot, driver is not initialized.");
+            return null;
+        }
+        try {
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String fileName = testName + "_" + timestamp + ".png";
+            String screenshotPath = "target/screenshots/" + fileName;
+
+            // Create screenshots directory if it doesn't exist
+            Path directory = Paths.get("target/screenshots");
+            if (!Files.exists(directory)) {
+                Files.createDirectories(directory);
+            }
+
+            // Get the underlying driver from SelfHealingDriver
+            WebDriver underlyingDriver = (WebDriver) driver.getClass().getMethod("getDelegate").invoke(driver);
+            File screenshot = ((TakesScreenshot) underlyingDriver).getScreenshotAs(OutputType.FILE);
+            Files.copy(screenshot.toPath(), Paths.get(screenshotPath));
+
+            logger.info(String.format("Screenshot saved: %s", screenshotPath));
+            return screenshotPath;
+        } catch (ReflectiveOperationException | ClassCastException | IOException e) {
+            logger.severe(String.format("Failed to take screenshot: %s", e.getMessage()));
+            return null;
+        }
+    }
+
+    /**
+     * Wait for a specified number of seconds
+     */
+    public static void wait(int seconds) {
+        try {
+            Thread.sleep(seconds * 1000L);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warning(String.format("Wait interrupted: %s", e.getMessage()));
+        }
+    }
+
+    /**
+     * Wait for a specified number of milliseconds
+     */
+    public static void waitMillis(long milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.warning(String.format("Wait interrupted: %s", e.getMessage()));
+        }
+    }
+
+    /**
+     * Generate test data for different scenarios
+     */
+    public static class TestData {
+
+        public static final String[] VALID_USERNAMES = { "sdpsp", "admin", "user1", "testuser" };
+        public static final String[] VALID_PASSWORDS = { "test", "password123", "admin123", "userpass" };
+        public static final String[] INVALID_USERNAMES = { "", "   ", "invalid@user", "user'123",
+                "<script>alert('xss')</script>" };
+        public static final String[] INVALID_PASSWORDS = { "", "123", "weak", "password" };
+
+        public static final String[] SQL_INJECTION_PAYLOADS = {
+                "'; DROP TABLE users; --",
+                "' OR '1'='1",
+                "'; INSERT INTO users VALUES ('hacker', 'password'); --",
+                "' UNION SELECT * FROM users --"
+        };
+
+        public static final String[] XSS_PAYLOADS = {
+                "<script>alert('xss')</script>",
+                "javascript:alert('xss')",
+                "<img src=x onerror=alert('xss')>",
+                "';alert('xss');//"
+        };
+
+        public static final String[] COMMAND_INJECTION_PAYLOADS = {
+                "& cat /etc/passwd",
+                "; ls -la",
+                "| whoami",
+                "`id`"
+        };
+    }
+
+    /**
+     * Validate email format
+     */
+    public static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email != null && email.matches(emailRegex);
+    }
+
+    /**
+     * Validate phone number format
+     */
+    public static boolean isValidPhone(String phone) {
+        String phoneRegex = "^\\+?[1-9]\\d{1,14}$";
+        return phone != null && phone.replaceAll("[\\s\\-\\(\\)]", "").matches(phoneRegex);
+    }
+
+    /**
+     * Validate password strength
+     */
+    public static boolean isStrongPassword(String password) {
+        if (password == null || password.length() < 8) {
+            return false;
+        }
+
+        boolean hasUpper = password.matches(".*[A-Z].*");
+        boolean hasLower = password.matches(".*[a-z].*");
+        boolean hasDigit = password.matches(".*\\d.*");
+        boolean hasSpecial = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*");
+
+        return hasUpper && hasLower && hasDigit && hasSpecial;
+    }
+
+    /**
+     * Clean up test data
+     */
+    public static void cleanupTestData(String... filePaths) {
+        for (String filePath : filePaths) {
+            try {
+                Path path = Paths.get(filePath);
+                if (Files.exists(path)) {
+                    Files.delete(path);
+                    logger.info(String.format("Cleaned up test data: %s", filePath));
+                }
+            } catch (IOException e) {
+                logger.warning(String.format("Failed to cleanup test data %s: %s", filePath, e.getMessage()));
+            }
+        }
+    }
+
+    /**
+     * Get current timestamp in readable format
+     */
+    public static String getCurrentTimestamp() {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    }
+
+    /**
+     * Get current timestamp in file-safe format
+     */
+    public static String getCurrentTimestampForFile() {
+        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+    }
+
+    /**
+     * Check if a file exists
+     */
+    public static boolean fileExists(String filePath) {
+        return Files.exists(Paths.get(filePath));
+    }
+
+    /**
+     * Get file size in bytes
+     */
+    public static long getFileSize(String filePath) {
+        try {
+            return Files.size(Paths.get(filePath));
+        } catch (IOException e) {
+            logger.warning(String.format("Failed to get file size for %s: %s", filePath, e.getMessage()));
+            return -1;
+        }
+    }
+
+    /**
+     * Create a test directory
+     */
+    public static boolean createTestDirectory(String directoryPath) {
+        try {
+            Path path = Paths.get(directoryPath);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+                logger.info(String.format("Created test directory: %s", directoryPath));
+                return true;
+            }
+            return true;
+        } catch (IOException e) {
+            logger.severe(String.format("Failed to create test directory %s: %s", directoryPath, e.getMessage()));
+            return false;
+        }
+    }
+
+    /**
+     * Delete a test directory and its contents
+     */
+    public static boolean deleteTestDirectory(String directoryPath) {
+        try {
+            Path path = Paths.get(directoryPath);
+            if (Files.exists(path)) {
+                Files.walk(path)
+                        .sorted((a, b) -> b.compareTo(a))
+                        .forEach(p -> {
+                            try {
+                                Files.delete(p);
+                            } catch (IOException e) {
+                                logger.warning(String.format("Failed to delete file: %s", p));
+                            }
+                        });
+                logger.info(String.format("Deleted test directory: %s", directoryPath));
+                return true;
+            }
+            return true;
+        } catch (IOException e) {
+            logger.severe(String.format("Failed to delete test directory %s: %s", directoryPath, e.getMessage()));
+            return false;
+        }
+    }
+
+    /**
+     * Measure the time taken for a page load action and assert threshold
+     * 
+     * @param pageLoadAction Runnable that performs the page load (e.g.
+     *                       loginPage.waitForPageLoad())
+     * @param logger         Logger for logging
+     */
+    public static void assertPageLoadWithinThreshold(Runnable pageLoadAction, Logger logger) {
+        long start = System.currentTimeMillis();
+        pageLoadAction.run();
+        long end = System.currentTimeMillis();
+        long loadTime = end - start;
+        // Get threshold from TestConfigs
+        long thresholdMs = com.sdp.m1.Utils.TestConfigs.getPageLoadThresholdMs();
+        if (loadTime > thresholdMs) {
+            logger.warning(
+                    String.format("Page load time exceeded threshold: %dms (threshold: %dms)", loadTime, thresholdMs));
+            throw new AssertionError(String.format("Page load time exceeded acceptable threshold: %dms", loadTime));
+        }
+        logger.info(String.format("Page loaded in acceptable time: %dms", loadTime));
+    }
+
+    public static void removeDriver() {
+        if (driver != null) {
+            try {
+                driver.quit();
+            } catch (Exception e) {
+                logger.warning("Error occurred while quitting WebDriver: " + e.getMessage());
+            }
+        }
+        driver = null;
+        waitDriver = null;
+    }
+
+    /**
+     * Get the WebDriver instance
+     */
+    public static SelfHealingDriver getDriver(String browserType) {
+        // If browserType is null, it's a call to get the existing driver.
+        // If the driver is null, we can't proceed without a browser type.
+        if (driver == null && browserType == null) {
+            return null;
+        } else if (driver == null) {
+            try {
+                switch (browserType.toLowerCase()) {
+                    case "firefox" -> {
+                        FirefoxOptions firefoxOptions = new FirefoxOptions();
+                        firefoxOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        if (TestConfigs.isHeadless()) {
+                            firefoxOptions.addArguments("--headless");
+                        } else {
+                            firefoxOptions.addArguments("--headed");
+                        }
+                        driver = SelfHealingDriver.create(new FirefoxDriver(firefoxOptions));
+                        break;
+                    }
+                    case "edge" -> {
+                        EdgeOptions edgeOptions = new EdgeOptions();
+                        edgeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        if (TestConfigs.isHeadless()) {
+                            edgeOptions.addArguments("--headless");
+                        } else {
+                            edgeOptions.addArguments("--headed");
+                        }
+                        driver = SelfHealingDriver.create(new EdgeDriver(edgeOptions));
+                        break;
+                    }
+                    default -> {
+                        // System.setProperty("webdriver.chrome.driver",
+                        // com.sdp.m1.Runner.TestConfigs.getChromeDriverPath());
+                        ChromeOptions chromeOptions = new ChromeOptions();
+                        chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                        if (TestConfigs.isHeadless()) {
+                            chromeOptions.addArguments("--headless");
+                        } else {
+                            chromeOptions.addArguments("--headed");
+                        }
+                        driver = SelfHealingDriver.create(new ChromeDriver(chromeOptions));
+                    }
+                }
+            } catch (
+
+            Exception e) {
+                System.out.println("Error occurred while initializing WebDriver: " + e.getMessage());
+                logger.severe(
+                        String.format("Failed to get WebDriver instance for %s: %s\nCheck whether healenium is up!!",
+                                browserType, e.getMessage()));
+            }
+            if (driver == null) {
+                System.out.println("Failed to initialize WebDriver");
+                throw new RuntimeException("WebDriver initialization failed");
+            }
+        }
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(Integer.parseInt(TestConfigs.getDelay())));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(Integer.parseInt(TestConfigs.getDelay())));
+        driver.manage().window().maximize();
+
+        return driver;
+
+    }
+
+    public static SelfHealingDriverWait getWaitDriver(SelfHealingDriver driver) {
+        if (driver == null) {
+            // Fail fast if the driver is not initialized. This prevents
+            // NullPointerExceptions later.
+            throw new IllegalStateException("Cannot create a wait instance with a null driver.");
+        }
+        if (waitDriver == null) {
+            // The timeout can also be sourced from TestConfigs for consistency
+            waitDriver = new SelfHealingDriverWait(driver, Duration.ofSeconds(10));
+        }
+        return waitDriver;
+    }
+
+}
+
+/*
+ * Public Methods:
+ * - markTestFailed(): Marks the current test as failed.
+ * - markTestPassed(): Marks the current test as passed.
+ * - isTestFailed(): Returns true if the test is marked as failed.
+ * - resetTestStatus(): Resets the test failure status.
+ * - generateRandomString(int length): Generates a random alphanumeric string.
+ * - generateRandomNumber(int length): Generates a random numeric string.
+ * - generateRandomEmail(): Generates a random email address.
+ * - generateRandomUsername(): Generates a random username.
+ * - generateRandomPassword(): Generates a random password.
+ * - generateRandomPhone(): Generates a random phone number.
+ * - takeScreenshot(String testName): Takes a screenshot and saves it with a
+ * timestamp.
+ * - wait(int seconds): Pauses execution for the given seconds.
+ * - waitMillis(long milliseconds): Pauses execution for the given milliseconds.
+ * - isValidEmail(String email): Validates email format.
+ * - isValidPhone(String phone): Validates phone number format.
+ * - isStrongPassword(String password): Checks password strength.
+ * - cleanupTestData(String... filePaths): Deletes specified files.
+ * - getCurrentTimestamp(): Returns current timestamp in readable format.
+ * - getCurrentTimestampForFile(): Returns current timestamp in file-safe
+ * format.
+ * - fileExists(String filePath): Checks if a file exists.
+ * - getFileSize(String filePath): Returns file size in bytes.
+ * - createTestDirectory(String directoryPath): Creates a directory if not
+ * exists.
+ * - deleteTestDirectory(String directoryPath): Deletes a directory and its
+ * contents.
+ * - assertPageLoadWithinThreshold(Runnable pageLoadAction, Logger logger):
+ * Asserts page load time within threshold.
+ * - removeDriver(): Quits and cleans up the WebDriver instance.
+ * - getDriver(String browserType): Initializes and returns a SelfHealingDriver
+ * for the browser.
+ * - getWaitDriver(SelfHealingDriver driver): Returns a SelfHealingDriverWait
+ * for explicit waits.
+ *
+ * Private Methods:
+ * (None. All methods in this class are public.)
+ */
+
+```
+---
+
+TASK:
+Generate a complete and correct set of test automation artifacts for the given feature. The output must be three separate, complete code blocks for the following files:
+1.  A Cucumber `.feature` file.
+2.  A Java Page Object class.
+3.  A Java Step Definitions class.
+
+INSTRUCTIONS:
+
+**1. Correlate Requirements to UI:**
+*   For each field in the **SRS JSON**, find its corresponding element in the **Page Structure JSON**.
+*   Use a multi-pass strategy:
+    1.  Attempt to match the SRS field key (e.g., `ServiceProviderID`) directly with an element's `id` or `name` or `selector` attribute.
+    2.  If no match, perform a case-insensitive, semantic match between the SRS field key/description and the element's visible `label` text.
+*   If a clear mapping cannot be found, add a `// TODO: Manual locator needed` comment in the generated Page Object.
+
+**2. Generate the `.feature` File:**
+*   Create a `Feature:` and `Background:` section that clearly describes the user story.
+*   For each field in the SRS, generate scenarios for the happy path, mandatory validation, and format/length validation based on the `validation` and `errorResponses` objects in the SRS.
+*   Use `Scenario Outlines` for validation tests.
+
+**3. Generate the Java Page Object Class:**
+*   The class name must end with `Page`.
+*   It **must** have a constructor that accepts `SelfHealingDriver` and `SelfHealingDriverWait`.
+*   Define all UI elements as private `WebElement` fields with `@FindBy` annotations.
+*   Encapsulate all Selenium actions (`.sendKeys()`, `.click()`) in public methods.
+
+**4. Generate the Java Step Definitions Class:**
+*   The class name must end with `Steps`.
+*   The constructor **must** accept the Page Object class for dependency injection.
+*   Step definition methods **must not** contain any `driver.findElement` or Selenium calls. They should only call methods on the Page Object instance.
+*   Use JUnit 5 `Assertions.assertEquals` for assertions.
+
+---
+HERE IS THE CONTEXT FOR THE NEW FEATURE:
+
+**SRS JSON:**
+```json
+{
+    "Sub_Section_ID": "2.1.2",
+    "Sub_Section_Name": "Search a Service Provider",
+    "Type": "Action",
+    "Requirements": [
+        {
+            "REQ_ID": "REQ-SEA-ESP-1",
+            "Description": "Users with the ROLE_SEARCH_SP permission shall be able to search for the existing SP by providing the Service Provider Company Name upon selecting the Service Provider tab and clicking on the 'Search' link or clicking on the 'Search' link under 'Service Provider' on the Provisioning Module home page."
+        },
+        {
+            "REQ_ID": "REQ-SEA-ESP-2",
+            "Description": "Upon entering the SP company name in the search bar and clicking on the Search button, the operations-user shall view search results with specified information/columns."
+        },
+        {
+            "REQ_ID": "REQ-SEA-ESP-3",
+            "Description": "Upon clicking on the Service Provider Id, the admin user shall be able to view the Service Provider information; all information except the Service Provider Id shall remain editable for the admin."
+        },
+        {
+            "REQ_ID": "REQ-SEA-ESP-3.2",
+            "Description": "Upon clicking on each NCS links, the existing values for each SLA parameters shall be displayed."
+        },
+        {
+            "REQ_ID": "REQ-SEA-ESP-4",
+            "Description": "Upon saving, the operations-user shall be able to change any SLA parameters by clicking on the respective link under the Resources section."
+        }
+    ],
+    "Fields": [
+        {
+            "Field_Name": "Search - Service Provider Company Name",
+            "Description": "Input box to provide Service Provider company name for search.",
+            "Type": "String",
+            "Constraints": {
+                "Mandatory": true
+            },
+            "Validation_Rules": [],
+            "Error_Response": []
+        }
+    ],
+    "Results_Columns": [
+        {
+            "Column_Name": "No",
+            "Description": "Auto incremented serial number for each search result."
+        },
+        {
+            "Column_Name": "Service Provider ID",
+            "Description": "Service Provider ID entered during SP profile registration."
+        },
+        {
+            "Column_Name": "Company name",
+            "Description": "Company name entered during SP profile registration."
+        },
+        {
+            "Column_Name": "Enabled",
+            "Description": "Indicates whether the SP profile is enabled or not. If enabled value displayed would be true; if disabled value displayed would be false."
+        },
+        {
+            "Column_Name": "Change Status",
+            "Description": "Provides Operations-User ability to disable the SP profile if it is currently enabled and vice versa. Displays 'Disable' if currently enabled, 'Enable' if currently disabled."
+        }
+    ],
+    "UI_Elements": [],
+    "Flows": [
+        "Select Service Provider tab -> click 'Search' link -> search page displayed",
+        "Enter SP company name in search bar -> click 'Search' button -> display search results table with columns No, Service Provider ID, Company name, Enabled, Change Status",
+        "Click on Service Provider ID -> view SP information page (editable except SP ID)",
+        "Click on NCS links to view existing SLA parameter values"
+    ]
+}
+```
+
+**Page Structure JSON:**
+```json
+{
+  "pageUrl": "https://m1-impl.hsenidmobile.com/provisioning/listServiceProvider.html?execution=e1s1",
+  "components": [
+    {
+      "type": "form",
+      "tag": "form",
+      "text": "",
+      "id": "spSearchCriteria",
+      "classes": "",
+      "selector": "#spSearchCriteria",
+      "role": "",
+      "boundingBox": {
+        "x": 224,
+        "width": 917,
+        "y": 150,
+        "height": 44
+      },
+      "actions": [
+        {
+          "role": "",
+          "name": "_eventId_searchServiceProvider",
+          "selector": "#submitbutton1",
+          "text": "",
+          "placeholder": "",
+          "type": "submit",
+          "value": "Search"
+        }
+      ],
+      "fields": [
+        {
+          "role": "",
+          "name": "companyName",
+          "selector": "#companyName",
+          "text": "",
+          "placeholder": "",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='spSearchCriteria']/input[2]",
+          "text": "",
+          "placeholder": "",
+          "type": "t",
+          "value": ""
+        }
+      ],
+      "attributes": {
+        "method": "post",
+        "name": "wawa",
+        "action": "/provisioning/listServiceProvider.html?execution=e1s1",
+        "id": "spSearchCriteria"
+      }
+    },
+    {
+      "type": "section",
+      "tag": "div",
+      "text": "",
+      "id": "doc2",
+      "classes": "yui-t4",
+      "selector": "#doc2",
+      "role": "",
+      "boundingBox": {
+        "x": 208,
+        "width": 950,
+        "y": 0,
+        "height": 263
+      },
+      "actions": [
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='navigation-secondary']/li[3]/a[1]",
+          "text": "Dashboard",
+          "placeholder": "",
+          "href": "listAppBySpUser.html",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "_eventId_searchServiceProvider",
+          "selector": "#submitbutton1",
+          "text": "",
+          "placeholder": "",
+          "type": "submit",
+          "value": "Search"
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='navigation-primary']/li[1]/div[1]/a[1]",
+          "text": "Home",
+          "placeholder": "",
+          "href": "home.html",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='ygmauserinfo']/span[2]/a[2]",
+          "text": "Admin",
+          "placeholder": "",
+          "href": "/admin",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='navigation-secondary']/li[2]/a[1]",
+          "text": "Register",
+          "placeholder": "",
+          "href": "registerServiceProvider.html",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='navigation-primary']/li[2]/div[1]/a[1]",
+          "text": "Application",
+          "placeholder": "",
+          "href": "listApplication.html",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='navigation-secondary']/li[1]/a[1]",
+          "text": "Search",
+          "placeholder": "",
+          "href": "listServiceProvider.html",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='ygmauserinfo']/span[2]/a[3]",
+          "text": "Reporting",
+          "placeholder": "",
+          "href": "/m1-sdp",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='ygmauserinfo']/span[2]/a[1]",
+          "text": "CDR-Query",
+          "placeholder": "",
+          "href": "/cdrquery",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='ygmauserinfo']/span[2]/a[4]",
+          "text": "Dashboard",
+          "placeholder": "",
+          "href": "/dashboard",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='navigation-primary']/li[3]/div[1]/a[1]",
+          "text": "Service Provider",
+          "placeholder": "",
+          "href": "listServiceProvider.html",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='ygmauserinfo']/a[1]",
+          "text": "Logout",
+          "placeholder": "",
+          "href": "#",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='ygmauserinfo']/span[2]/a[5]",
+          "text": "Change Password",
+          "placeholder": "",
+          "href": "/admin/change_password.html",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='copyright']/div[1]/span[1]/a[1]",
+          "text": "hSenid Software International.",
+          "placeholder": "",
+          "href": "http://www.hsenid.com/",
+          "type": "a",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='copyright']/div[1]/span[2]/a[1]",
+          "text": "MobileOne Ltd.",
+          "placeholder": "",
+          "href": "http://www.m1.com.sg/M1/site/M1Corp/",
+          "type": "a",
+          "value": ""
+        }
+      ],
+      "fields": [
+        {
+          "role": "",
+          "name": "companyName",
+          "selector": "#companyName",
+          "text": "",
+          "placeholder": "",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "role": "",
+          "name": "",
+          "selector": "//*[@id='spSearchCriteria']/input[2]",
+          "text": "",
+          "placeholder": "",
+          "type": "t",
+          "value": ""
+        }
+      ],
+      "attributes": {
+        "id": "doc2",
+        "class": "yui-t4"
+      }
+    }
+  ]
+}
+```
+---
+YOUR OUTPUT:
+Provide three separate, complete, and immediately usable code blocks for the following files:
+1. A new `.feature` file.
+2. A new Java Page Object class.
+3. A new Java Step Definitions class.
+
