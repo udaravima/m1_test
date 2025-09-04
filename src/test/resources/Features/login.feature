@@ -68,7 +68,7 @@ Feature: User Login Functionality
     Then I should see an error message
     And I should remain on the login page
 
-  @negative @validation
+  @negative @validation @Login
   Scenario: Login with Very Long Username
     When I enter invalid "verylongusername123456789012345678901234567890" and "test"
     And I click the login button

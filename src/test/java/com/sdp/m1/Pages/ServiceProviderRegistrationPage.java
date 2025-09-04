@@ -53,7 +53,7 @@ public class ServiceProviderRegistrationPage {
     private WebElement errorMessageContainer;
 
     // TODO: Replace with a more specific locator for the success message
-    @FindBy(className = "success-message") // Placeholder locator
+    @FindBy(className = "success-msg") // Placeholder locator
     private WebElement successMessageContainer;
 
     // --- Interaction Methods ---

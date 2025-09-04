@@ -6,7 +6,7 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(features = "src/test/resources/Features", glue = {
-                "com.sdp.m1.Steps", "com.sdp.m1.Hooks" }, tags = "@Registration", // Default tags to run from
+                "com.sdp.m1.Steps", "com.sdp.m1.Hooks" }, tags = "@Login", // Default tags to run from
                                                                                             // IDE. Can be
                 // overridden by Maven.
                 monochrome = true, plugin = { //

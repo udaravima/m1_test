@@ -306,7 +306,7 @@ public class LoginSteps {
 
     @And("I should not be able to access login page again")
     public void i_should_not_be_able_to_access_login_page_again() {
-        String loginUrl = TestConfigs.getBaseUrl() + "/cas/login";
+        String loginUrl = TestConfigs.getBaseUrl() + "";
         driver.navigate().to(loginUrl);
         if (loginPage.isOnLoginPage()) {
             throw new AssertionError("Able to access login page after login");

@@ -273,12 +273,12 @@ public class LoginPage {
     public boolean hasSessionCookie() {
         // If TestUtils has a session check, use it here
         // Otherwise, keep this implementation
-        return driver.manage().getCookies().stream().anyMatch(c -> c.getName().toLowerCase().contains("session"));
+        return driver.manage().getCookies().stream().anyMatch(c -> c.getName().toLowerCase().contains("jsessionid"));
     }
 
     public void clickLogoutButton() {
         try {
-            WebElement logoutBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("logout")));
+            WebElement logoutBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id='ygmauserinfo']/a")));
             logoutBtn.click();
             logger.info(String.format("Logout button clicked"));
         } catch (TimeoutException | NoSuchElementException e) {

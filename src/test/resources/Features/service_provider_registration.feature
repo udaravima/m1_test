@@ -26,10 +26,10 @@ Feature: Service Provider Registration
     Then I should see the error message "<ERROR_MESSAGE>"
 
     Examples:
-      | VALUE      | ERROR_MESSAGE                                          | Description          |
-      |            | "Service Provider Id required"                         | Mandatory check      |
-      | "1234567"  | "Please enter 8 digit number for Service Provider Id." | Length check (short) |
-      | "abcdefgh" | "Please enter 8 digit number for Service Provider Id." | Format check (text)  |
+      | VALUE    | ERROR_MESSAGE                                        | Description          |
+      |          | Service provider Id required                         | Mandatory check      |
+      |  1234567 | Please enter 8 digit number for Service Provider Id. | Length check (short) |
+      | abcdefgh | Please enter 8 digit number for Service Provider Id. | Format check (text)  |
 
   @Registration
   Scenario Outline: Validate the 'Company name' field
@@ -38,9 +38,9 @@ Feature: Service Provider Registration
     Then I should see the error message "<ERROR_MESSAGE>"
 
     Examples:
-      | VALUE                                               | ERROR_MESSAGE                                    | Description      |
-      |                                                     | "Company Name required"                          | Mandatory check  |
-      | "A Very Long Company Name That Exceeds Fifty Chars" | "Company Name should be less than 50 characters" | Max length check |
+      | VALUE                                             | ERROR_MESSAGE                                  | Description      |
+      |                                                   | Company Name required                          | Mandatory check  |
+      | A Very Long Company Name That Exceeds Fifty Chars | Company Name should be less than 50 characters | Max length check |
 
   @Registration
   Scenario: Validate the 'SP users' field

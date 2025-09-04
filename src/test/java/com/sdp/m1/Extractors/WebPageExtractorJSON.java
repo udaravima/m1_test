@@ -69,14 +69,7 @@ public class WebPageExtractorJSON {
 
     @SuppressWarnings("unused")
     private static final class Component {
-        String type; // e.g. form, navbar, section
-        String tag; // HTML tag name
-        String text; // visible text
-        String id;
-        String classes;
-        String ariaLabel;
-        String selector; // CSS selector
-        String role;
+        String type, tag, text, id, classes, ariaLabel, selector, role;// e.g. form, navbar, section
         Map<String, Integer> boundingBox = new HashMap<>();
         Set<Map<String, String>> actions = new HashSet<>();
         Set<Map<String, String>> fields = new HashSet<>();
@@ -469,7 +462,7 @@ public class WebPageExtractorJSON {
         SelfHealingDriver driver = TestUtils.getDriver(TestConfigs.getBrowser());
         SelfHealingDriverWait wait = TestUtils.getWaitDriver(driver);
 
-        String customUrl = "https://m1-impl.hsenidmobile.com/provisioning/home.html";
+        String customUrl = "https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html";
         driver.get(customUrl);
 
         login(driver, wait);
@@ -498,21 +491,24 @@ public class WebPageExtractorJSON {
             logger.info("Navigated with cookies");
             driver.navigate().to(NAV_URL);
         }
-        driver.navigate().to("https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html");
-        driver.navigate().to("https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html");
+        driver.navigate().to(customUrl);
+        driver.navigate().to(customUrl);
+
 
         // logger.info("Waiting for page to be fully loaded...");
         // try {
-        //     new WebDriverWait(driver, Duration.ofSeconds(THREAD_DELAY / 1000))
-        //             .until(ExpectedConditions.jsReturnsValue("return document.readyState == 'complete'"));
+        // new WebDriverWait(driver, Duration.ofSeconds(THREAD_DELAY / 1000))
+        // .until(ExpectedConditions.jsReturnsValue("return document.readyState ==
+        // 'complete'"));
         // } catch (TimeoutException e) {
-        //     logger.severe("Page did not finish loading within the timeout.");
+        // logger.severe("Page did not finish loading within the timeout.");
         // }
 
         logger.info("Done waiting!");
 
         WebPageExtractorJSON extractor = new WebPageExtractorJSON(driver, TestUtils.getWaitDriver(driver));
-        String fileName = extractor.getFileName("https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html");
+        String fileName = extractor
+                .getFileName("https://m1-impl.hsenidmobile.com/provisioning/registerServiceProvider.html");
         extractor.runExtractor(fileName);
         driver.quit();
     }
